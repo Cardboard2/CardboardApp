@@ -22,7 +22,7 @@ const tiers : tier[] = [
     id: 'tier-pleb',
     href: '#',
     price: { monthly: 'Free', annually: 'Free' },
-    description: 'Everything necessary to get started. We can be nice if we want to.',
+    description: 'Everything necessary to get started. We can be nice if we wanted to.',
     features: ['Free 15 GB storage just for you ❤️'],
   },
   {
@@ -30,7 +30,7 @@ const tiers : tier[] = [
     id: 'tier-normal',
     href: '#',
     price: { monthly: '$2.00', annually: '$1.49' },
-    description: 'When you need some serious storage for them 🐈 pics.',
+    description: 'When you need some serious storage for them 🐈‍⬛ pics.',
     features: [
       '100 GB of on-demand storage',
       'We will actually answer your emails'

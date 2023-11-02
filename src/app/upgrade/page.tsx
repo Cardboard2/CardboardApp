@@ -1,11 +1,11 @@
 import React from 'react';
 
 import {loadStripe} from '@stripe/stripe-js';
-import ReactDOM from 'react-dom';
+//import ReactDOM from 'react-dom';
 
 import TierSelect from "./_components/TierSelect.tsx"
 
-import {
+/*import {
     PaymentElement,
     Elements,
     ElementsConsumer,
@@ -13,7 +13,7 @@ import {
 
 
 
-const stripePromise = loadStripe('pk_test_51O7cRxIEdHdbj4cnyv1joCVIZeXw5KCIRp4piDxBopx7NpqpoBAWwyFm0wkOVVGZ6tnWpQQF4dZupOjXfFetAIfk00O1Lao5gt');
+const stripePromise = loadStripe('pk_test_51O7cRxIEdHdbj4cnyv1joCVIZeXw5KCIRp4piDxBopx7NpqpoBAWwyFm0wkOVVGZ6tnWpQQF4dZupOjXfFetAIfk00O1Lao5gt');*/
 
 export default function Upgrade() {
     return (

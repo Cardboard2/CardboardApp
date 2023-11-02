@@ -1,33 +1,51 @@
 import React from "react"
 import { CheckCircleIcon } from '@heroicons/react/20/solid'
 
-const tiers = [
+type price = {
+  monthly: string,
+  annually: string
+}
+
+interface tier {
+  name: string,
+  id: string,
+  href: string,
+  price: price,
+  description: string
+  features: string[]
+  
+}
+
+const tiers : tier[] = [
   {
     name: '20x30 All Purpose',
     id: 'tier-pleb',
     href: '#',
-    price: { monthly: 'Free' },
+    price: { monthly: 'Free', annually: 'Free' },
     description: 'Everything necessary to get started. We can be nice if we want to.',
-    features: ['Free 5 Gb storage just for you ❤️'],
+    features: ['Free 15 GB storage just for you ❤️'],
   },
   {
     name: '40x60 Heavy Duty',
-    id: 'tier-',
+    id: 'tier-normal',
     href: '#',
-    price: { monthly: '$10', annually: '$8' },
-    description: 'When you need some serious storage for them 😻 pics.',
+    price: { monthly: '$2.00', annually: '$1.49' },
+    description: 'When you need some serious storage for them 🐈 pics.',
     features: [
-      '100 Gb of on-demand storage',
+      '100 GB of on-demand storage',
+      'We will actually answer your emails'
     ],
   },
   {
     name: '80x120 Industrial Grade',
     id: 'tier-whale',
     href: '#',
-    price: { monthly: '$60', annually: '$48' },
+    price: { monthly: '$6.00', annually: '$5.00' },
     description: 'You are an instagram model or something, idk. You do you.',
     features: [
-      '1 Tb of storage (1024 Gb. Smol are not always bad.)',
+      'A massive 1 TB of storage',
+      'You might be able to call us also'
+
     ],
   },
 ]
@@ -35,6 +53,38 @@ const tiers = [
 /*function classNames(...classes : any) {
   return classes.filter(Boolean).join(' ')
 }*/
+
+function PricePerMonth(props : {tier : tier})
+{
+  if (props.tier.id == undefined || props.tier.price.annually == undefined || props.tier.price.monthly == undefined)
+    return
+    
+  else if (props.tier.id != 'tier-pleb') {
+    return (
+      <div>
+        <p className="mt-6 flex items-baseline gap-x-1">
+          <span className="text-5xl font-bold tracking-tight text-gray-900">{props.tier.price.monthly}</span> 
+          <span className="text-sm font-semibold leading-6 text-gray-600">/month</span>
+        </p>
+        <p className="mt-3 text-sm leading-6 text-gray-500">
+          {props.tier.price.annually} per month if paid annually
+        </p>
+      </div>
+      );
+  }
+  else {
+    return( 
+      <div>
+        <p className="mt-6 flex items-baseline gap-x-1">
+          <span className="text-5xl font-bold tracking-tight text-gray-900">{props.tier.price.monthly}</span> 
+        </p>
+        <p className="mt-3 text-sm leading-6 text-gray-500">
+          And no, you won't have to sign your soul
+        </p>
+      </div>
+    );
+  }
+}
 
 
 export default function TierSelect() {
@@ -56,13 +106,7 @@ export default function TierSelect() {
                   <h3 id={tier.id} className="text-base font-semibold leading-7 text-gray-900">
                     {tier.name}
                   </h3>
-                  <p className="mt-6 flex items-baseline gap-x-1">
-                    <span className="text-5xl font-bold tracking-tight text-gray-900">{tier.price.monthly}</span>
-                    <span className="text-sm font-semibold leading-6 text-gray-600">/month</span>
-                  </p>
-                  <p className="mt-3 text-sm leading-6 text-gray-500">
-                    {tier.price.annually} per month if paid annually
-                  </p>
+                  <PricePerMonth tier={tier}/>
                   <a
                     href={tier.href}
                     aria-describedby={tier.id}

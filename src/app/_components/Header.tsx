@@ -5,9 +5,8 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import CardboardLogo from './CardboardLogo.tsx'
 
 const navigation = [
-  { name: 'Product', href: '#' },
-  { name: 'Features', href: '#' },
-  { name: 'Marketplace', href: '#' },
+  { name: 'Services', href: '#' },
+  { name: 'Pricing', href: '#' },
   { name: 'Company', href: '#' },
 ]
 

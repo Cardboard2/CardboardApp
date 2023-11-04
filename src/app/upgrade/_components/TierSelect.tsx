@@ -29,7 +29,7 @@ const tiers : tier[] = [
     name: '40x60 Heavy Duty',
     id: 'tier-normal',
     href: '#',
-    price: { monthly: '$2.00', annually: '$1.49' },
+    price: { monthly: '$1.99', annually: '$1.49' },
     description: 'When you need some serious storage for them 🐈‍⬛ pics.',
     features: [
       '100 GB of on-demand storage',
@@ -40,7 +40,7 @@ const tiers : tier[] = [
     name: '80x120 Industrial Grade',
     id: 'tier-whale',
     href: '#',
-    price: { monthly: '$6.00', annually: '$5.00' },
+    price: { monthly: '$5.99', annually: '$4.99' },
     description: 'You are an instagram model or something, idk. You do you.',
     features: [
       'A massive 1 TB of storage',

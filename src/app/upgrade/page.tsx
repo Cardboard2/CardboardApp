@@ -8,16 +8,9 @@ import { useState } from 'react';
 import { TierSelect } from "./_components/TierSelect.tsx"
 import { Header } from "../_components/Header.tsx"
 import { PaymentProps } from '../_components/Utils.tsx';
-
-/*import {
-    PaymentElement,
-    Elements,
-    ElementsConsumer,
-  } from '@stripe/react-stripe-js';
+import { SessionProvider } from "next-auth/react"
 
 
-
-const stripePromise = loadStripe('pk_test_51O7cRxIEdHdbj4cnyv1joCVIZeXw5KCIRp4piDxBopx7NpqpoBAWwyFm0wkOVVGZ6tnWpQQF4dZupOjXfFetAIfk00O1Lao5gt');*/
 
 export default function Upgrade() {
   const [makePayment, setMakePayment] = useState(false)

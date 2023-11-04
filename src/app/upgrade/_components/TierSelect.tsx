@@ -1,5 +1,6 @@
 import React from "react"
 import { CheckCircleIcon } from '@heroicons/react/20/solid'
+import { PaymentProps } from '../../_components/Utils'
 
 type price = {
   monthly: string,
@@ -13,7 +14,6 @@ interface tier {
   price: price,
   description: string
   features: string[]
-  
 }
 
 const tiers : tier[] = [
@@ -84,10 +84,16 @@ function PricePerMonth(props : {tier : tier})
   }
 }
 
+/*href={tier.href}
+                  aria-describedby={tier.id}*/
 
-export default function TierSelect() {
-    return (
-      <div className="bg-amber-100 py-24 sm:py-32 rounded-lg shadow-lg">
+export function TierSelect(props : {paymentState : PaymentProps}) {
+  if (!props.paymentState.setMakePayment)
+    return;
+
+  return (
+    <div className={`flex justify-center w-full ${props.paymentState.makePayment ? "-translate-x-full" : ""} duration-500`}>
+      <div className={`bg-amber-100 py-24 sm:py-32 rounded-lg shadow-lg w-fit`}>
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-4xl sm:text-center">
             <p className="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
@@ -97,7 +103,7 @@ export default function TierSelect() {
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600 sm:text-center">
             We are aware that each person have their own need 😉
           </p>
-          <div className="mt-20 flow-root">
+          <div className={`mt-20 flow-root`}>
             <div className="isolate -mt-16 grid max-w-sm grid-cols-1 gap-y-16 divide-y divide-gray-700 sm:mx-auto lg:-mx-8 lg:mt-0 lg:max-w-none lg:grid-cols-3 lg:divide-x lg:divide-y-0 xl:-mx-4">
               {tiers.map((tier) => (
                 <div key={tier.id} className="pt-16 lg:px-8 lg:pt-0 xl:px-14">
@@ -105,13 +111,12 @@ export default function TierSelect() {
                     {tier.name}
                   </h3>
                   <PricePerMonth tier={tier}/>
-                  <a
-                    href={tier.href}
-                    aria-describedby={tier.id}
+                  <button
+                    onClick={() => props.paymentState.setMakePayment(!props.paymentState.makePayment)}
                     className="mt-10 block duration-300 rounded-md bg-red-600 px-3 py-2 text-center text-sm active:opacity-80 font-semibold leading-6 text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
                   >
                     Choose plan
-                  </a>
+                  </button>
                   <p className="mt-10 text-sm font-semibold leading-6 text-gray-900">{tier.description}</p>
                   <ul role="list" className="mt-6 space-y-3 text-sm leading-6 text-gray-600">
                     {tier.features.map((feature) => (
@@ -127,5 +132,6 @@ export default function TierSelect() {
           </div>
         </div>
       </div>
-    );
+    </div>
+  );
 }

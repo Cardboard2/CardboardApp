@@ -78,9 +78,7 @@ function PricePerMonth(props : {tier : tier})
         <p className="mt-6 flex items-baseline gap-x-1">
           <span className="text-5xl font-bold tracking-tight text-gray-900">{props.tier.price.monthly}</span> 
         </p>
-        <p className="mt-3 text-sm leading-6 text-gray-500">
-          And no, you won't have to sign your soul
-        </p>
+        <p className="mt-3 text-sm leading-6 text-gray-500">And no, you won't have to sign your soul</p>
       </div>
     );
   }

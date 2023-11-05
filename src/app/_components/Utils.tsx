@@ -1,6 +1,11 @@
 import { Dispatch, SetStateAction } from 'react'
+import { StripeElementsOptionsMode } from "@stripe/stripe-js"
 
 export interface PaymentProps {
-    makePayment: boolean
-    setMakePayment: Dispatch<SetStateAction<boolean>>
+    selectingTier: boolean
+    setSelectingTier: Dispatch<SetStateAction<boolean>>
+    makingPayment: boolean
+    setMakingPayment: Dispatch<SetStateAction<boolean>>
+    billingData: StripeElementsOptionsMode
+    setBillingData: Dispatch<SetStateAction<StripeElementsOptionsMode>>
 }

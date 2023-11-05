@@ -25,7 +25,7 @@ export default function Payment() {
         customer: typeof req.body.user_id === 'string' ? req.body.user_id : "",
         return_url: 'http://localhost:3000/checkout/return?session_id={CHECKOUT_SESSION_ID}',
       }));
-      res.json(session);
+      res.send(session);
     });
   
   return router;

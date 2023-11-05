@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState, Dispatch, SetStateAction, Fragment } from 'react'
+import { useState, type Dispatch, type SetStateAction, Fragment } from 'react'
 import { Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
@@ -61,6 +61,9 @@ function MobileNavigationMenu(props : {mobileMenuState: MobileMenuProps}){
       </div>
     )
   });
+
+  MobilenavigationComponent.displayName = "MobileNavigationCompnent";
+  
   return (
     <Transition
             as={Fragment}

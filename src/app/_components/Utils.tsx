@@ -1,5 +1,5 @@
-import { Dispatch, SetStateAction } from 'react'
-import { StripeElementsOptionsMode } from "@stripe/stripe-js"
+import type { Dispatch, SetStateAction } from 'react'
+import type { StripeElementsOptionsMode } from "@stripe/stripe-js"
 
 export interface PaymentProps {
     selectingTier: boolean

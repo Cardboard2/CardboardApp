@@ -4,6 +4,7 @@ import { StripeElementsOptionsMode } from "@stripe/stripe-js"
 import { useState, Fragment } from 'react'
 import { Switch, Transition } from '@headlessui/react'
 import type { PaymentProps } from '../../_components/Utils'
+import { PaymentData } from "~/PaymentData"
 
 type price = {
   monthly: string,
@@ -54,26 +55,38 @@ const tiers : tier[] = [
   },
 ]
 
-const tierPaymentOption : StripeElementsOptionsMode[] = [
+const tierPaymentOption : PaymentData[] = [
   {
-    mode: "subscription",
-    currency: "aud",
-    amount: 2,
+    name: "tier-normal-monthly",
+    price: 1.99,
+    interval: "monthly",
+    interval_count: 1,
+    user_id: "user1",
+    currency: "aud"
   },
   {
-    mode: "subscription",
-    currency: "aud",
-    amount: 18,
+    name: "tier-normal-yearly",
+    price: 17.99,
+    interval: "monthly",
+    interval_count: 1,
+    user_id: "user1",
+    currency: "aud"
   },
   {
-    mode: "subscription",
-    currency: "aud",
-    amount: 6,
+    name: "tier-whale-monthly",
+    price: 5.99,
+    interval: "monthly",
+    interval_count: 1,
+    user_id: "user1",
+    currency: "aud"
   },
   {
-    mode: "subscription",
-    currency: "aud",
-    amount: 60,
+    name: "tier-whale-yearly",
+    price: 59.99,
+    interval: "monthly",
+    interval_count: 1,
+    user_id: "user1",
+    currency: "aud"
   },
 ]
 

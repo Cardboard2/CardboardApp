@@ -1,19 +1,22 @@
 "use client"
 import React from 'react';
 import { useState } from 'react';
-import { StripeElementsOptionsMode } from "@stripe/stripe-js"
 
 import { TierSelect } from "./_components/TierSelect.tsx"
 import { Header } from "../_components/Header.tsx"
 import { type PaymentProps } from '../_components/Utils.tsx';
+import type { PaymentData } from '~/PaymentData.tsx';
 //import { PaymentHandler } from './_components/PaymentHandler.tsx';
 
 //import { SessionProvider } from "next-auth/react"
 
-const defaultBillingData : StripeElementsOptionsMode = {
-  mode: "subscription",
-  currency: "aud",
-  amount: 0,
+const defaultBillingData : PaymentData = {
+  name: "default",
+  price: 0,
+  interval: "monthly",
+  interval_count: 1,
+  user_id: "user1",
+  currency: "aud"
 }
 
 export default function Upgrade() {

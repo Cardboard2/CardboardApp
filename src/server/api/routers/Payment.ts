@@ -1,6 +1,5 @@
-import { Router } from 'express';
+/*import { Router } from 'express';
 import Stripe from 'stripe';
-import type {Request, Response} from 'express';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ? process.env.STRIPE_SECRET_KEY : "", {
   apiVersion: "2023-10-16",
@@ -23,3 +22,4 @@ export default function Payment() {
       })
     });
 }
+*/

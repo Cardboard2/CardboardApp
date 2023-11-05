@@ -1,10 +1,9 @@
 import React from "react"
 import { CheckCircleIcon } from '@heroicons/react/20/solid'
-import { StripeElementsOptionsMode } from "@stripe/stripe-js"
 import { useState, Fragment } from 'react'
 import { Switch, Transition } from '@headlessui/react'
 import type { PaymentProps } from '../../_components/Utils'
-import { PaymentData } from "~/PaymentData"
+import type { PaymentData } from "~/PaymentData"
 
 type price = {
   monthly: string,

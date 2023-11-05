@@ -13,19 +13,19 @@ export default function Payment() {
   const router = Router();
 
   router
-    .post("/subscription", async (req : Request<PaymentData>) => {
-      const model:PaymentData = req.body;
-      await stripe.checkout.sessions.create({
+    .post("/subscription", (req, res) => {
+      const session = (async () => await stripe.checkout.sessions.create({
         mode: "subscription",
         line_items: [{
-            price: model.price,
+            price: typeof req.body.price === 'string' ? req.body.price : "",
             quantity: 1
           }
         ],
         ui_mode: "embedded",
-        customer: model.user_id,
+        customer: typeof req.body.user_id === 'string' ? req.body.user_id : "",
         return_url: 'http://localhost:3000/checkout/return?session_id={CHECKOUT_SESSION_ID}',
-      })
+      }));
+      res.json(session);
     });
   
   return router;

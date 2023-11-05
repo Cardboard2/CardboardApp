@@ -77,10 +77,6 @@ const tierPaymentOption : StripeElementsOptionsMode[] = [
   },
 ]
 
-function classNames(...classes : any) {
-  return classes.filter(Boolean).join(' ')
-}
-
 function PricePerMonth(props : {tier : tier})
 {
   if (props.tier.id == undefined || props.tier.price.monthly == undefined)
@@ -177,17 +173,13 @@ export function TierSelect(props : {paymentState : PaymentProps}) {
                   <Switch
                     checked={annualPayment}
                     onChange={setAnnualPayment}
-                    className={classNames(
-                      annualPayment ? 'bg-amber-500' : 'bg-amber-300',
-                      'relative inline-flex h-8 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-amber-700 focus:ring-offset-2'
-                    )}
+                    className={`
+                      ${annualPayment ? 'bg-amber-500' : 'bg-amber-300'} relative inline-flex h-8 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-amber-700 focus:ring-offset-2`}
                   >
                     <span
                       aria-hidden="true"
-                      className={classNames(
-                        annualPayment ? 'translate-x-6' : 'translate-x-0',
-                        'pointer-events-none inline-block h-7 w-7 transform rounded-full bg-amber-700 shadow ring-0 transition duration-300 ease-in-out'
-                      )}
+                      className={`
+                        ${annualPayment ? 'translate-x-6' : 'translate-x-0'} pointer-events-none inline-block h-7 w-7 transform rounded-full bg-amber-700 shadow ring-0 transition duration-300 ease-in-out`}
                     />
                   </Switch>
                   <Switch.Label as="span" className="ml-3 text-l">

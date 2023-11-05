@@ -12,8 +12,8 @@ import type { PaymentData } from '~/PaymentData.tsx';
 
 const defaultBillingData : PaymentData = {
   name: "default",
-  price: 0,
-  interval: "monthly",
+  price: "",
+  interval: "month",
   interval_count: 1,
   user_id: "user1",
   currency: "aud"

@@ -57,32 +57,32 @@ const tiers : tier[] = [
 const tierPaymentOption : PaymentData[] = [
   {
     name: "tier-normal-monthly",
-    price: 199,
-    interval: "monthly",
+    price: "price_1O95MAIEdHdbj4cnIlR0sIgM",
+    interval: "month",
     interval_count: 1,
     user_id: "user1",
     currency: "aud"
   },
   {
     name: "tier-normal-yearly",
-    price: 1799,
-    interval: "monthly",
+    price: "price_1O95TNIEdHdbj4cn850p9f5d",
+    interval: "year",
     interval_count: 1,
     user_id: "user1",
     currency: "aud"
   },
   {
     name: "tier-whale-monthly",
-    price: 599,
-    interval: "monthly",
+    price: "price_1O95YsIEdHdbj4cnsVnrZ89j",
+    interval: "month",
     interval_count: 1,
     user_id: "user1",
     currency: "aud"
   },
   {
     name: "tier-whale-yearly",
-    price: 5999,
-    interval: "monthly",
+    price: "price_1O95YsIEdHdbj4cnEevJpMxf",
+    interval: "year",
     interval_count: 1,
     user_id: "user1",
     currency: "aud"

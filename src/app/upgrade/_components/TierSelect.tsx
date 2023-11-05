@@ -73,7 +73,7 @@ const tierPaymentOption : PaymentData[] = [
   },
   {
     name: "tier-whale-monthly",
-    price: "price_1O95YsIEdHdbj4cnsVnrZ89j",
+    price: "price_1O98rkIEdHdbj4cndIUjsLeR",
     interval: "month",
     interval_count: 1,
     user_id: "user1",
@@ -81,7 +81,7 @@ const tierPaymentOption : PaymentData[] = [
   },
   {
     name: "tier-whale-yearly",
-    price: "price_1O95YsIEdHdbj4cnEevJpMxf",
+    price: "price_1O98rkIEdHdbj4cnQRHrt7DY",
     interval: "year",
     interval_count: 1,
     user_id: "user1",
@@ -155,6 +155,7 @@ function SelectTierForPayment(annualPayment : boolean, tier : tier, paymentState
     else
       tier.id == 'tier-whale' ? paymentState.setBillingData(tierPaymentOption[2]) : paymentState.setBillingData(tierPaymentOption[0])
     paymentState.setSelectingTier(!paymentState.selectingTier)
+    paymentState.setMakingPayment(!paymentState.makingPayment)
   }
   
 }

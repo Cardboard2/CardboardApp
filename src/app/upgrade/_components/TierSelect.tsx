@@ -3,7 +3,7 @@ import { CheckCircleIcon } from '@heroicons/react/20/solid'
 import { StripeElementsOptionsMode } from "@stripe/stripe-js"
 import { useState, Fragment } from 'react'
 import { Switch, Transition } from '@headlessui/react'
-import { PaymentProps } from '../../_components/Utils'
+import type { PaymentProps } from '../../_components/Utils'
 
 type price = {
   monthly: string,
@@ -148,10 +148,11 @@ function SelectTierForPayment(annualPayment : boolean, tier : tier, paymentState
 }
 
 export function TierSelect(props : {paymentState : PaymentProps}) {
+  const [annualPayment, setAnnualPayment] = useState(false);
+
   if (!props.paymentState.setSelectingTier || !props.paymentState.setMakingPayment)
     return;
 
-  const [annualPayment, setAnnualPayment] = useState(false)
   const ref = React.createRef<HTMLDivElement>()
 
   const TierSelectComponent = React.forwardRef<HTMLDivElement, PaymentProps>((props , forwardedRef) => {
@@ -218,6 +219,8 @@ export function TierSelect(props : {paymentState : PaymentProps}) {
       </div>
     );
   });
+
+  TierSelectComponent.displayName = "TierSelectComponent";
   
   return (
     <Transition

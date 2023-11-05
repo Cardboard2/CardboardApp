@@ -1,12 +1,11 @@
 "use client"
 import React from 'react';
-import { Fragment,useState } from 'react';
+import { useState } from 'react';
 import { StripeElementsOptionsMode } from "@stripe/stripe-js"
-import { Transition } from '@headlessui/react';
 
 import { TierSelect } from "./_components/TierSelect.tsx"
 import { Header } from "../_components/Header.tsx"
-import { PaymentProps } from '../_components/Utils.tsx';
+import { type PaymentProps } from '../_components/Utils.tsx';
 //import { PaymentHandler } from './_components/PaymentHandler.tsx';
 
 //import { SessionProvider } from "next-auth/react"

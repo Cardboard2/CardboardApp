@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Request, Router } from 'express';
 import Stripe from 'stripe';
 
 import type { PaymentData } from '~/PaymentData';
@@ -13,9 +13,9 @@ export default function Payment() {
   const router = Router();
 
   router
-    .post("/subscription", async (req, res, next) => {
+    .post("/subscription", async (req : Request<PaymentData>) => {
       const model:PaymentData = req.body;
-      const session = await stripe.checkout.sessions.create({
+      await stripe.checkout.sessions.create({
         mode: "subscription",
         line_items: [{
             price: model.price,
@@ -26,7 +26,6 @@ export default function Payment() {
         customer: model.user_id,
         return_url: 'http://localhost:3000/checkout/return?session_id={CHECKOUT_SESSION_ID}',
       })
-      res.json(session)
     });
   
   return router;

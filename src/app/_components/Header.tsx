@@ -6,9 +6,9 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import CardboardLogo from './CardboardLogo.tsx'
 
 const navigation = [
-  { name: 'Services', href: '#' },
-  { name: 'Pricing', href: '#' },
-  { name: 'Company', href: '#' },
+  { name: 'Services', href: '/services' },
+  { name: 'Pricing', href: '/pricing' },
+  { name: 'Company', href: '/company' },
 ]
 
 export interface MobileMenuProps {

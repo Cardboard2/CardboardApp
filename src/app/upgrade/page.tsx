@@ -18,13 +18,13 @@ const defaultBillingData : StripeElementsOptionsMode = {
 }
 
 export default function Upgrade() {
-  const [selectingTier, setSelectingTier] = useState(true)
-  const [makingPayment, setMakingPayment] = useState(false)
-  const [billingData, setBillingData] = useState(defaultBillingData)
-  const paymentState : PaymentProps = {selectingTier, setSelectingTier, makingPayment, setMakingPayment, billingData, setBillingData}
+  const [selectingTier, setSelectingTier] = useState(true);
+  const [makingPayment, setMakingPayment] = useState(false);
+  const [billingData, setBillingData] = useState(defaultBillingData);
+  const paymentState : PaymentProps = {selectingTier, setSelectingTier, makingPayment, setMakingPayment, billingData, setBillingData};
 
   if (!paymentState)
-    return
+    return;
   
   const ref = React.createRef<HTMLDivElement>()
   const SelectComponent = React.forwardRef<HTMLDivElement, PaymentProps>((props , forwardedRef) => {

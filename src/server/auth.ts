@@ -57,10 +57,14 @@ export const authOptions: NextAuthOptions = {
       // The name to display on the sign in form (e.g. "Sign in with...")
       id: "credentials",
       name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
+      },
       async authorize(credentials, req) {
         const payload = {
-          email: credentials.email,
-          password: credentials.password,
+          email: credentials?.email,
+          password: credentials?.password,
         };
 
         // Call DB to see if credentials exists or not

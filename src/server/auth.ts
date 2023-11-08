@@ -4,11 +4,8 @@ import {
   type DefaultSession,
   type NextAuthOptions,
 } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
-
-import { env } from "~/env.mjs";
 import { db } from "~/server/db";
 
 /**
@@ -61,7 +58,8 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials, req) {
+
+      authorize(credentials) {
         const payload = {
           email: credentials?.email,
           password: credentials?.password,

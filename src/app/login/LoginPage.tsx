@@ -1,15 +1,13 @@
 "use client";
 
-import { useForm, SubmitHandler } from "react-hook-form";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { signIn } from "next-auth/react";
 import CardboardLogo from "~/app/_components/CardboardLogo";
 import LoginForm from "./LoginForm";
 import SignUpForm from "./SignUpForm";
+import Image from "next/image";
 
 export default function LoginWrapper() {
-  const [error, setError] = React.useState("");
-
   const [isLogin, setIsLogin] = React.useState(true);
 
   const toggleLoginScreen = () => {
@@ -18,7 +16,6 @@ export default function LoginWrapper() {
     } else {
       setIsLogin(true);
     }
-    setError("");
   };
 
   return (
@@ -62,7 +59,12 @@ export default function LoginWrapper() {
                   href="#"
                   className="flex w-full items-center justify-center gap-3 rounded-md bg-[#1466ee] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
                 >
-                  <img className="h-5 w-5" src="./GoogleGIcon.png" />
+                  <Image
+                    width="15"
+                    height="15"
+                    alt="Google G Icon"
+                    src="/GoogleGIcon.png"
+                  />
                   <span className="text-sm font-semibold leading-6">
                     Google
                   </span>

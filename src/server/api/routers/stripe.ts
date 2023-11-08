@@ -19,15 +19,17 @@ export const stripeRouter = createTRPCRouter({
   createSubscription: publicProcedure
     .input(z.object({ price: z.string() }))
     .mutation(async ({ input }) => {
-      return  await stripe.checkout.sessions.create({
+      return await stripe.checkout.sessions.create({
           mode: "subscription",
           line_items: [{
               price: input.price,
               quantity: 1
             }
           ],
-          ui_mode: "embedded",
-          return_url: 'http://localhost:3000/checkout/return?session_id={CHECKOUT_SESSION_ID}',
+          ui_mode: "hosted",
+          success_url: 'http://localhost:3000/checkout/success?session_id={CHECKOUT_SESSION_ID}',
+          cancel_url: 'http://localhost:3000/checkout/cancelled?session_id={CHECKOUT_SESSION_ID}'
+          
         });
     }),
 });

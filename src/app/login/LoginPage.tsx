@@ -7,11 +7,6 @@ import CardboardLogo from "~/app/_components/CardboardLogo";
 import LoginForm from "./LoginForm";
 import SignUpForm from "./SignUpForm";
 
-interface IFormInput {
-  email: string;
-  password: string;
-}
-
 export default function LoginWrapper() {
   const [error, setError] = React.useState("");
 

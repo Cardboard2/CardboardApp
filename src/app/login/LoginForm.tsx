@@ -2,6 +2,11 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import React from "react";
 import { signIn } from "next-auth/react";
 
+interface IFormInput {
+  email: string;
+  password: string;
+}
+
 const LoginForm = () => {
   const [error, setError] = React.useState("");
 

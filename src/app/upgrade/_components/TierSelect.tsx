@@ -183,7 +183,12 @@ export function TierSelect() {
                   {annualPayment ? <PricePerAnnum tier={tier}/> : <PricePerMonth tier={tier}/>}
                   <button
                     onClick={() => SelectTierForPayment(tier)}
-                    className="mt-6 block duration-300 rounded-md bg-amber-700 px-3 py-2 text-center text-sm active:opacity-80 font-semibold leading-6 text-white shadow-sm hover:bg-amber-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+                    disabled={createNewSession.isLoading}
+                    className={`mt-6 block duration-300 rounded-md bg-amber-700 px-3 py-2 \
+                         ${createNewSession.isLoading ? 'cursor-wait' : ''} text-center text-sm \
+                          active:opacity-80 font-semibold leading-6 text-white shadow-sm hover:bg-amber-800 \
+                          focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600\
+                          disabled:opacity-50`}
                   >
                     Choose plan
                   </button>

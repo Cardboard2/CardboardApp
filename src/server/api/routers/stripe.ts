@@ -3,6 +3,7 @@ import { z } from "zod";
 import {
   createTRPCRouter,
   protectedProcedure,
+  publicProcedure,
 } from "~/server/api/trpc";
 
 import { env } from "~/env.mjs";
@@ -27,9 +28,14 @@ export const stripeRouter = createTRPCRouter({
             }
           ],
           ui_mode: "hosted",
-          success_url: getBaseUrl() + "/checkout/success?session_id={CHECKOUT_SESSION_ID}",
-          cancel_url: getBaseUrl() + "/checkout/cancelled?session_id={CHECKOUT_SESSION_ID}"
+          success_url: getBaseUrl() + "/checkout/success?sessionId={CHECKOUT_SESSION_ID}",
+          cancel_url: getBaseUrl() + "/checkout?sessionId={CHECKOUT_SESSION_ID}"
           
         });
+    }),
+  cancelSession: publicProcedure
+    .input(z.object({ sessionId: z.string() }))
+    .mutation(async ({ input }) => {
+      return await stripe.checkout.sessions.expire(input.sessionId);
     }),
 });

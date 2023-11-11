@@ -11,7 +11,11 @@ const config = {
             {
                 source: '/pricing',
                 destination: '/upgrade'
-            }
+            },
+            {
+                source: '/checkout',
+                destination: '/upgrade'
+            },
         ];
     }
 };

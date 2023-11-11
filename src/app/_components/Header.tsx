@@ -2,8 +2,11 @@ import React from 'react'
 import { useState, type Dispatch, type SetStateAction, Fragment } from 'react'
 import { Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { useSession, signIn, signOut } from 'next-auth/react'
 
 import CardboardLogo from './CardboardLogo.tsx'
+import { useRouter } from 'next/navigation'
+
 
 const navigation = [
   { name: 'Services', href: '/services' },
@@ -18,6 +21,8 @@ export interface MobileMenuProps {
 
 function MobileNavigationMenu(props : {mobileMenuState: MobileMenuProps}){
   const ref = React.createRef<HTMLDivElement>();
+  const { data: session } = useSession();
+
   const MobilenavigationComponent = React.forwardRef<HTMLDivElement, MobileMenuProps>((props , forwardedRef) => {
     return (
       <div ref={forwardedRef} className="lg:hidden h-screen fixed top-0 left-0 right-0">
@@ -38,12 +43,12 @@ function MobileNavigationMenu(props : {mobileMenuState: MobileMenuProps}){
                   ))}
                 </div>
                 <div className="py-6">
-                  <a
-                    href="/login"
+                  <button
+                    onClick={() => session && session.user ? signOut() : signIn()}
                     className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-amber-100"
                   >
-                    Log in
-                  </a>
+                    {session && session.user ? "Sign Out" : "Sign In"}
+                  </button>
                 </div>
               </div>
             </div>
@@ -81,6 +86,7 @@ function MobileNavigationMenu(props : {mobileMenuState: MobileMenuProps}){
 }
 
 export function Header() {
+  const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mobileMenuState: MobileMenuProps = {mobileMenuOpen, setMobileMenuOpen};
 
@@ -107,9 +113,9 @@ export function Header() {
               {item.name}
             </a>
           ))}
-          <a href="/login" className="text-sm font-semibold leading-6 text-gray-900">
-            Log in <span aria-hidden="true">&rarr;</span>
-          </a>
+          <button onClick={() => session && session.user ? signOut() : signIn()} className="text-sm font-semibold leading-6 text-gray-900">
+            {session && session.user ? "Sign Out" : "Sign In"} <span aria-hidden="true">&rarr;</span>
+          </button>
         </div>
       </nav>
       <MobileNavigationMenu mobileMenuState={mobileMenuState}/>

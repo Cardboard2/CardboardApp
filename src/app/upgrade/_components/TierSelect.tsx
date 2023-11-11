@@ -6,6 +6,7 @@ import { CheckCircleIcon } from '@heroicons/react/20/solid'
 import { api } from "~/trpc/react"
 
 import { useRouter } from "next/navigation"
+import { useSession, signIn } from "next-auth/react"
 
 type price = {
   monthly: string,
@@ -120,10 +121,11 @@ function PricePerAnnum(props : {tier : tier})
 }
 
 export function TierSelect() {
+  const { data: session } = useSession();
   const [annualPayment, setAnnualPayment] = useState(false);
   const router = useRouter();
 
-  const createNewSession = api.stripe.createSubscription.useMutation({
+  const createNewStripeSession = api.stripe.createSubscription.useMutation({
     onSuccess: (data) => {
         router.refresh();
         if (data.url != null) {
@@ -134,12 +136,19 @@ export function TierSelect() {
   
   function SelectTierForPayment(tier : tier)
   {
-    if (tier.id == "tier-pleb") {
-      // Mutate user as pleb
+    if (session && session.user) {
+      console.log(session)
+      if (tier.id == "tier-pleb") {
+        // Mutate user as pleb
+      }
+      else if (tier.priceId) {
+        createNewStripeSession.mutate({price: annualPayment ? tier.priceId.annually : tier.priceId.monthly});
+      }
     }
-    else if (tier.priceId) {
-      createNewSession.mutate({price: annualPayment ? tier.priceId.annually : tier.priceId.monthly});
-    }
+    else
+      signIn()
+      
+    
   }
 
   return (
@@ -183,9 +192,9 @@ export function TierSelect() {
                   {annualPayment ? <PricePerAnnum tier={tier}/> : <PricePerMonth tier={tier}/>}
                   <button
                     onClick={() => SelectTierForPayment(tier)}
-                    disabled={createNewSession.isLoading}
+                    disabled={createNewStripeSession.isLoading}
                     className={`mt-6 block duration-300 rounded-md bg-amber-700 px-3 py-2 \
-                         ${createNewSession.isLoading ? 'cursor-wait' : ''} text-center text-sm \
+                         ${createNewStripeSession.isLoading ? 'cursor-wait' : ''} text-center text-sm \
                           active:opacity-80 font-semibold leading-6 text-white shadow-sm hover:bg-amber-800 \
                           focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600\
                           disabled:opacity-50`}

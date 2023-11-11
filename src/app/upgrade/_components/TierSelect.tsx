@@ -133,13 +133,24 @@ export function TierSelect() {
         }
     },
   });
+
+  const makeNewPleb = api.user.setUserFreeTier.useMutation({
+    onSuccess: () => {
+      router.refresh();
+      router.push("profile");
+    },
+  })
+  
+  const {data: user} = api.user.getUser.useQuery();
+  console.log(user);
   
   function SelectTierForPayment(tier : tier)
   {
-    if (session && session.user) {
+    if (user) {
       console.log(session)
       if (tier.id == "tier-pleb") {
         // Mutate user as pleb
+        makeNewPleb.mutate();
       }
       else if (tier.priceId) {
         createNewStripeSession.mutate({price: annualPayment ? tier.priceId.annually : tier.priceId.monthly});
@@ -192,7 +203,7 @@ export function TierSelect() {
                   {annualPayment ? <PricePerAnnum tier={tier}/> : <PricePerMonth tier={tier}/>}
                   <button
                     onClick={() => SelectTierForPayment(tier)}
-                    disabled={createNewStripeSession.isLoading}
+                    disabled={createNewStripeSession.isLoading || makeNewPleb.isLoading}
                     className={`mt-6 block duration-300 rounded-md bg-amber-700 px-3 py-2 \
                          ${createNewStripeSession.isLoading ? 'cursor-wait' : ''} text-center text-sm \
                           active:opacity-80 font-semibold leading-6 text-white shadow-sm hover:bg-amber-800 \

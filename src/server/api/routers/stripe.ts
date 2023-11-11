@@ -19,8 +19,8 @@ const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
 export const stripeRouter = createTRPCRouter({
   createSubscription: protectedProcedure
     .input(z.object({ price: z.string() }))
-    .mutation(async ({ input }) => {
-      return await stripe.checkout.sessions.create({
+    .mutation(async ({ input, ctx }) => {
+      const session = await stripe.checkout.sessions.create({
           mode: "subscription",
           line_items: [{
               price: input.price,
@@ -30,12 +30,28 @@ export const stripeRouter = createTRPCRouter({
           ui_mode: "hosted",
           success_url: getBaseUrl() + "/checkout/success?sessionId={CHECKOUT_SESSION_ID}",
           cancel_url: getBaseUrl() + "/checkout?sessionId={CHECKOUT_SESSION_ID}"
-          
         });
+      
+      if (session.url && session.status){
+        const postRet = await ctx.db.payment.create({
+          data: {
+            id      : session.id,
+            status  : session.status,
+            userId  : ctx.session.user.id
+          }
+        });
+        if (postRet && postRet.id)
+          return session.url;
+      };
+
+      return null;
     }),
-  cancelSession: publicProcedure
+  expireSession: publicProcedure
     .input(z.object({ sessionId: z.string() }))
-    .mutation(async ({ input }) => {
-      return await stripe.checkout.sessions.expire(input.sessionId);
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.db.payment.update({
+        where : {id: input.sessionId},
+        data  : {status: "expired"}
+      });
     }),
 });

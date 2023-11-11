@@ -12,14 +12,14 @@ import { PricePerAnnum, PricePerMonth } from "./TierFunctions"
 
 export function TierSelect() {
   const { data: session } = useSession();
-  const [annualPayment, setAnnualPayment] = useState(false);
   const router = useRouter();
+  const [annualPayment, setAnnualPayment] = useState(false);
 
   const createNewStripeSession = api.stripe.createSubscription.useMutation({
     onSuccess: (data) => {
         router.refresh();
-        if (data.url != null) {
-          router.push(data.url)
+        if (data != null) {
+          router.push(data)
         }
     },
   });

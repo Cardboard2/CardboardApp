@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import {
   createTRPCRouter,
+  protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
 
@@ -16,7 +17,7 @@ const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
 
 
 export const stripeRouter = createTRPCRouter({
-  createSubscription: publicProcedure
+  createSubscription: protectedProcedure
     .input(z.object({ price: z.string() }))
     .mutation(async ({ input }) => {
       return await stripe.checkout.sessions.create({

@@ -1,12 +1,31 @@
 "use client"
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { TierSelect } from "./_components/TierSelect.tsx"
 import { Header } from "../_components/Header.tsx"
 import { SessionProvider } from 'next-auth/react';
+import { useSearchParams } from 'next/navigation';
+import { api } from '~/trpc/react.tsx';
 
 export default function Upgrade() {
+  const searchParams = useSearchParams();
+  const sessionId = searchParams.get('sessionId');
+  const [stripeCancelled, setStripeCancelled] = useState(false);
 
+  const expireStripeSession = api.stripe.expireSession.useMutation({
+    onSuccess: (data) => {
+      if (data == "expired") {
+        console.log(data); 
+        setStripeCancelled(true);
+      }
+    }
+  });
+  
+  useEffect(() => {
+    if (sessionId) {
+      expireStripeSession.mutate({sessionId: sessionId});
+    };
+  });
 
   return (
     <SessionProvider>

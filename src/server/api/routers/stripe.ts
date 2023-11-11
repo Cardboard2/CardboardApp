@@ -18,7 +18,7 @@ const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
 
 export const stripeRouter = createTRPCRouter({
   createSubscription: protectedProcedure
-    .input(z.object({ price: z.string() }))
+    .input(z.object({ tier:z.string(), price: z.string() }))
     .mutation(async ({ input, ctx }) => {
       const session = await stripe.checkout.sessions.create({
           mode: "subscription",
@@ -36,6 +36,7 @@ export const stripeRouter = createTRPCRouter({
         const postRet = await ctx.db.payment.create({
           data: {
             id      : session.id,
+            tier    : input.tier,
             status  : session.status,
             userId  : ctx.session.user.id
           }
@@ -49,9 +50,10 @@ export const stripeRouter = createTRPCRouter({
   expireSession: publicProcedure
     .input(z.object({ sessionId: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      return await ctx.db.payment.update({
+      const ret = await ctx.db.payment.update({
         where : {id: input.sessionId},
         data  : {status: "expired"}
       });
+      return ret.status;
     }),
 });

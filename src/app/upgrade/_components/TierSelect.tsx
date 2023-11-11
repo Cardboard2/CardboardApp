@@ -43,7 +43,7 @@ export function TierSelect() {
         makeNewPleb.mutate();
       }
       else if (tier.priceId) {
-        createNewStripeSession.mutate({price: annualPayment ? tier.priceId.annually : tier.priceId.monthly});
+        createNewStripeSession.mutate({price: annualPayment ? tier.priceId.annually : tier.priceId.monthly, tier: tier.id});
       }
     }
     else

@@ -5,7 +5,7 @@ import { Switch } from '@headlessui/react'
 import { CheckCircleIcon } from '@heroicons/react/20/solid'
 import { api } from "~/trpc/react"
 
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useSession, signIn } from "next-auth/react"
 import { tier,tiers } from "./Tiers"
 import { PricePerAnnum, PricePerMonth } from "./TierFunctions"
@@ -49,9 +49,6 @@ export function TierSelect() {
     else
       signIn()
   }
-
-  const searchParams = useSearchParams();
-  const sessionId = searchParams.get('sessionId');
 
   return (
     <div className={`flex justify-center w-full`}>

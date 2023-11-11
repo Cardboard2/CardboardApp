@@ -32,7 +32,6 @@ export function TierSelect() {
   })
   
   const {data: user} = api.user.getUser.useQuery();
-  console.log(user);
   
   function SelectTierForPayment(tier : tier)
   {

@@ -15,17 +15,16 @@ export default function Upgrade() {
   const expireStripeSession = api.stripe.expireSession.useMutation({
     onSuccess: (data) => {
       if (data == "expired") {
-        console.log(data); 
         setStripeCancelled(true);
       }
     }
   });
   
   useEffect(() => {
-    if (sessionId) {
+    if (sessionId && !stripeCancelled) {
       expireStripeSession.mutate({sessionId: sessionId});
     };
-  });
+  }, []);
 
   return (
     <SessionProvider>

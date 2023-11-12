@@ -75,12 +75,12 @@ function Success() {
         <Transition
             as={Fragment}
             show={stripeCompleted}
-            enter="transform duration-700 transition ease-in-out"
-            enterFrom="-translate-y-full opacity-0 scale-95"
-            enterTo="-translate-y-0 opacity-100 scale-100"
-            leave="transform duration-700 transition ease-in-out"
-            leaveFrom="-translate-y-0 opacity-100 scale-100 "
-            leaveTo="-translate-y-full opacity-0 scale-95 "
+            enter="transform duration-500 transition ease-in-out"
+            enterFrom="translate-y-full opacity-0 scale-95"
+            enterTo="translate-y-0 opacity-100 scale-100"
+            leave="transform duration-500 transition ease-in-out"
+            leaveFrom="translate-y-0 opacity-100 scale-100 "
+            leaveTo="translate-y-full opacity-0 scale-95 "
         >
             <SuccessMessageComponent ref={ref}/>
         </Transition>

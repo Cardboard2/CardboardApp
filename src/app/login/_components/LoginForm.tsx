@@ -82,7 +82,7 @@ const LoginForm = () => {
             id="remember-me"
             name="remember-me"
             type="checkbox"
-            className="h-4 w-4 rounded border-gray-300 text-amber-700 focus:ring-amber-800"
+            className="h-4 w-4 rounded border-gray-300 text-amber-700 focus:ring-amber-800 accent-amber-600"
           />
           <label
             htmlFor="remember-me"

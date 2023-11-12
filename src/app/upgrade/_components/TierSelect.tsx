@@ -27,7 +27,7 @@ export function TierSelect() {
   const makeNewPleb = api.user.setUserFreeTier.useMutation({
     onSuccess: () => {
       router.refresh();
-      router.push("profile");
+      router.push("/dashboard");
     },
   })
   

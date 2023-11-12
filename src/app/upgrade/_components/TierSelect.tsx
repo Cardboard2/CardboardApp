@@ -35,18 +35,13 @@ export function TierSelect() {
   
   function SelectTierForPayment(tier : tier)
   {
-    if (user) {
-      console.log(session)
-      if (tier.id == "tier-pleb") {
-        // Mutate user as pleb
-        makeNewPleb.mutate();
-      }
-      else if (tier.priceId) {
-        createNewStripeSession.mutate({price: annualPayment ? tier.priceId.annually : tier.priceId.monthly, tier: tier.id});
-      }
+    if (tier.id == "tier-pleb") {
+      // Mutate user as pleb
+      makeNewPleb.mutate();
     }
-    else
-      signIn()
+    else if (tier.priceId) {
+      createNewStripeSession.mutate({price: annualPayment ? tier.priceId.annually : tier.priceId.monthly, tier: tier.id});
+    }
   }
 
   return (
@@ -89,7 +84,7 @@ export function TierSelect() {
                   </h3>
                   {annualPayment ? <PricePerAnnum tier={tier}/> : <PricePerMonth tier={tier}/>}
                   <button
-                    onClick={() => SelectTierForPayment(tier)}
+                    onClick={() => {user ? SelectTierForPayment(tier) : router.push("/login")}}
                     disabled={createNewStripeSession.isLoading || makeNewPleb.isLoading || (user && user.tierId) == tier.id}
                     className={`mt-6 block duration-300 rounded-md bg-amber-700 w-32 px-3 py-2 \
                          ${createNewStripeSession.isLoading ? 'cursor-wait' : ''} text-center text-sm \

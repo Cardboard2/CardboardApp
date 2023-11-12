@@ -70,6 +70,8 @@ function Success() {
             </div>
         );
     });
+
+    SuccessMessageComponent.displayName = "SuccessMessageComponent";
     
     return (
         <Transition

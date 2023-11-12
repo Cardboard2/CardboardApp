@@ -44,12 +44,12 @@ const LoginForm = () => {
         >
           Email address
         </label>
-        <div className="mt-2">
+        <div className="mt-2 ring-2 ring-inset ring-amber-700 rounded-md">
           <input
             {...register("email")}
             type="text"
             required
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            className="block w-full border-0 p-2 text-gray-900 shadow-sm bg-transparent focus:outline-none duration-300 text-sm leading-6"
           />
         </div>
       </div>
@@ -61,7 +61,7 @@ const LoginForm = () => {
         >
           Password
         </label>
-        <div className="mt-2">
+        <div className="mt-2 ring-2 ring-inset ring-amber-700 rounded-md">
           <input
             {...register("password")}
             id="password"
@@ -69,7 +69,7 @@ const LoginForm = () => {
             type="password"
             autoComplete="current-password"
             required
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            className="block w-full border-0 p-2 text-gray-900 shadow-sm bg-transparent focus:outline-none duration-300 text-sm leading-6"
           />
         </div>
         {error}
@@ -82,7 +82,7 @@ const LoginForm = () => {
             id="remember-me"
             name="remember-me"
             type="checkbox"
-            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+            className="h-4 w-4 rounded border-gray-300 text-amber-700 focus:ring-amber-800"
           />
           <label
             htmlFor="remember-me"
@@ -95,7 +95,7 @@ const LoginForm = () => {
         <div className="text-sm leading-6">
           <a
             href="#"
-            className="font-semibold text-indigo-600 hover:text-indigo-500"
+            className="font-semibold text-amber-700 hover:text-amber-800 duration-300"
           >
             Forgot password?
           </a>
@@ -105,7 +105,7 @@ const LoginForm = () => {
       <div>
         <button
           type="submit"
-          className="flex w-full justify-center rounded-md bg-amber-400 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          className="flex w-full justify-center rounded-md bg-amber-400 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-amber-500 active:opacity-80 duration-300"
         >
           Login
         </button>

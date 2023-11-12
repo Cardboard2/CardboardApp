@@ -95,7 +95,7 @@ export function Header() {
   return (
     <header className="bg-amber-400 w-full bg-opacity-90">
       <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8 z-50" aria-label="Global">
-        <a href="/" className="-m-1.5 p-1.5">
+        <a href="/dashboard" className="-m-1.5 p-1.5">
           <span className="sr-only">Cardboard</span>
           <div className='w-10 h-10 text-amber-950'><CardboardLogo/></div>
         </a>

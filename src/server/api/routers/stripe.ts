@@ -42,7 +42,7 @@ export const stripeRouter = createTRPCRouter({
             userId  : ctx.session.user.id
           }
         });
-        if (postRet && postRet.id)
+        if (postRet?.id)
           return session.url;
       };
 

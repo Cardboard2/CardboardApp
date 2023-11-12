@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { TierSelect } from "./_components/TierSelect.tsx"
 import { Header } from "../_components/Header.tsx"
@@ -10,6 +10,7 @@ import { api } from '~/trpc/react.tsx';
 export default function Upgrade() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('sessionId');
+  const shouldExpire = useRef(true);
   const [stripeCancelled, setStripeCancelled] = useState(false);
 
   const expireStripeSession = api.stripe.expireSession.useMutation({
@@ -21,7 +22,8 @@ export default function Upgrade() {
   });
   
   useEffect(() => {
-    if (sessionId && !stripeCancelled) {
+    if (sessionId && !stripeCancelled && shouldExpire.current) {
+      shouldExpire.current = false;
       expireStripeSession.mutate({sessionId: sessionId});
     };
   }, []);

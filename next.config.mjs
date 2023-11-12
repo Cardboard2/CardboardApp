@@ -16,6 +16,10 @@ const config = {
                 source: '/checkout',
                 destination: '/upgrade'
             },
+            {
+                source: '/checkout/success',
+                destination: '/upgrade/success'
+            },
         ];
     }
 };

@@ -22,6 +22,7 @@ export interface MobileMenuProps {
 function MobileNavigationMenu(props : {mobileMenuState: MobileMenuProps}){
   const ref = React.createRef<HTMLDivElement>();
   const { data: session } = useSession();
+  const router = useRouter();
 
   const MobilenavigationComponent = React.forwardRef<HTMLDivElement, MobileMenuProps>((props , forwardedRef) => {
     return (
@@ -44,7 +45,7 @@ function MobileNavigationMenu(props : {mobileMenuState: MobileMenuProps}){
                 </div>
                 <div className="py-6">
                   <button
-                    onClick={() => session && session.user ? signOut() : signIn()}
+                    onClick={() => session && session.user ? signOut() : router.push("/login")}
                     className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-amber-100"
                   >
                     {session && session.user ? "Sign Out" : "Sign In"}
@@ -89,6 +90,7 @@ export function Header() {
   const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mobileMenuState: MobileMenuProps = {mobileMenuOpen, setMobileMenuOpen};
+  const router = useRouter();
 
   return (
     <header className="bg-amber-400 w-full bg-opacity-90">
@@ -113,7 +115,7 @@ export function Header() {
               {item.name}
             </a>
           ))}
-          <button onClick={() => session && session.user ? signOut() : signIn()} className="text-sm font-semibold leading-6 text-gray-900">
+          <button onClick={() => session && session.user ? signOut() : router.push("/login")} className="text-sm font-semibold leading-6 text-gray-900">
             {session && session.user ? "Sign Out" : "Sign In"} <span aria-hidden="true">&rarr;</span>
           </button>
         </div>

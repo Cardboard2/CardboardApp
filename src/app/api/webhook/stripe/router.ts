@@ -10,14 +10,12 @@ const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
     typescript: true
   });
 
-console.log(env.STRIPE_WEBHOOK_SECRET);
-
-const webhook = async (req: NextApiRequest, res: NextApiResponse) => {
+export async function stripeWebhook(req: NextApiRequest, res: NextApiResponse) {
     console.info("New stripe webhook request!");
     if (req.method == "POST") {
         const signature = req.headers["stripe-signature"] as string;
         const endpointSecret = env.STRIPE_WEBHOOK_SECRET;
-        var event: Stripe.Event;
+        let event: Stripe.Event;
         const db = new PrismaClient();
 
         try {
@@ -29,15 +27,15 @@ const webhook = async (req: NextApiRequest, res: NextApiResponse) => {
             );
             switch (event.type) {
                 case "checkout.session.completed":
-                    const completedCheckoutSession = event.data.object as Stripe.Checkout.Session;
+                    const completedCheckoutSession = event.data.object;
                     if (!completedCheckoutSession.id || !completedCheckoutSession.customer_email || !completedCheckoutSession.line_items)
                         throw new Error("Invalid Session Data!");
 
-                    const user = db.user.findUnique({where: {email: completedCheckoutSession.customer_email}});
+                    const user = await db.user.findUnique({where: {email: completedCheckoutSession.customer_email}});
                     if (!user)
                         throw new Error("User not found!");
 
-                    db.user.update({
+                    const ret = await db.user.update({
                         where: {
                             email: completedCheckoutSession.customer_email
                         },
@@ -50,6 +48,5 @@ const webhook = async (req: NextApiRequest, res: NextApiResponse) => {
             console.info(msg);
             return res.status(400).send(msg);
         }
-
     };
-};
+}

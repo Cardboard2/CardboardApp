@@ -4,30 +4,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { TierSelect } from "./_components/TierSelect.tsx"
 import { Header } from "../_components/Header.tsx"
 import { SessionProvider } from 'next-auth/react';
-import { useSearchParams } from 'next/navigation';
-import { api } from '~/trpc/react.tsx';
 
 export default function Upgrade() {
-  const searchParams = useSearchParams();
-  const sessionId = searchParams.get('sessionId');
-  const shouldExpire = useRef(true);
-  const [stripeCancelled, setStripeCancelled] = useState(false);
-
-  const expireStripeSession = api.stripe.expireSession.useMutation({
-    onSuccess: (data) => {
-      if (data == "expired") {
-        setStripeCancelled(true);
-      }
-    }
-  });
-  
-  useEffect(() => {
-    if (sessionId && !stripeCancelled && shouldExpire.current) {
-      shouldExpire.current = false;
-      expireStripeSession.mutate({sessionId: sessionId});
-    };
-  }, []);
-
   return (
     <SessionProvider>
       <main className="flex min-h-screen flex-col items-center justify-center bg-amber-200 text-amber-950">

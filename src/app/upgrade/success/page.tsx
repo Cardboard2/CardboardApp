@@ -2,47 +2,11 @@
 
 import { Transition } from "@headlessui/react";
 import { SessionProvider } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Fragment, createRef, forwardRef, useEffect, useRef, useState } from "react";
+import { Fragment, createRef, forwardRef} from "react";
 import { Header } from "~/app/_components/Header";
-import { api } from "~/trpc/react";
 
 function Success() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const sessionId = searchParams.get('sessionId');
-    const [stripeCompleted, setStripeCompleted] = useState(false);
-    const shouldUseEffect = useRef(true);
-
-    const finalisePayment = api.stripe.completeSession.useMutation({
-        onSuccess: (data) => {
-            if (data){
-                setStripeCompleted(true);
-            }
-            else
-                router.push("/checkout?checkoutError=PaymentNotCompleted")
-        },
-        onError(error) {
-            router.push("/checkout?checkoutError=" + error.data?.code)
-        },
-    })
-
-    useEffect(() => {
-        if (shouldUseEffect.current){
-            shouldUseEffect.current = false;
-        }
-        else {
-            return;
-        }
-        if (sessionId && !stripeCompleted) {
-            finalisePayment.mutate({sessionId: sessionId});
-        }
-        else if (!sessionId && !stripeCompleted) {
-            router.push("/checkout?noSessionId");
-        }
-        
-    }, []);
-
+    const stripeCompleted = true;
     const ref = createRef<HTMLDivElement>();
 
     const SuccessMessageComponent = forwardRef<HTMLDivElement>((props, forwardedRef) => {

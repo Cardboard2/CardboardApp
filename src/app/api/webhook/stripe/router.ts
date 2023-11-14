@@ -43,7 +43,7 @@ const webhook = async (req: NextApiRequest, res: NextApiResponse) => {
                         },
                         data: {
                             tierId: "tier-max"
-                        }},
+                        }}),
             }
         } catch (err) {
             const msg = "Webhook signature verification failed: ".concat(err instanceof Error ? err.message : "Unknown Error!");

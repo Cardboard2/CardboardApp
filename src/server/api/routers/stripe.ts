@@ -18,7 +18,7 @@ const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
 
 export const stripeRouter = createTRPCRouter({
   createSubscription: protectedProcedure
-    .input(z.object({ tier:z.string(), tierId:z.string(), price: z.string() }))
+    .input(z.object({ tier:z.string(), price: z.string() }))
     .mutation(async ({ input, ctx }) => {
       const session = await stripe.checkout.sessions.create({
           mode: "subscription",
@@ -28,8 +28,6 @@ export const stripeRouter = createTRPCRouter({
             }
           ],
           ui_mode: "hosted",
-          customer: ctx.session.user.id,
-          
           customer_email: ctx.session.user.email ?? undefined,
           success_url: getBaseUrl() + "/checkout/success?sessionId={CHECKOUT_SESSION_ID}",
           cancel_url: getBaseUrl() + "/checkout?sessionId={CHECKOUT_SESSION_ID}"

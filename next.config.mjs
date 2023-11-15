@@ -5,6 +5,25 @@
 await import("./src/env.mjs");
 
 /** @type {import("next").NextConfig} */
-const config = {};
+const config = {
+    async rewrites() {
+        return [
+            {
+                source: '/pricing',
+                destination: '/upgrade'
+            },
+            {
+                source: '/checkout',
+                destination: '/upgrade'
+            },
+            {
+                source: '/checkout/success',
+                destination: '/upgrade/success'
+            },
+        ];
+    }
+};
 
 export default config;
+
+

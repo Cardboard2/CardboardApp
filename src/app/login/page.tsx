@@ -1,12 +1,18 @@
 "use client";
 import React from "react";
 import { SessionProvider } from "next-auth/react";
-import LoginWrapper from "./LoginPage";
+import LoginWrapper from "./_components/LoginPage";
+import { LoginHeader } from "./_components/Header";
 
 const ProfilePage = () => {
   return (
     <SessionProvider>
-      <LoginWrapper />
+      <div className="fixed flex z-50 top-0 w-full shadow">
+          <LoginHeader/>
+        </div>
+      <div className="w-screen h-screen flex justify-center items-center">
+        <LoginWrapper />
+      </div>
     </SessionProvider>
   );
 };

@@ -6,13 +6,14 @@ import { headers } from "next/headers";
 import { env } from "~/env.mjs";
 import { NextRequest, NextResponse } from "next/server";
 
+const db = new PrismaClient();
+
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
     apiVersion: "2023-10-16",
     typescript: true
   });
 
 export async function POST(req: NextRequest) {
-  console.info("New stripe webhook request!");
   const priceMap = new Map<string, string>([
     ["price_1O95MAIEdHdbj4cnIlR0sIgM", "tier-normal"],
     ["price_1O95TNIEdHdbj4cn850p9f5d", "tier-normal"],
@@ -22,8 +23,6 @@ export async function POST(req: NextRequest) {
    
   const body = await req.text();
   const signature = headers().get("stripe-signature");
-  const db = new PrismaClient();
-
   let event : Stripe.Event | null = null;
   try {
     event = stripe.webhooks.constructEvent(body, signature!, env.STRIPE_WEBHOOK_SECRET);

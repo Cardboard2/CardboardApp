@@ -15,10 +15,10 @@ const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
 
 export async function POST(req: NextRequest) {
   const priceMap = new Map<string, string>([
-    ["price_1O95MAIEdHdbj4cnIlR0sIgM", "tier-normal"],
-    ["price_1O95TNIEdHdbj4cn850p9f5d", "tier-normal"],
-    ["price_1O98rkIEdHdbj4cndIUjsLeR", "tier-whale"],
-    ["price_1O98rkIEdHdbj4cnQRHrt7DY", "tier-whale"],
+    ["199", "tier-normal"],
+    ["1799", "tier-normal"],
+    ["499", "tier-whale"],
+    ["5999", "tier-whale"],
   ]); 
    
   const body = await req.text();
@@ -29,18 +29,15 @@ export async function POST(req: NextRequest) {
     switch (event?.type){
       case "checkout.session.completed":
 
-        if (!event.data.object.customer_email || !event.data.object.line_items?.data[0]?.price?.lookup_key)
+        if (!event.data.object.customer_email || !event.data.object.amount_total)
           throw new Error("Invalid checkout session data");
-
+        
         const userEmail = event.data.object.customer_email;
-        const priceApiId = event.data.object.line_items!.data[0]!.price!.lookup_key;
-
-        console.log(priceApiId);
-
-        const tierId = priceMap.get(priceApiId);
+        const paymentAmount = String(event.data.object.amount_total);
+        const tierId = priceMap.get(paymentAmount);
 
         const updatedUser = await db.user.update({
-          where : {email: userEmail},
+          where : {email: userEmail!},
           data  : {tierId: tierId},
         });
 
@@ -61,7 +58,7 @@ export async function POST(req: NextRequest) {
     };
   } catch (err) {
     const errMsg = err instanceof Error ? err.message : "Unknown Error..." 
-    console.error(`Webhook signature verification failed: ${errMsg}`);
+    console.error(`Webhook processing failed: ${errMsg}`);
     return NextResponse.json({ error: errMsg }, { status: 400 });
   };
 

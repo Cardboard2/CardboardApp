@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import { headers } from "next/headers";
 
 import { env } from "~/env.mjs";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 const db = new PrismaClient();
 
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
         const tierId = priceMap.get(paymentAmount);
 
         const updatedUser = await db.user.update({
-          where : {email: userEmail!},
+          where : {email: userEmail},
           data  : {tierId: tierId},
         });
 

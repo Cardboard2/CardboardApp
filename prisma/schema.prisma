@@ -1,10 +1,19 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+//datasource db {
+//  provider     = "mysql"
+//  url          = env("DATABASE_URL")
+// relationMode = "prisma"
+//}
+
 datasource db {
-  provider     = "mysql"
-  url          = env("DATABASE_URL")
-  relationMode = "prisma"
+  provider = "sqlite"
+  // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
+  // Further reading:
+  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
+  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -12,59 +21,98 @@ generator client {
 }
 
 model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id])
+  createdById String
 
-    @@index([name])
+  @@index([name])
 }
 
 // Necessary for Next auth
 model Account {
-    id                String  @id @default(cuid())
-    userId            String
-    type              String
-    provider          String
-    providerAccountId String
-    refresh_token     String? // @db.Text
-    access_token      String? // @db.Text
-    expires_at        Int?
-    token_type        String?
-    scope             String?
-    id_token          String? // @db.Text
-    session_state     String?
-    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? // @db.Text
+  access_token      String? // @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? // @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([provider, providerAccountId])
+  @@unique([provider, providerAccountId])
 }
 
 model Session {
-    id           String   @id @default(cuid())
-    sessionToken String   @unique
-    userId       String
-    expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    posts         Post[]
+  id               String    @id @default(cuid())
+  name             String?
+  email            String?   @unique
+  emailVerified    DateTime?
+  image            String?
+  accounts         Account[]
+  sessions         Session[]
+  posts            Post[]
+  rootId           String?
+  folders          Folder[]  @relation("ownRelation")
+  authorisedFolder Folder[]  @relation("authorisedRelation")
+  files            File[]    @relation("ownRelation")
+  authorisedFiles  File[]    @relation("authorisedRelation")
 }
 
 model VerificationToken {
-    identifier String
-    token      String   @unique
-    expires    DateTime
+  identifier String
+  token      String   @unique
+  expires    DateTime
 
-    @@unique([identifier, token])
+  @@unique([identifier, token])
+}
+
+model Folder {
+  id      String   @id @default(cuid())
+  name    String
+  folders Folder[] @relation("folderRelation")
+  files   File[]
+  path    String   @unique
+
+  parentFolder Folder? @relation("folderRelation", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId     String?
+
+  ownedBy     User   @relation("ownRelation", fields: [createdById], references: [id], onDelete: Cascade)
+  createdById String
+
+  authorisedUsers User[] @relation("authorisedRelation")
+}
+
+model File {
+  id         String   @id @default(cuid())
+  name       String
+  type       String
+  awsKey     String   @unique
+  size       Int
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime
+
+  parentFolder Folder @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  parentId     String
+
+  ownedBy     User   @relation("ownRelation", fields: [createdById], references: [id], onDelete: Cascade)
+  createdById String
+
+  authorisedUsers User[] @relation("authorisedRelation")
 }

@@ -20,18 +20,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  createdBy   User   @relation(fields: [createdById], references: [id])
-  createdById String
-
-  @@index([name])
-}
-
 // Necessary for Next auth
 model Account {
   id                String  @id @default(cuid())
@@ -67,12 +55,13 @@ model User {
   image            String?
   accounts         Account[]
   sessions         Session[]
-  posts            Post[]
   rootId           String?
   folders          Folder[]  @relation("ownRelation")
   authorisedFolder Folder[]  @relation("authorisedRelation")
   files            File[]    @relation("ownRelation")
   authorisedFiles  File[]    @relation("authorisedRelation")
+  tierId           String?
+  payments         Payment[]
 }
 
 model VerificationToken {
@@ -115,4 +104,12 @@ model File {
   createdById String
 
   authorisedUsers User[] @relation("authorisedRelation")
+}
+
+model Payment {
+  id     String @id
+  status String
+  userId String
+  tierId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

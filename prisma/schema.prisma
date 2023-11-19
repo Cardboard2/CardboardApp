@@ -2,22 +2,26 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 //datasource db {
-//  provider     = "mysql"
-//  url          = env("DATABASE_URL")
-// relationMode = "prisma"
+//  provider = "sqlite"
+// NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
+// Further reading:
+// https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
+// https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+//  url      = env("DATABASE_URL")
 //}
 
-datasource db {
-  provider = "sqlite"
-  // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-  // Further reading:
-  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
-  url      = env("DATABASE_URL")
-}
+//generator client {
+//  provider = "prisma-client-js"
+//}
 
 generator client {
   provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 // Necessary for Next auth
@@ -27,12 +31,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? // @db.Text
-  access_token      String? // @db.Text
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? // @db.Text
+  id_token          String?  @db.Text
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -76,10 +80,10 @@ model Folder {
   id      String   @id @default(cuid())
   name    String
   folders Folder[] @relation("folderRelation")
-  files   File[]
+  files   File[]   @relation("fileToFolderRelation")
   path    String   @unique
 
-  parentFolder Folder? @relation("folderRelation", fields: [parentId], references: [id], onDelete: Cascade)
+  parentFolder Folder? @relation("folderRelation", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   parentId     String?
 
   ownedBy     User   @relation("ownRelation", fields: [createdById], references: [id], onDelete: Cascade)
@@ -97,7 +101,7 @@ model File {
   createdAt  DateTime @default(now())
   modifiedAt DateTime
 
-  parentFolder Folder @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  parentFolder Folder @relation("fileToFolderRelation", fields: [parentId], references: [id], onDelete: Cascade)
   parentId     String
 
   ownedBy     User   @relation("ownRelation", fields: [createdById], references: [id], onDelete: Cascade)

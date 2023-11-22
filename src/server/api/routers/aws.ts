@@ -162,7 +162,6 @@ import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
-async function calculate(ctx: any) {}
 
 export const awsRouter = createTRPCRouter({
   // Get the root folder and return its contents

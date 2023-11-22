@@ -358,8 +358,6 @@ export const awsRouter = createTRPCRouter({
       z.object({
         file: z.any(),
         metadata: z.object({
-          lastModified: z.number(),
-          lastModifiedDate: z.date(),
           name: z.string(),
           size: z.number(),
           type: z.string(),
@@ -402,7 +400,6 @@ export const awsRouter = createTRPCRouter({
             size: metadata.size,
             parentFolder: { connect: { id: folder?.id } },
             awsKey: folder?.path + metadata.name,
-            modifiedAt: new Date(metadata.lastModifiedDate),
           },
         });
 
@@ -421,7 +418,6 @@ export const awsRouter = createTRPCRouter({
           data: {
             type: metadata.type,
             size: metadata.size,
-            modifiedAt: new Date(),
           },
         });
 
@@ -600,7 +596,7 @@ export const awsRouter = createTRPCRouter({
               type: currFile?.type,
               size: currFile?.size,
               createdAt: currFile?.createdAt,
-              modifiedAt: currFile?.modifiedAt,
+              modifiedAt: currFile?.updatedAt,
             };
 
             responseList.push(tmp);

@@ -98,8 +98,8 @@ model File {
   type       String
   awsKey     String   @unique
   size       Int
-  createdAt  DateTime @default(now())
-  modifiedAt DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   parentFolder Folder @relation("fileToFolderRelation", fields: [parentId], references: [id], onDelete: Cascade)
   parentId     String

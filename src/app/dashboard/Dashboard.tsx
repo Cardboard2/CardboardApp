@@ -12,6 +12,9 @@ import {
   DocumentIcon,
 } from "@heroicons/react/24/outline";
 
+import { FileDetail } from "./_components/FileDetail";
+import { DashboardProps } from "./_components/DashboardProps";
+
 function readFile(file: Blob) {
   return new Promise((resolve, reject) => {
     var fr = new FileReader();
@@ -27,21 +30,11 @@ function validateName(name: string) {
   return name.match(/^[^a-zA-Z0-9]+$/) ? false : true;
 }
 
-interface listResult {
-  objectFile: string;
-  name: string;
-  type?: string;
-  size?: number;
-  createdAt?: Date;
-  modifiedAt?: Date;
-  id: string;
-}
-
-const Dashboard = () => {
+export function Dashboard(props : {dashboardProps: DashboardProps}){
   const { data: session } = useSession();
   const [currFolderName, updateFolderName] = useState("root");
   const [currFolderId, updateFolderId] = useState("");
-  const [currItems, updateItems] = useState<Array<listResult>>([]);
+  const [currItems, updateItems] = useState<Array<FileDetail>>([]);
 
   const createFolderAPI = api.aws.createFolder.useMutation({
     onSuccess: () => {
@@ -161,8 +154,6 @@ const Dashboard = () => {
       await new Promise((r) => setTimeout(r, 1000));
       await readFile(currFile).then((file) => {
         var fileData = {
-          lastModified: currFile.lastModified,
-          lastModifiedDate: currFile.lastModifiedDate,
           name: currFile.name,
           size: currFile.size,
           type: currFile.type,
@@ -200,56 +191,60 @@ const Dashboard = () => {
               Create Folder
             </button>
           </div>
-          <div></div>
-          <div>You are in {currFolderName}</div>
 
           <div className="justify-content mt-5 flex flex-col gap-1">
-            {currItems?.map(({ name, type, size, id, objectFile }) => {
+            {currItems?.map((item) => {
               return (
-                <div key={name}>
-                  {objectFile == "Folder" ? (
+                <div key={item.name} onClick={() => {
+                  if (item.objectFile != "Folder"){
+                    props.dashboardProps.setDialogOpen(true);
+                    props.dashboardProps.setFileDetail(item);
+                    props.dashboardProps.setFolderId(currFolderId);
+                  }
+                }}>
+                  {item.objectFile == "Folder" ? (
                     <div className="flex flex-row border-[1px] border-black p-1">
                       <FolderIcon
                         className="h-6 w-6"
                         aria-hidden="true"
                       ></FolderIcon>
                       <button
-                        onClick={() => updateFolderInfo(id)}
+                        onClick={() => updateFolderInfo(item.id)}
                         className="ml-1"
-                        key={name}
-                        title={name}
+                        key={item.name}
+                        title={item.name}
                       >
-                        Folder : {name}
+                        Folder : {item.name}
                       </button>
                     </div>
                   ) : (
                     <div
                       className="item-center justify-end gap-1 border-[1px] border-black p-1"
-                      id={name}
-                      key={name}
+                      id={item.name}
+                      key={item.name}
                     >
-                      {String(type).includes("image") ? (
+                      {String(item.type).includes("image") ? (
                         <PhotoIcon className="float-left h-6 w-6 "></PhotoIcon>
                       ) : (
                         <DocumentIcon className="float-left h-6 w-6 "></DocumentIcon>
                       )}
-                      <button className="ml-1" key={name} title={name}>
-                        {name}
+                      <button className="ml-1" key={item.name} title={item.name}>
+                        {item.name}
                       </button>
                       <div className="float-right inline-flex gap-1">
                         <button
                           className="float-right h-6 w-6 "
-                          id={"download-" + name}
-                          onClick={(e) => downloadFile(name)}
+                          id={"download-" + item.name}
+                          onClick={(e) => downloadFile(item.name)}
                         >
                           <ArrowDownTrayIcon></ArrowDownTrayIcon>
                         </button>
                         <PencilSquareIcon
-                          onClick={(e) => renameFile(name, e)}
+                          onClick={(e) => renameFile(item.name, e)}
                           className="float-right h-6 w-6 "
                         ></PencilSquareIcon>
                         <TrashIcon
-                          onClick={() => deleteFile(name)}
+                          onClick={() => deleteFile(item.name)}
                           className="float-right h-6 w-6"
                         ></TrashIcon>
                       </div>
@@ -266,5 +261,3 @@ const Dashboard = () => {
     return <></>;
   }
 };
-
-export default Dashboard;

@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
 import { SessionProvider } from "next-auth/react";
-import Dashboard from "./Dashboard";
+import { Dashboard } from "./Dashboard";
+import { ItemPreview } from "./_components/ItemPreview";
 import Profile from "../profile/Profile";
 
 import { Fragment, useState } from "react";
@@ -17,6 +18,8 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import CardboardLogo from "~/app/_components/CardboardLogo";
+import { defaultFileDetail } from "./_components/FileDetail";
+import { DashboardProps } from "./_components/DashboardProps";
 
 const navigation = [
   { name: "Dashboard", href: "#", icon: HomeIcon, current: true },
@@ -33,6 +36,18 @@ function classNames(...classes: string[]) {
 
 export default function Example() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [ dialogOpen, setDialogOpen ] = useState(false);
+  const [ folderId, setFolderId ] = useState("");
+  const [ fileDetail, setFileDetail ] = useState(defaultFileDetail);
+
+  const dashboardProps: DashboardProps = {
+    fileDetail: fileDetail,
+    dialogOpen: dialogOpen,
+    folderId: folderId,
+    setDialogOpen: setDialogOpen,
+    setFileDetail: setFileDetail,
+    setFolderId: setFolderId
+  }
 
   return (
     <>
@@ -254,7 +269,8 @@ export default function Example() {
                   Dashboard
                 </h2>
               </div>
-              <Dashboard />
+              <Dashboard dashboardProps={dashboardProps}/>
+              {dialogOpen? <ItemPreview dashboardProps={dashboardProps}/> : <></>}
             </div>
           </main>
         </div>

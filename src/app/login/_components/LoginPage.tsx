@@ -46,7 +46,7 @@ export default function LoginWrapper() {
 
               <div
                 className="mt-6 gap-4 hover:cursor-pointer"
-                onClick={() => signIn("google", { callbackUrl: "/profile" })}
+                onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
               >
                 <div
                   className="flex w-full items-center justify-center gap-3 rounded-md bg-blue-700 hover:bg-blue-800 active:opacity-80 duration-300 hover px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"

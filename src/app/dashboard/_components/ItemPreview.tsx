@@ -24,29 +24,8 @@ function DataSizeConversion(size: number | undefined) {
 
 
 
-export function ItemPreview(props:{dashboardProps : DashboardProps}) {
-  const [url, setUrl] = useState("none");
-  const haveFetchedUrl = useRef(false);
-
-  const urlGet = api.aws.getDownloadLink.useMutation({
-    onSuccess: (data) => {
-      if (data){
-        setUrl(data.link);
-      }
-    },
-    onError: (err) => {
-      setUrl("error");
-    },
-  });
-
-  if (!haveFetchedUrl.current) {
-    haveFetchedUrl.current = true;
-    if (String(props.dashboardProps.fileDetail.type).includes("image")){
-      urlGet.mutate({
-        request: { name: props.dashboardProps.fileDetail.name, folderId: props.dashboardProps.folderId},
-      });
-    }
-  }
+export function ItemPreview(props: {dashboardProps : DashboardProps}) {
+  const {data: url} = api.aws.getInlineUrl.useQuery({request: {id: props.dashboardProps.fileDetail.id}});
 
 
   return (
@@ -78,7 +57,7 @@ export function ItemPreview(props:{dashboardProps : DashboardProps}) {
               >
                 <Dialog.Panel className="w-full max-w-6xl transform overflow-hidden rounded-2xl h-full max-h-[48rem] bg-amber-200 p-6 text-left align-middle shadow-xl transition-all flex justify-between items-starts">
                   <div className='flex justify-center items-center w-9/12 p-2 bg-amber-300 shadow-inner rounded-2xl m-2'>
-                    <img src={url} alt=""/>
+                    <iframe src={url} className={`h-full w-full p-1 bg-black`}/>
                   </div>
 
                   <div className="m-2 w-3/12 h-fit ring-2 ring-amber-700 p-2 rounded-lg">

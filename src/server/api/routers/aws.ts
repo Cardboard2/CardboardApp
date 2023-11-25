@@ -157,6 +157,23 @@ async function createPresignedUrl(
   return getSignedUrl(s3Client, command, { expiresIn: 60 * expiryMinutes });
 }
 
+// // ============= create presigned url ======================
+async function getInlineUrl(
+  bucketName: string,
+  key: string,
+) {
+  const expiryMinutes = 15;
+  const input = {
+    Bucket: bucketName, // required
+    Key: key,
+    ResponseContentDisposition: `inline`,
+  };
+
+  const command = new GetObjectCommand(input);
+
+  return getSignedUrl(s3Client, command, { expiresIn: 60 * expiryMinutes });
+}
+
 // TPRC Imports
 import { z } from "zod";
 
@@ -659,6 +676,28 @@ export const awsRouter = createTRPCRouter({
           fileName: file.name,
           link: url,
         };
+      }
+    }),
+
+  getInlineUrl: protectedProcedure
+    .input(
+      z.object({
+        request: z.object({
+          id: z.string()
+        }),
+      }),
+    )
+    .query(async ({ctx, input}) => {
+      const file = await ctx.db.file.findUnique({
+        where: {
+          id: input.request.id,
+        },
+      });
+
+      if (!file || !file.awsKey)
+        return "";
+      else {
+        return (await getInlineUrl(bucketName, file.awsKey));
       }
     }),
 });

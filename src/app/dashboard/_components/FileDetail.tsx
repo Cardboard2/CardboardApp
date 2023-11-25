@@ -8,6 +8,10 @@ export interface FileDetail {
     id: string
 };
 
+export interface FormInput {
+    files: FileList
+}
+
 export const defaultFileDetail: FileDetail = {
     objectFile: "Unknown",
     name: "Unknown",

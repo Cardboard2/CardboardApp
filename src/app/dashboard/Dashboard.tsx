@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { type SubmitHandler, useForm } from "react-hook-form";
 import { api } from "~/trpc/react";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -12,10 +12,10 @@ import {
   DocumentIcon,
 } from "@heroicons/react/24/outline";
 
-import { FileDetail } from "./_components/FileDetail";
+import { FileDetail, FormInput } from "./_components/FileDetail";
 import { DashboardProps } from "./_components/DashboardProps";
 
-function readFile(file: Blob) {
+function readFile(file: File) {
   return new Promise((resolve, reject) => {
     var fr = new FileReader();
     fr.onload = () => {
@@ -139,7 +139,7 @@ export function Dashboard(props : {dashboardProps: DashboardProps}){
     });
   }
 
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit } = useForm<FormInput>();
 
   const uploadFile = api.aws.uploadFile.useMutation({
     onSuccess: () => {
@@ -147,10 +147,15 @@ export function Dashboard(props : {dashboardProps: DashboardProps}){
     },
   });
 
-  const onSubmit = async function (data: any) {
+  const onSubmit: SubmitHandler<FormInput> = async (data) => {
     for (var i = 0; i < data.files.length; i++) {
-      var currFile = data.files[i];
-      console.log(currFile);
+      const currFile = data.files[i] as File;
+
+      if (!currFile)
+        return;
+      else if (!currFile.name || !currFile.size || !currFile.type )
+        return;
+
       await new Promise((r) => setTimeout(r, 1000));
       await readFile(currFile).then((file) => {
         var fileData = {
@@ -159,11 +164,8 @@ export function Dashboard(props : {dashboardProps: DashboardProps}){
           type: currFile.type,
           folderId: currFolderId,
         };
-
-        // var fileDataString = JSON.stringify(fileData);
-
-        // console.log(fileDataString);
-        const encryptedData = btoa(file);
+        const rawData = file as Blob;
+        const encryptedData = btoa(rawData.toString());
         uploadFile.mutate({ file: encryptedData, metadata: fileData });
       });
     }

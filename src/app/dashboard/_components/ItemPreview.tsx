@@ -41,7 +41,6 @@ export function ItemPreview(props:{dashboardProps : DashboardProps}) {
 
   if (!haveFetchedUrl.current) {
     haveFetchedUrl.current = true;
-    console.log("Is going!");
     if (String(props.dashboardProps.fileDetail.type).includes("image")){
       urlGet.mutate({
         request: { name: props.dashboardProps.fileDetail.name, folderId: props.dashboardProps.folderId},

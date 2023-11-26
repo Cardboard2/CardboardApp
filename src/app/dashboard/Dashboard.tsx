@@ -17,7 +17,7 @@ import { DashboardProps } from "./_components/DashboardProps";
 
 function readFile(file: File) {
   return new Promise((resolve, reject) => {
-    let fr = new FileReader();
+    const fr = new FileReader();
     fr.onload = () => {
       resolve(fr.result);
     };
@@ -42,7 +42,7 @@ export function Dashboard(props : {dashboardProps: DashboardProps}){
     },
   });
   function createFolder() {
-    let folderName = window.prompt("Enter new folder name");
+    const folderName = window.prompt("Enter new folder name");
     if (folderName && validateName(folderName)) {
       createFolderAPI.mutate({
         request: { name: folderName, parentId: currFolderId },
@@ -108,7 +108,7 @@ export function Dashboard(props : {dashboardProps: DashboardProps}){
     },
   });
   function renameFile(name: string) {
-    let rename = window.prompt("Enter new file name");
+    const rename = window.prompt("Enter new file name");
     if (rename && validateName(rename)) {
       renameFileAPI.mutate({
         request: { oldName: name, newName: rename, folderId: currFolderId },
@@ -154,7 +154,7 @@ export function Dashboard(props : {dashboardProps: DashboardProps}){
 
       await new Promise((r) => setTimeout(r, 1000));
       await readFile(currFile).then((file) => {
-        let fileData = {
+        const fileData = {
           name: currFile.name,
           size: currFile.size,
           type: currFile.type,

@@ -176,7 +176,7 @@ async function getInlineUrl(
 
 // TPRC Imports
 import { z } from "zod";
-import { FileDetail } from "~/app/dashboard/_components/FileDetail";
+import type { FileDetail } from "~/app/dashboard/_components/FileDetail";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
@@ -383,7 +383,7 @@ export const awsRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      let metadata = input.metadata;
+      const metadata = input.metadata;
       console.log(metadata);
       // console.log(input.file.size);
       let fileChanged = false;
@@ -465,7 +465,7 @@ export const awsRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       // Try to create the file
       // If file already exists, since path is unique it will preven tfile from creating
-      let parentFolder = await ctx.db.folder.findFirst({
+      const parentFolder = await ctx.db.folder.findFirst({
         where: {
           id: input.request.parentId,
           createdById: ctx.session.user.id,
@@ -475,7 +475,7 @@ export const awsRouter = createTRPCRouter({
       console.log("parentFolder is ", parentFolder);
 
       if (parentFolder) {
-        let newFolder = await ctx.db.folder
+        const newFolder = await ctx.db.folder
           .create({
             data: {
               name: input.request.name,
@@ -569,9 +569,9 @@ export const awsRouter = createTRPCRouter({
       if (folder) {
         console.log("folder found");
         console.log(folder);
-        let responseList : FileDetail[] = [];
+        const responseList : FileDetail[] = [];
 
-        let response = {
+        const response = {
           name: folder.name,
           folderId: folder.id,
           childList: responseList,

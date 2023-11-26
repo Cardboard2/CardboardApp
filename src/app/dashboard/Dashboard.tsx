@@ -17,7 +17,7 @@ import { DashboardProps } from "./_components/DashboardProps";
 
 function readFile(file: File) {
   return new Promise((resolve, reject) => {
-    var fr = new FileReader();
+    let fr = new FileReader();
     fr.onload = () => {
       resolve(fr.result);
     };
@@ -42,7 +42,7 @@ export function Dashboard(props : {dashboardProps: DashboardProps}){
     },
   });
   function createFolder() {
-    var folderName = window.prompt("Enter new folder name");
+    let folderName = window.prompt("Enter new folder name");
     if (folderName && validateName(folderName)) {
       createFolderAPI.mutate({
         request: { name: folderName, parentId: currFolderId },
@@ -83,11 +83,11 @@ export function Dashboard(props : {dashboardProps: DashboardProps}){
 
   useEffect(() => {
     getFiles.mutate({ folderId: currFolderId });
-  }, [true]);
+  }, []);
 
   useEffect(() => {
     console.log("currFolderId is now " + currFolderId);
-  }, [currFolderId]);
+  }, []);
 
   const deleteFileAPI = api.aws.deleteFile.useMutation({
     onSuccess: () => {
@@ -107,8 +107,8 @@ export function Dashboard(props : {dashboardProps: DashboardProps}){
       getFiles.mutate({ folderId: currFolderId });
     },
   });
-  function renameFile(name: string, e: any) {
-    var rename = window.prompt("Enter new file name");
+  function renameFile(name: string) {
+    let rename = window.prompt("Enter new file name");
     if (rename && validateName(rename)) {
       renameFileAPI.mutate({
         request: { oldName: name, newName: rename, folderId: currFolderId },
@@ -148,24 +148,20 @@ export function Dashboard(props : {dashboardProps: DashboardProps}){
   });
 
   const onSubmit: SubmitHandler<FormInput> = async (data) => {
-    for (var i = 0; i < data.files.length; i++) {
-      const currFile = data.files[i] as File;
-
-      if (!currFile)
-        return;
-      else if (!currFile.name || !currFile.size || !currFile.type )
+    for (const currFile of data.files) {
+      if (!currFile.name || !currFile.size || !currFile.type )
         return;
 
       await new Promise((r) => setTimeout(r, 1000));
       await readFile(currFile).then((file) => {
-        var fileData = {
+        let fileData = {
           name: currFile.name,
           size: currFile.size,
           type: currFile.type,
           folderId: currFolderId,
         };
         const rawData = file as Blob;
-        const encryptedData = btoa(rawData.toString());
+        const encryptedData = btoa(String(rawData));
         uploadFile.mutate({ file: encryptedData, metadata: fileData });
       });
     }
@@ -237,12 +233,12 @@ export function Dashboard(props : {dashboardProps: DashboardProps}){
                         <button
                           className="float-right h-6 w-6 "
                           id={"download-" + item.name}
-                          onClick={(e) => downloadFile(item.name)}
+                          onClick={() => downloadFile(item.name)}
                         >
                           <ArrowDownTrayIcon></ArrowDownTrayIcon>
                         </button>
                         <PencilSquareIcon
-                          onClick={(e) => renameFile(item.name, e)}
+                          onClick={() => renameFile(item.name)}
                           className="float-right h-6 w-6 "
                         ></PencilSquareIcon>
                         <TrashIcon

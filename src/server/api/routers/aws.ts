@@ -10,10 +10,10 @@ import {
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 // Set your AWS credentials and S3 bucket information
-const region = process.env.AWS_REGION ?? "";
-const accessKeyId = process.env.AWS_ACCESS_KEY ?? "";
-const secretAccessKey = process.env.AWS_SECRET_KEY ?? "";
-const bucketName = process.env.AWS_BUCKET_NAME ?? "";
+const region = process.env.USER_AWS_REGION ?? "";
+const accessKeyId = process.env.USER_AWS_ACCESS_KEY ?? "";
+const secretAccessKey = process.env.USER_AWS_SECRET_KEY ?? "";
+const bucketName = process.env.USER_AWS_BUCKET_NAME ?? "";
 
 // Create an S3 client
 const s3Client = new S3Client({

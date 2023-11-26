@@ -28,7 +28,7 @@ const s3Client = new S3Client({
 async function uploadObject(
   bucketName: string,
   key: string,
-  fileStream: any,
+  fileStream: Buffer,
   type: string,
 ) {
   const params = {
@@ -98,7 +98,7 @@ async function renameObject(
 
   await s3Client
     .send(copyCommand)
-    .then((data) => {
+    .then(() => {
       s3Client
         .send(deleteCommand)
         .then((data) => {
@@ -176,6 +176,7 @@ async function getInlineUrl(
 
 // TPRC Imports
 import { z } from "zod";
+import { FileDetail } from "~/app/dashboard/_components/FileDetail";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
@@ -187,15 +188,15 @@ export const awsRouter = createTRPCRouter({
     // TODO: Get the root folder for the current user
     // Query user model for rootId, if null=create else get the folder files
 
-    ctx.db.user
+    await ctx.db.user
       .findFirst({
         where: { id: ctx.session.user.id },
       })
-      .then((result) => {
-        if (result && result["rootId"] == null) {
+      .then(async (result) => {
+        if (result && result.rootId == null) {
           console.log("creating folder");
           console.log(String(ctx.session.user.id) + "/");
-          ctx.db.folder
+          await ctx.db.folder
             .create({
               data: {
                 name: ctx.session.user.id,
@@ -203,8 +204,8 @@ export const awsRouter = createTRPCRouter({
                 path: String(ctx.session.user.id) + "/",
               },
             })
-            .then((createResponse) => {
-              ctx.db.user
+            .then(async (createResponse) => {
+              await ctx.db.user
                 .update({
                   where: {
                     id: ctx.session.user.id,
@@ -258,10 +259,10 @@ export const awsRouter = createTRPCRouter({
       });
 
       if (file && parentFolder) {
-        var extension: string = "";
+        let extension = "";
 
         if (input.request.oldName.includes(".")) {
-          let extensionSplit = input.request.oldName.split(".")[1];
+          const extensionSplit = input.request.oldName.split(".")[1];
 
           if (extensionSplit) {
             extension = "." + extensionSplit;
@@ -365,14 +366,14 @@ export const awsRouter = createTRPCRouter({
           },
         });
 
-        deleteObject(bucketName, deleted.awsKey);
+        await deleteObject(bucketName, deleted.awsKey);
       }
     }),
 
   uploadFile: protectedProcedure
     .input(
       z.object({
-        file: z.any(),
+        file: z.string(),
         metadata: z.object({
           name: z.string(),
           size: z.number(),
@@ -382,10 +383,10 @@ export const awsRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      var metadata = input.metadata;
+      let metadata = input.metadata;
       console.log(metadata);
       // console.log(input.file.size);
-      var fileChanged = false;
+      let fileChanged = false;
 
       const folder = await ctx.db.folder.findFirst({
         where: {
@@ -426,7 +427,7 @@ export const awsRouter = createTRPCRouter({
         // Update the metadata of the file
         console.log(metadata.name + " already exists");
 
-        const newFile = await ctx.db.file.update({
+        await ctx.db.file.update({
           where: {
             id: existingFile.id,
             createdById: ctx.session.user.id,
@@ -442,7 +443,7 @@ export const awsRouter = createTRPCRouter({
 
       // If a file has been updated, upload the new object to s3
       if (fileChanged == true) {
-        let data = Buffer.from(input.file, "base64");
+        const data = Buffer.from(input.file, "base64");
         return uploadObject(
           bucketName,
           folder?.path + metadata.name,
@@ -464,17 +465,17 @@ export const awsRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       // Try to create the file
       // If file already exists, since path is unique it will preven tfile from creating
-      var parentFolder = await ctx.db.folder.findFirst({
+      let parentFolder = await ctx.db.folder.findFirst({
         where: {
           id: input.request.parentId,
           createdById: ctx.session.user.id,
         },
       });
 
-      console.log("parentFolder is " + parentFolder);
+      console.log("parentFolder is ", parentFolder);
 
       if (parentFolder) {
-        var newFolder = await ctx.db.folder
+        let newFolder = await ctx.db.folder
           .create({
             data: {
               name: input.request.name,
@@ -528,10 +529,10 @@ export const awsRouter = createTRPCRouter({
                 files: true,
               },
             })
-            .then((res) => {
+            .then(async (res) => {
               folder = res;
-              if (res !== null && res.id !== null) {
-                ctx.db.user
+              if (res?.id !== null) {
+                await ctx.db.user
                   .update({
                     where: {
                       id: ctx.session.user.id,
@@ -568,9 +569,9 @@ export const awsRouter = createTRPCRouter({
       if (folder) {
         console.log("folder found");
         console.log(folder);
-        var responseList = new Array();
+        let responseList : FileDetail[] = [];
 
-        var response = {
+        let response = {
           name: folder.name,
           folderId: folder.id,
           childList: responseList,
@@ -578,8 +579,8 @@ export const awsRouter = createTRPCRouter({
 
         // Add the parent to go back
         if (folder.parentId) {
-          let tmp = {
-            objectFile: "Folder",
+          const tmp = {
+            objectType: "Folder",
             id: folder.parentId,
             name: "..",
           };
@@ -588,13 +589,11 @@ export const awsRouter = createTRPCRouter({
         }
 
         if (folder.folders) {
-          for (let i = 0; i < folder.folders.length; i++) {
-            let currFile = folder.folders[i];
-
-            let tmp = {
-              objectFile: "Folder",
-              id: currFile?.id,
-              name: currFile?.name,
+          for (const currFile of folder.folders) {
+            const tmp = {
+              objectType: "Folder",
+              id: currFile?.id ?? "Unknown",
+              name: currFile?.name ?? "Unknown",
             };
 
             responseList.push(tmp);
@@ -602,13 +601,11 @@ export const awsRouter = createTRPCRouter({
         }
 
         if (folder.files) {
-          for (let i = 0; i < folder.files.length; i++) {
-            let currFile = folder.files[i];
-
-            let tmp = {
-              objectFile: "File",
-              id: currFile?.id,
-              name: currFile?.name,
+          for (const currFile of folder.files) {
+            const tmp = {
+              objectType: "File",
+              id: currFile?.id ?? "Unknown",
+              name: currFile?.name ?? "Unknown",
               type: currFile?.type,
               size: currFile?.size,
               createdAt: currFile?.createdAt,
@@ -641,7 +638,7 @@ export const awsRouter = createTRPCRouter({
       },
     });
 
-    if (sumResult._sum && sumResult._sum.size !== null) {
+    if (sumResult._sum?.size !== null) {
       const sumMB = sumResult._sum.size / (1000 * 1000);
       return sumMB;
     }
@@ -671,7 +668,7 @@ export const awsRouter = createTRPCRouter({
 
       if (file?.awsKey) {
         console.log(file);
-        let url = await createPresignedUrl(bucketName, file?.awsKey, file.name);
+        const url = await createPresignedUrl(bucketName, file?.awsKey, file.name);
         return {
           fileName: file.name,
           link: url,
@@ -694,7 +691,7 @@ export const awsRouter = createTRPCRouter({
         },
       });
 
-      if (!file || !file.awsKey)
+      if (!file?.awsKey)
         return "";
       else {
         return (await getInlineUrl(bucketName, file.awsKey));

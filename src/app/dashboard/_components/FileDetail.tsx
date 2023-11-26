@@ -1,5 +1,5 @@
 export interface FileDetail {
-    objectFile: string
+    objectType: string
     name: string
     type?: string
     size?: number
@@ -13,7 +13,7 @@ export interface FormInput {
 }
 
 export const defaultFileDetail: FileDetail = {
-    objectFile: "Unknown",
+    objectType: "Unknown",
     name: "Unknown",
     id: "Unknown"
 };

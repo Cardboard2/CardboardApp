@@ -198,13 +198,13 @@ export function Dashboard(props : {dashboardProps: DashboardProps}){
             {currItems?.map((item) => {
               return (
                 <div key={item.name} onClick={() => {
-                  if (item.objectFile != "Folder"){
+                  if (item.objectType != "Folder"){
                     props.dashboardProps.setDialogOpen(true);
                     props.dashboardProps.setFileDetail(item);
                     props.dashboardProps.setFolderId(currFolderId);
                   }
                 }}>
-                  {item.objectFile == "Folder" ? (
+                  {item.objectType == "Folder" ? (
                     <div className="flex flex-row border-[1px] border-black p-1">
                       <FolderIcon
                         className="h-6 w-6"

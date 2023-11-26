@@ -1,8 +1,9 @@
 import { Dialog, Transition } from '@headlessui/react'
-import { Fragment, createRef, useEffect, useRef, useState } from 'react'
+import { Fragment, useState } from 'react'
 import { DashboardProps } from './DashboardProps'
-import { FileDetail } from './FileDetail';
 import { api } from '~/trpc/react';
+import { ArrowDownCircleIcon, InformationCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { DocumentIcon, ShareIcon } from '@heroicons/react/20/solid';
 
 const SIZE_KILO = 1024;
 const SIZE_MEGA = 1048576;
@@ -27,11 +28,14 @@ function DisplayContent(type: string, url: string) {
   if (type == "" || url == "")
     return (<></>);
 
+  else if (!type.includes("image") && !type.includes("mp4") && !type.includes("pdf") && !type.includes("text"))
+    return (<DocumentIcon className='h-24 w-24 text-slate-200'/>)
+
   else if (type.includes("image"))
-    return (<img src={url} className='object-contain max-w-full max-h-full p-1'/>);
+    return (<img src={url} className='object-contain max-w-full max-h-full p-3 pt-10'/>);
     
   else
-    return (<iframe src={url} allowFullScreen={true} className='h-full w-full p-1'/>);
+    return (<iframe src={url} allowFullScreen={true} className={`h-full w-full p-3 flex items-center justify-center pt-10 ${type.includes("text") ? "bg-slate-100" : ""}`}/>);
 }
 
 
@@ -51,7 +55,7 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-slate-900 opacity-30" />
+            <div className="fixed inset-0 bg-slate-900 opacity-80" />
           </Transition.Child>
 
           <div className="fixed h-full w-full inset-0 overflow-y-auto">
@@ -65,16 +69,24 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-6xl transform overflow-hidden rounded-2xl h-full max-h-[48rem] bg-amber-200 p-6 text-left align-middle shadow-xl transition-all flex justify-between items-starts">
-                  <div className='flex justify-center items-center w-9/12 p-2 bg-amber-300 shadow-inner rounded-2xl m-2'>
-                    {DisplayContent(props.dashboardProps.fileDetail.type ?? "", url ?? "")}
+                
+                <Dialog.Panel className="relative w-full max-w-6xl transform overflow-hidden rounded-2xl bg-black bg-opacity-20 shadow-xl h-full max-h-[48rem] p-1 flex items-center justify-center ">
+                  <div className='absolute right-2 top-2'>
+                    <button className='h-10 w-10 p-2 text-amber-500'>
+                      <ShareIcon/>
+                    </button>
+                    <button className='h-10 w-10 p-2 text-amber-500'>
+                      <ArrowDownCircleIcon/>
+                    </button>
+                    <button className='h-10 w-10 p-2 text-amber-500'>
+                      <InformationCircleIcon/>
+                    </button>
+                    <button className='h-10 w-10 p-2 text-amber-500'>
+                      <XCircleIcon/>
+                    </button>
                   </div>
-
-                  <div className="m-2 w-3/12 h-fit ring-2 ring-amber-700 p-2 rounded-lg">
-                    <p><span className='text-sm font-bold text-gray-700'>Name: </span><span className='text-sm font-semibold text-gray-800'>{props.dashboardProps.fileDetail.name}</span></p>
-                    <p><span className='text-sm font-bold text-gray-700'>Type: </span><span className='text-sm font-semibold text-gray-800'>{props.dashboardProps.fileDetail.type}</span></p>
-                    <p><span className='text-sm font-bold text-gray-700'>Size: </span><span className='text-sm font-semibold text-gray-800'>{DataSizeConversion(props.dashboardProps.fileDetail.size)}</span></p>
-                  </div>
+                  {DisplayContent(props.dashboardProps.fileDetail.type ?? "", url ?? "")}
+                  
                 </Dialog.Panel>
               </Transition.Child>
             </div>
@@ -82,5 +94,5 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
         </Dialog>
       </Transition>
     </>
-  )
+  );
 }

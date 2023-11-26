@@ -40,7 +40,7 @@ async function uploadObject(
 
   // Upload the file to S3
   const uploadCommand = new PutObjectCommand(params);
-  s3Client
+  await s3Client
     .send(uploadCommand)
     .then((data) => {
       console.log("File uploaded successfully");
@@ -154,7 +154,7 @@ async function createPresignedUrl(
 
   const command = new GetObjectCommand(input);
 
-  return getSignedUrl(s3Client, command, { expiresIn: 60 * expiryMinutes });
+  return await getSignedUrl(s3Client, command, { expiresIn: 60 * expiryMinutes });
 }
 
 // // ============= create presigned url ======================
@@ -171,7 +171,7 @@ async function getInlineUrl(
 
   const command = new GetObjectCommand(input);
 
-  return getSignedUrl(s3Client, command, { expiresIn: 60 * expiryMinutes });
+  return await getSignedUrl(s3Client, command, { expiresIn: 60 * expiryMinutes });
 }
 
 // TPRC Imports

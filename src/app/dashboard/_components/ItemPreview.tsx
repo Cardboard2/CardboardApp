@@ -23,11 +23,21 @@ function DataSizeConversion(size: number | undefined) {
 }
 
 
+function DisplayContent(type: string, url: string) {
+  if (type == "" || url == "")
+    return (<></>);
+
+  else if (type.includes("image"))
+    return (<img src={url} className='object-contain max-w-full max-h-full p-1'/>);
+    
+  else
+    return (<iframe src={url} allowFullScreen={true} className='h-full w-full p-1'/>);
+}
+
 
 export function ItemPreview(props: {dashboardProps : DashboardProps}) {
   const {data: url} = api.aws.getInlineUrl.useQuery({request: {id: props.dashboardProps.fileDetail.id}});
-
-
+  console.log(props.dashboardProps.fileDetail.type)
   return (
     <>
       <Transition appear show={props.dashboardProps.dialogOpen} as={Fragment}>
@@ -57,7 +67,7 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
               >
                 <Dialog.Panel className="w-full max-w-6xl transform overflow-hidden rounded-2xl h-full max-h-[48rem] bg-amber-200 p-6 text-left align-middle shadow-xl transition-all flex justify-between items-starts">
                   <div className='flex justify-center items-center w-9/12 p-2 bg-amber-300 shadow-inner rounded-2xl m-2'>
-                    <iframe src={url} className={`h-full w-full p-1 bg-black`}/>
+                    {DisplayContent(props.dashboardProps.fileDetail.type ?? "", url ?? "")}
                   </div>
 
                   <div className="m-2 w-3/12 h-fit ring-2 ring-amber-700 p-2 rounded-lg">

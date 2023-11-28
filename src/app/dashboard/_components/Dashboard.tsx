@@ -12,8 +12,8 @@ import {
   DocumentIcon,
 } from "@heroicons/react/24/outline";
 
-import { FileDetail, FormInput } from "./_components/FileDetail";
-import { DashboardProps } from "./_components/DashboardProps";
+import { FileDetail, FormInput } from "./FileDetail";
+import { DashboardProps } from "./DashboardProps";
 
 function readFile(file: File) {
   return new Promise((resolve, reject) => {

@@ -4,6 +4,8 @@ import { DashboardProps } from './DashboardProps'
 import { api } from '~/trpc/react';
 import { ArrowDownCircleIcon, InformationCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { DocumentIcon, ShareIcon } from '@heroicons/react/20/solid';
+import { FileDetail } from './FileDetail';
+import { Spinner } from '~/app/_components/Spinner';
 
 const SIZE_KILO = 1024;
 const SIZE_MEGA = 1048576;
@@ -23,10 +25,33 @@ function DataSizeConversion(size: number | undefined) {
     return String(size) + " B";
 }
 
+function DisplayMetadata(showMetadata: boolean, fileDetail: FileDetail) {
+  return(
+    <Transition appear show={showMetadata} as={Fragment}>
+      <Transition.Child
+          as={Fragment}
+          enter="ease-in-out duration-300"
+          enterFrom="opacity-0 "
+          enterTo="opacity-100"
+          leave="ease-in-out duration-300"
+          leaveFrom="opacity-100 "
+          leaveTo="opacity-0 "
+        >
+          <div className="absolute right-2 top-12 p-2 rounded-xl w-[24rem] bg-amber-300 text-left shadow-xl">
+            <p className="truncate"><span className='font-extrabold text-gray-600 text-xs'>Name: </span><span className="text-sm text-gray-800 font-semibold">{fileDetail.name}</span></p>
+            <p className="truncate"><span className='font-extrabold text-gray-600 text-xs'>Type: </span><span className="text-sm text-gray-800 font-semibold">{fileDetail.type}</span></p>
+            <p className="truncate"><span className='font-extrabold text-gray-600 text-xs'>Last modified: </span><span className="text-sm text-gray-800 font-semibold">{String(fileDetail.modifiedAt)}</span></p>
+            <p className="truncate"><span className='font-extrabold text-gray-600 text-xs'>Size: </span><span className="text-sm text-gray-800 font-semibold">{DataSizeConversion(fileDetail.size)}</span></p>
+          </div>
+        </Transition.Child>
+    </Transition>
+  );
+}
+
 
 function DisplayContent(type: string, url: string) {
   if (type == "" || url == "")
-    return (<></>);
+    return (<Spinner/>);
 
   else if (!type.includes("image") && !type.includes("mp4") && !type.includes("pdf") && !type.includes("text"))
     return (<DocumentIcon className='h-24 w-24 text-slate-200'/>)
@@ -41,6 +66,7 @@ function DisplayContent(type: string, url: string) {
 
 export function ItemPreview(props: {dashboardProps : DashboardProps}) {
   const {data: url} = api.aws.getInlineUrl.useQuery({request: {id: props.dashboardProps.fileDetail.id}});
+  const [showMetadata, setShowMetadata] = useState(false);
   console.log(props.dashboardProps.fileDetail.type)
   return (
     <>
@@ -78,15 +104,15 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
                     <button className='h-10 w-10 p-2 text-amber-500'>
                       <ArrowDownCircleIcon/>
                     </button>
-                    <button className='h-10 w-10 p-2 text-amber-500'>
+                    <button onClick={()=>setShowMetadata(!showMetadata)} className='h-10 w-10 p-2 text-amber-500'>
                       <InformationCircleIcon/>
                     </button>
-                    <button className='h-10 w-10 p-2 text-amber-500'>
+                    <button onClick={()=>props.dashboardProps.setDialogOpen(false)} className='h-10 w-10 p-2 text-amber-500'>
                       <XCircleIcon/>
                     </button>
                   </div>
                   {DisplayContent(props.dashboardProps.fileDetail.type ?? "", url ?? "")}
-                  
+                  {DisplayMetadata(showMetadata, props.dashboardProps.fileDetail)}
                 </Dialog.Panel>
               </Transition.Child>
             </div>

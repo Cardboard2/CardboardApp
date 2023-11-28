@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { SessionProvider } from "next-auth/react";
-import { Dashboard } from "./Dashboard";
+import { Dashboard } from "./_components/Dashboard";
 import { ItemPreview } from "./_components/ItemPreview";
 import Profile from "../profile/Profile";
 

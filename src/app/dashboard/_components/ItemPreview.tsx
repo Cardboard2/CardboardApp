@@ -48,6 +48,15 @@ function DisplayMetadata(showMetadata: boolean, fileDetail: FileDetail) {
   );
 }
 
+function DownloadFile(downloadUrl: string) {
+  if (downloadUrl != "") {
+    const el = document.createElement("a");
+    el.href = downloadUrl;
+    el.click();
+    el.remove();
+  }
+}
+
 
 function DisplayContent(type: string, url: string) {
   if (type == "" || url == "")
@@ -63,11 +72,12 @@ function DisplayContent(type: string, url: string) {
     return (<iframe src={url} allowFullScreen={true} className={`h-full w-full p-3 flex items-center justify-center pt-10 ${type.includes("text") ? "bg-slate-100" : ""}`}/>);
 }
 
-
 export function ItemPreview(props: {dashboardProps : DashboardProps}) {
-  const {data: url} = api.aws.getInlineUrl.useQuery({request: {id: props.dashboardProps.fileDetail.id}});
+  const {data: url} = api.aws.getInlineUrl.useQuery({id: props.dashboardProps.fileDetail.id});
+  const {data: downloadUrl} = api.aws.queryDownloadLink.useQuery({id: props.dashboardProps.fileDetail.id});
   const [showMetadata, setShowMetadata] = useState(false);
-  console.log(props.dashboardProps.fileDetail.type)
+  
+
   return (
     <>
       <Transition appear show={props.dashboardProps.dialogOpen} as={Fragment}>
@@ -101,7 +111,7 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
                     <button className='h-10 w-10 p-2 text-amber-500'>
                       <ShareIcon/>
                     </button>
-                    <button className='h-10 w-10 p-2 text-amber-500'>
+                    <button onClick={()=>DownloadFile(downloadUrl ?? "")} className='h-10 w-10 p-2 text-amber-500'>
                       <ArrowDownCircleIcon/>
                     </button>
                     <button onClick={()=>setShowMetadata(!showMetadata)} className='h-10 w-10 p-2 text-amber-500'>

@@ -677,24 +677,50 @@ export const awsRouter = createTRPCRouter({
     }),
 
   getInlineUrl: protectedProcedure
-    .input(
-      z.object({
-        request: z.object({
-          id: z.string()
-        }),
-      }),
-    )
+    .input(z.object({id: z.string()}))
     .query(async ({ctx, input}) => {
-      const file = await ctx.db.file.findUnique({
+      const ret = await ctx.db.user.findUnique({
         where: {
-          id: input.request.id,
+          id: ctx.session.user.id,
+        },
+        include: {
+          files: {
+            where: {
+              id: input.id,
+            },
+          },
         },
       });
-
-      if (!file?.awsKey)
-        return "";
-      else {
-        return (await getInlineUrl(bucketName, file.awsKey));
+      if (ret?.files?.length) {
+        const file = ret.files[0];
+        if (file?.awsKey)
+          return (await getInlineUrl(bucketName, file.awsKey));
       }
+      return "";
+    }),
+
+  queryDownloadLink: protectedProcedure
+    .input(z.object({id: z.string()}))
+    .query(async ({ ctx, input }) => {
+
+      const ret = await ctx.db.user.findUnique({
+        where: {
+          id: ctx.session.user.id,
+        },
+        include: {
+          files: {
+            where: {
+              id: input.id,
+            },
+          },
+        },
+      });
+      if (ret?.files?.length) {
+        const file = ret.files[0];
+        if (file?.awsKey)
+          return (await createPresignedUrl(bucketName, file.awsKey, file.name));
+      }
+
+      return "";
     }),
 });

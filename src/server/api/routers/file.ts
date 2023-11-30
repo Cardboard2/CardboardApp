@@ -13,10 +13,10 @@ export const fileRouter = createTRPCRouter({
                 if (file?.shared == false) {
                     const updatedFile = await ctx.db.file.update({where: {id: input.id}, data: {shared: true}});
                     if (updatedFile?.shared)
-                        return (getBaseUrl() + "/sharedFile?id=" + updatedFile.id);
+                        return (getBaseUrl() + "/sharedfile?id=" + updatedFile.id);
                 }
                 else if (file?.shared == true)
-                    return (getBaseUrl() + "/sharedFile&id=" + file.id);
+                    return (getBaseUrl() + "/sharedfile?id=" + file.id);
                 else
                     return ("err");
             }

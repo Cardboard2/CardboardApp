@@ -178,7 +178,7 @@ async function getInlineUrl(
 import { z } from "zod";
 import type { FileDetail } from "~/app/dashboard/_components/FileDetail";
 
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 
 
 export const awsRouter = createTRPCRouter({
@@ -696,6 +696,12 @@ export const awsRouter = createTRPCRouter({
         if (file?.awsKey)
           return (await getInlineUrl(bucketName, file.awsKey));
       }
+      else {
+        const file = await ctx.db.file.findUnique({where: {id: input.id}});
+        if (file?.shared && file.awsKey)
+          return (await getInlineUrl(bucketName, file.awsKey));
+      }
+
       return "";
     }),
 
@@ -720,7 +726,32 @@ export const awsRouter = createTRPCRouter({
         if (file?.awsKey)
           return (await createPresignedUrl(bucketName, file.awsKey, file.name));
       }
+      else {
+        const file = await ctx.db.file.findUnique({where: {id: input.id}});
+        if (file?.shared && file.awsKey)
+          return (await getInlineUrl(bucketName, file.awsKey));
+      }
 
       return "";
     }),
+
+    getSharedFileDownloadUrl: publicProcedure
+      .input(z.object({id: z.string()}))
+      .query(async ({ ctx, input }) => {
+        const file = await ctx.db.file.findUnique({where: {id: input.id}});
+          if (file?.shared && file.awsKey)
+            return (await createPresignedUrl(bucketName, file.awsKey, file.name));
+
+        return "";
+      }),
+
+    getSharedFileInlineUrl: publicProcedure
+      .input(z.object({id: z.string()}))
+      .query(async ({ ctx, input }) => {
+        const file = await ctx.db.file.findUnique({where: {id: input.id}});
+          if (file?.shared && file.awsKey)
+            return (await getInlineUrl(bucketName, file.awsKey));
+
+        return "";
+      }),
 });

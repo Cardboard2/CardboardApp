@@ -25,9 +25,9 @@ function DataSizeConversion(size: number | undefined) {
     return String(size) + " B";
 }
 
-function DisplayMetadata(showMetadata: boolean, fileDetail: FileDetail) {
+export function DisplayMetadata(showMetadata: boolean, fileDetail: FileDetail) {
   return(
-    <Transition appear show={showMetadata} as={Fragment}>
+    <Transition appear show={showMetadata && fileDetail.name != "Unknown"} as={Fragment}>
       <Transition.Child
           as={Fragment}
           enter="ease-in-out duration-300"
@@ -38,7 +38,7 @@ function DisplayMetadata(showMetadata: boolean, fileDetail: FileDetail) {
           leaveTo="opacity-0 scale-0 -translate-y-full"
         >
           <div className="absolute right-2 top-12 p-2 rounded-xl w-[20rem] md:w-[42rem] bg-amber-300 text-left shadow-xl">
-            <p className="text-lg font-bold text-amber-950 p-1 mb-2">Your file info</p>
+            <p className="text-lg font-bold text-amber-950 p-1 mb-2">File info</p>
             <p className="truncate"><span className='font-extrabold text-gray-600 text-xs'>Name: </span><span className="text-sm text-gray-800 font-semibold">{fileDetail.name}</span></p>
             <p className="truncate"><span className='font-extrabold text-gray-600 text-xs'>Type: </span><span className="text-sm text-gray-800 font-semibold">{fileDetail.type}</span></p>
             <p className="truncate"><span className='font-extrabold text-gray-600 text-xs'>Last modified: </span><span className="text-sm text-gray-800 font-semibold">{String(fileDetail.modifiedAt)}</span></p>
@@ -90,7 +90,7 @@ function ShareFile(showSharing: boolean, url: string) {
   );
 };
 
-function DownloadFile(downloadUrl: string) {
+export function DownloadFile(downloadUrl: string) {
   if (downloadUrl != "") {
     const el = document.createElement("a");
     el.href = downloadUrl;
@@ -100,8 +100,11 @@ function DownloadFile(downloadUrl: string) {
 }
 
 
-function DisplayContent(type: string, url: string) {
-  if (type == "" || url == "")
+export function DisplayContent(type: string, url: string) {
+  if (type == "Unknown")
+    return (<p className='text-2xl font-bold text-gray-50'>File does not exist or was not shared ❌</p>);
+
+  else if (type == "" || url == "")
     return (<Spinner/>);
 
   else if (!type.includes("image") && !type.includes("mp4") && !type.includes("pdf") && !type.includes("text"))

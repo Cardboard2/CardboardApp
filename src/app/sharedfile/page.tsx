@@ -5,12 +5,20 @@ import { Fragment, useState } from "react";
 import { api } from "~/trpc/react";
 
 import { ArrowDownCircleIcon, InformationCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { DisplayContent, DisplayMetadata, DownloadFile } from "../dashboard/_components/ItemPreview";
+import { defaultFileDetail } from "../dashboard/_components/FileDetail";
+
 
 export default function SharedFile() {
     const [showing, setShowing] = useState(true);
     const [showMetadata, setShowMetadata] = useState(false);
     const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const id = searchParams.get("id") ?? "";
+
+    const ret = api.file.getSharedFile.useQuery({id: id});
 
     return(
         <div>
@@ -50,7 +58,7 @@ export default function SharedFile() {
                         <Dialog.Panel className="relative w-full max-w-6xl transform overflow-hidden rounded-2xl bg-black bg-opacity-20 shadow-xl h-full max-h-[48rem] p-1 flex items-center justify-center ">
                         <div className='absolute right-2 top-2'>
                             
-                            <button onClick={()=>{}} className='h-10 w-10 p-2 text-amber-500 hover:text-amber-700 active:opacity-80 duration-200'>
+                            <button onClick={()=>{DownloadFile(ret.data?.downloadUrl ?? "")}} className='h-10 w-10 p-2 text-amber-500 hover:text-amber-700 active:opacity-80 duration-200'>
                             <ArrowDownCircleIcon/>
                             </button>
                             <button onClick={()=>{setShowMetadata(!showMetadata)}} className='h-10 w-10 p-2 text-amber-500 hover:text-amber-700 active:opacity-80 duration-200'>
@@ -64,6 +72,8 @@ export default function SharedFile() {
                             <XCircleIcon/>
                             </button>
                         </div>
+                        {DisplayContent(ret.data?.file.type ?? "", ret.data?.inlineUrl ?? "")}
+                        {DisplayMetadata(showMetadata, ret.data?.file ?? defaultFileDetail)}
                         </Dialog.Panel>
                     </Transition.Child>
                     </div>

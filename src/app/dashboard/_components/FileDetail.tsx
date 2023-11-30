@@ -15,5 +15,6 @@ export interface FormInput {
 export const defaultFileDetail: FileDetail = {
     objectType: "Unknown",
     name: "Unknown",
-    id: "Unknown"
+    id: "Unknown",
+    type: "Unknown"
 };

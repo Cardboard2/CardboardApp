@@ -30,12 +30,12 @@ function DisplayMetadata(showMetadata: boolean, fileDetail: FileDetail) {
     <Transition appear show={showMetadata} as={Fragment}>
       <Transition.Child
           as={Fragment}
-          enter="ease-in-out duration-200"
-          enterFrom="opacity-0 scale-50 -translate-y-full"
+          enter="ease-in-out duration-300"
+          enterFrom="opacity-0 scale-0 -translate-y-full"
           enterTo="opacity-100 scale-100 translate-y-0"
-          leave="ease-in-out duration-200"
+          leave="ease-in-out duration-300"
           leaveFrom="opacity-100 scale-100 translate-y-0"
-          leaveTo="opacity-0 scale-50 -translate-y-full"
+          leaveTo="opacity-0 scale-0 -translate-y-full"
         >
           <div className="absolute right-2 top-12 p-2 rounded-xl w-[20rem] md:w-[42rem] bg-amber-300 text-left shadow-xl">
             <p className="text-lg font-bold text-amber-950 p-1 mb-2">Your file info</p>
@@ -74,12 +74,12 @@ function ShareFile(showSharing: boolean, url: string) {
     <Transition appear show={showSharing} as={Fragment}>
       <Transition.Child
           as={Fragment}
-          enter="ease-in-out duration-200"
-          enterFrom="opacity-0 scale-50 -translate-y-full"
+          enter="ease-in-out duration-300"
+          enterFrom="opacity-0 scale-0 -translate-y-full"
           enterTo="opacity-100 scale-100 translate-y-0"
-          leave="ease-in-out duration-200"
+          leave="ease-in-out duration-300"
           leaveFrom="opacity-100 scale-100 translate-y-0"
-          leaveTo="opacity-0 scale-50 -translate-y-full"
+          leaveTo="opacity-0 scale-0 -translate-y-full"
         >
           <div className="absolute right-2 top-12 p-2 rounded-xl w-[20rem] md:w-[42rem] bg-amber-300 text-left shadow-xl">
             <p className="text-lg font-bold text-amber-950 p-1 mb-2">Share your files</p>

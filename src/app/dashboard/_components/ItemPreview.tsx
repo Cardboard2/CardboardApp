@@ -60,8 +60,8 @@ function ShareFile(showSharing: boolean, url: string) {
       <div>
         <div className='relative w-full bg-gray-50 p-2 rounded-xl shadow-lg mb-2 flex'>
           <input type="text" disabled={true} id="shareFileUrl" value={url} className=" bg-transparent focus:outline-none w-full h-full"/>
-          <button onClick={()=>{
-            navigator.clipboard.writeText(url);
+          <button onClick={async ()=>{
+            await navigator.clipboard.writeText(url);
           }} className="ml-2 top-1/2 right-0 h-6 w-6 text-amber-700 hover:text-amber-800 active:opacity-80 duration-200"><ClipboardDocumentIcon/></button>
           
         </div>

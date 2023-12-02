@@ -28,15 +28,13 @@ function AdminStatsList(props: { AdminListProps: UserListInterface[] }) {
 
   useEffect(() => {
     let usage = 0;
-    let tiers = {
+    const tiers = {
       "tier-pleb": 0,
       "tier-normal": 0,
       "tier-whale": 0,
     };
 
-    for (let i = 0; i < props.AdminListProps.length; i++) {
-      let currUser = props.AdminListProps[i];
-
+    for (const currUser of props.AdminListProps) {
       if (currUser?.usage) {
         usage += currUser.usage.userUsage;
       }
@@ -70,6 +68,7 @@ function AdminStatsList(props: { AdminListProps: UserListInterface[] }) {
         <dl className="lg:grid-cols-0 mx-auto max-w-7xl grid-cols-1 sm:grid-cols-5 md:grid lg:px-2 xl:px-0">
           {Object.keys(adminStats).map((key) => (
             <StatisticBox
+              key={key}
               title={key}
               statistic={adminStats[key as keyof AdminStatsInterface]}
             />

@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import e from "express";
 const db = new PrismaClient();
 
 interface TierInterface {
@@ -18,19 +17,19 @@ export function getUserUsageStats(
   bytes: number | undefined | null,
   tierId: string | undefined | null,
 ) {
-  let ret = {
+  const ret = {
     userUsage: 0,
     totalStorage: convertToMb(TierSize["tier-pleb"]), // Pleb by default
   };
 
-  ret["userUsage"] = convertToMb(bytes);
+  ret.userUsage = convertToMb(bytes);
   if (
     tierId !== "" &&
     tierId !== null &&
     tierId !== undefined &&
     tierId !== "tier-pleb"
   ) {
-    ret["totalStorage"] = convertToMb(TierSize[tierId as keyof TierInterface]);
+    ret.totalStorage = convertToMb(TierSize[tierId as keyof TierInterface]);
   }
 
   return ret;
@@ -59,7 +58,7 @@ export async function calculateUsage(userId: string) {
 }
 
 export async function updateUsage(userId: string, usage: number | null) {
-  const sumResult = await db.user.update({
+  return await db.user.update({
     data: {
       usage: usage,
     },
@@ -67,8 +66,6 @@ export async function updateUsage(userId: string, usage: number | null) {
       id: userId,
     },
   });
-
-  return sumResult;
 }
 
 function checkStorageLimit(tier: string, newSize: number) {
@@ -82,7 +79,7 @@ function checkStorageLimit(tier: string, newSize: number) {
 }
 
 function checkTier(tierExpiry: Date) {
-  let currDate = new Date();
+  const currDate = new Date();
 
   if (tierExpiry >= currDate) {
     return true;
@@ -92,25 +89,25 @@ function checkTier(tierExpiry: Date) {
 
 // Check if the user is within limits
 // Check if usage in date + new upload is within limits
-export async function checkEligibity(userId: string, fileSize: number = 0) {
+export async function checkEligibity(userId: string, fileSize = 0) {
   const user = await db.user.findUniqueOrThrow({
     where: { id: userId },
   });
 
   if (user) {
-    var currSize = 0;
+    let currSize = 0;
 
     if (user.usage !== null) {
       currSize = user.usage;
     }
 
-    var currTier = "";
+    let currTier = "";
 
     if (user.tierId !== null && user.tierId !== undefined) {
       currTier = user.tierId;
     }
 
-    let newSize = fileSize + currSize;
+    const newSize = fileSize + currSize;
     console.log(user);
     if (checkStorageLimit(currTier, newSize) == false) {
       console.log("out of limit");
@@ -138,8 +135,8 @@ export async function checkEligibity(userId: string, fileSize: number = 0) {
   }
 }
 
-export function makePleb(userId: string) {
-  db.user.update({
+export async function makePleb(userId: string) {
+  return await db.user.update({
     data: {
       tierId: "tier-pleb",
     },

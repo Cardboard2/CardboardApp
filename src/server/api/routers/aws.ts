@@ -327,13 +327,32 @@ export const awsRouter = createTRPCRouter({
           },
         });
 
-        deleteObject(bucketName, deleted.awsKey);
+        deleteObject(bucketName, deleted.awsKey)
+          .then((data) => {
+            console.log("Delete successful");
+            console.log(data);
+          })
+          .catch((err) => {
+            console.error("Error deleting file:", err);
+          });
 
-        const totalUsage = await calculateUsage(ctx.session.user.id);
-        console.log(totalUsage);
-        if (totalUsage !== null) {
-          updateUsage(ctx.session.user.id, totalUsage.size);
-        }
+        calculateUsage(ctx.session.user.id)
+          .then((data) => {
+            if (data) {
+              updateUsage(ctx.session.user.id, data.size)
+                .then((data) => {
+                  if (data) {
+                    console.log("Updated usage for user");
+                  }
+                })
+                .catch((err) => {
+                  console.error("Error updating usage:", err);
+                });
+            }
+          })
+          .catch((err) => {
+            console.error("Error calculating usage:", err);
+          });
       }
     }),
 
@@ -387,7 +406,7 @@ export const awsRouter = createTRPCRouter({
         console.log("asdasds");
         console.log(newEligiblity);
 
-        if (newEligiblity && !newEligiblity["allowed"]) {
+        if (newEligiblity && !newEligiblity.allowed) {
           console.log("not allowed new file");
           return false;
         }
@@ -413,7 +432,7 @@ export const awsRouter = createTRPCRouter({
 
         // First check eligibility to upload new file
         // Calculate sizeDiff (this would be the updated usage with the old file replaced with the new one)
-        let sizeDiff = metadata.size - existingFile.size;
+        const sizeDiff = metadata.size - existingFile.size;
 
         const newEligiblity = await checkEligibity(
           ctx.session.user.id,
@@ -422,7 +441,7 @@ export const awsRouter = createTRPCRouter({
         console.log("asdasds");
         console.log(newEligiblity);
 
-        if (newEligiblity && !newEligiblity["allowed"]) {
+        if (newEligiblity && !newEligiblity.allowed) {
           console.log("not allowed existing file");
           return false;
         }
@@ -446,11 +465,24 @@ export const awsRouter = createTRPCRouter({
       // If a file has been updated, upload the new object to s3
       if (fileChanged == true) {
         // Update the user's usage
-        const totalUsage = await calculateUsage(ctx.session.user.id);
-        console.log(totalUsage);
-        if (totalUsage !== null) {
-          updateUsage(ctx.session.user.id, totalUsage.size);
-        }
+
+        calculateUsage(ctx.session.user.id)
+          .then((data) => {
+            if (data) {
+              updateUsage(ctx.session.user.id, data.size)
+                .then((data) => {
+                  if (data) {
+                    console.log("Updated usage for user");
+                  }
+                })
+                .catch((err) => {
+                  console.error("Error updating usage:", err);
+                });
+            }
+          })
+          .catch((err) => {
+            console.error("Error calculating usage:", err);
+          });
 
         const data = Buffer.from(input.file, "base64");
         return uploadObject(
@@ -529,7 +561,7 @@ export const awsRouter = createTRPCRouter({
         // If root doesn't exist, create it and use it
         if (folder == null) {
           // Root doesnt exist, create it
-          let rootFolder = await ctx.db.folder.create({
+          const rootFolder = await ctx.db.folder.create({
             data: {
               name: ctx.session.user.id,
               ownedBy: { connect: { id: ctx.session.user.id } },
@@ -544,7 +576,7 @@ export const awsRouter = createTRPCRouter({
           folder = rootFolder;
 
           if (rootFolder?.id !== null) {
-            let user = await ctx.db.user.update({
+            const user = await ctx.db.user.update({
               where: {
                 id: ctx.session.user.id,
               },
@@ -560,7 +592,15 @@ export const awsRouter = createTRPCRouter({
               user?.tierId == undefined
             ) {
               console.log("making pleb");
-              makePleb(ctx.session.user.id);
+              makePleb(ctx.session.user.id)
+                .then((data) => {
+                  if (data) {
+                    console.log("Updated pleb-tier for user");
+                  }
+                })
+                .catch((err) => {
+                  console.error("Error updating tier:", err);
+                });
             }
           }
         }
@@ -646,10 +686,6 @@ export const awsRouter = createTRPCRouter({
   //     return data?.Contents;
   //   });
   // }),
-
-  getUserUsage: protectedProcedure.mutation(async ({ ctx }) => {
-    console.log(await calculateUsage(ctx.session.user.id));
-  }),
 
   getDownloadLink: protectedProcedure
     .input(

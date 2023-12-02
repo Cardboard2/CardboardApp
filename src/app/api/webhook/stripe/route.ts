@@ -42,9 +42,9 @@ export async function POST(req: NextRequest) {
         const paymentAmount = String(event.data.object.amount_total);
         const tierObject = priceMap.get(paymentAmount);
 
-        let expiryDate = new Date();
+        const expiryDate = new Date();
         if (tierObject !== undefined)
-          expiryDate.setMonth(expiryDate.getMonth() + tierObject?.renewMonths);
+          expiryDate.setMonth(expiryDate.getMonth() + tierObject.renewMonths);
 
         const updatedUser = await db.user.update({
           where: { email: userEmail },
@@ -60,18 +60,18 @@ export async function POST(req: NextRequest) {
           data: {
             userId: updatedUser.id,
             id: event.data.object.id,
-            tierId: tierObject?.tier!,
+            tierId: tierObject?.tier ?? "",
             status: event.data.object.status!,
           },
         });
 
         if (!newPayment) throw new Error("Failed to store payment!");
 
-      case "customer.subscription.deleted":
-      // Make them pleb again subscription ends
-      // Update expiry date to nothing?
+      // case "customer.subscription.deleted":
+      // // Make them pleb again subscription ends
+      // // Update expiry date to nothing?
 
-      // Need to make another case for subscription updated
+      // // Need to make another case for subscription updated
     }
   } catch (err) {
     const errMsg = err instanceof Error ? err.message : "Unknown Error...";

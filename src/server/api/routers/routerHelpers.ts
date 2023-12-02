@@ -138,8 +138,8 @@ export async function checkEligibity(userId: string, fileSize: number = 0) {
   }
 }
 
-export async function makePleb(userId: string) {
-  return await db.user.update({
+export function makePleb(userId: string) {
+  db.user.update({
     data: {
       tierId: "tier-pleb",
     },

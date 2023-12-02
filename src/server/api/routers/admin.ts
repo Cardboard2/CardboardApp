@@ -26,7 +26,7 @@ export const adminRouter = createTRPCRouter({
     if (user && user.role == "Admin") {
       const userList = await ctx.db.user.findMany({});
 
-      let responseList: UserListInterface[] = [];
+      const responseList: UserListInterface[] = [];
 
       for (const currUser of userList) {
         let currTier = currUser?.tierId;
@@ -74,7 +74,7 @@ export const adminRouter = createTRPCRouter({
           },
         });
 
-        let responseList: FileListInterface[] = [];
+        const responseList: FileListInterface[] = [];
         if (userContents) {
           for (const currFile of userContents) {
             const tmp: FileListInterface = {
@@ -82,7 +82,7 @@ export const adminRouter = createTRPCRouter({
               name: currFile?.name ?? "Unknown",
               type: currFile?.type ?? "Unknown",
               size: convertToMb(currFile?.size),
-              awsKey: currFile?.awsKey,
+              awsKey: currFile?.awsKey ?? "Unknown",
               createdAt: currFile?.createdAt,
               modifiedAt: currFile?.updatedAt,
             };
@@ -102,6 +102,8 @@ export const adminRouter = createTRPCRouter({
       where: { id: ctx.session.user.id },
       data: { role: "Admin" },
     });
+
+    return { name: user.name, role: user.role };
   }),
 
   makeUser: protectedProcedure.mutation(async ({ ctx }) => {
@@ -109,5 +111,7 @@ export const adminRouter = createTRPCRouter({
       where: { id: ctx.session.user.id },
       data: { role: "User" },
     });
+
+    return { name: user.name, role: user.role };
   }),
 });

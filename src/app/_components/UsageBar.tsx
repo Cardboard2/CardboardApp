@@ -9,12 +9,12 @@ const UsageBar = ({ usage, totalSpace }: UsageBarInterface) => {
   const [percent, updatePercent] = useState(0);
 
   useEffect(() => {
-    let newPercent = (usage / totalSpace) * 100;
+    const newPercent = (usage / totalSpace) * 100;
     updateBar(newPercent);
-  }, [usage]);
+  }, [usage, totalSpace]);
 
-  async function updateBar(newPercent: number) {
-    for (let i = 0; i < newPercent + 1; i++) {
+  function updateBar(newPercent: number) {
+    for (let i = 0; i < newPercent; i++) {
       setTimeout(function () {
         updatePercent(Math.round(i));
       }, i * 7);

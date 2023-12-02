@@ -2,6 +2,19 @@ import { z } from "zod";
 import { protectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 import { convertToMb, getUserUsageStats, makePleb } from "./routerHelpers";
 
+export interface UserListInterface {
+  name: string | null | undefined;
+  id: string | null | undefined;
+  email: string | null | undefined;
+  role: string | null | undefined;
+  usage: {
+    userUsage: number | null | undefined;
+    totalStorage: number | null | undefined;
+  };
+  tierId: string | null | undefined;
+  tierExpiry: Date | null | undefined;
+}
+
 export const adminRouter = createTRPCRouter({
   isAdmin: protectedProcedure.query(async ({ ctx }) => {
     const user = await ctx.db.user.findUniqueOrThrow({
@@ -23,10 +36,9 @@ export const adminRouter = createTRPCRouter({
     if (user && user.role == "Admin") {
       const userList = await ctx.db.user.findMany({});
 
-      var responseList = new Array();
+      let responseList: UserListInterface[] = [];
 
-      for (let i = 0; i < userList.length; i++) {
-        let currUser = userList[i];
+      for (const currUser of userList) {
         let currTier = currUser?.tierId;
         if (
           currUser?.tierId == undefined ||
@@ -37,7 +49,7 @@ export const adminRouter = createTRPCRouter({
           if (currUser?.id !== undefined) makePleb(currUser?.id);
         }
 
-        let tmp = {
+        const tmp: UserListInterface = {
           name: currUser?.name,
           id: currUser?.id,
           email: currUser?.email,
@@ -72,12 +84,10 @@ export const adminRouter = createTRPCRouter({
           },
         });
 
-        var responseList = new Array();
+        let responseList = new Array();
         if (userContents) {
-          for (let i = 0; i < userContents.length; i++) {
-            let currFile = userContents[i];
-
-            let tmp = {
+          for (const currFile of userContents) {
+            const tmp = {
               id: currFile?.id,
               name: currFile?.name,
               type: currFile?.type,

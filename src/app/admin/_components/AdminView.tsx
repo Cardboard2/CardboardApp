@@ -130,7 +130,7 @@ function FileList(props: {
 
               <StatisticBox
                 title={"Total Usage (%)"}
-                statistic={Math.round(
+                statistic={Math.floor(
                   (props.SelectedUser.usage.userUsage /
                     props.SelectedUser.usage.totalStorage) *
                     100,

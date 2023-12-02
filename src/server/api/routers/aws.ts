@@ -13,6 +13,7 @@ import {
   checkEligibity,
   updateUsage,
   makePleb,
+  getUserUsageStats,
 } from "./routerHelpers";
 
 // Set your AWS credentials and S3 bucket information
@@ -311,6 +312,7 @@ export const awsRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       console.log("deleting file");
+
       const file = await ctx.db.file.findFirst({
         where: {
           createdById: ctx.session.user.id,
@@ -336,23 +338,14 @@ export const awsRouter = createTRPCRouter({
             console.error("Error deleting file:", err);
           });
 
-        calculateUsage(ctx.session.user.id)
-          .then((data) => {
-            if (data) {
-              updateUsage(ctx.session.user.id, data.size)
-                .then((data) => {
-                  if (data) {
-                    console.log("Updated usage for user");
-                  }
-                })
-                .catch((err) => {
-                  console.error("Error updating usage:", err);
-                });
-            }
-          })
-          .catch((err) => {
-            console.error("Error calculating usage:", err);
-          });
+        const user = await calculateUsage(ctx.session.user.id);
+
+        const updatedUser = await updateUsage(ctx.session.user.id, user.size);
+
+        return {
+          status: "success",
+          usage: getUserUsageStats(updatedUser.usage, updatedUser.tierId),
+        };
       }
     }),
 
@@ -403,12 +396,10 @@ export const awsRouter = createTRPCRouter({
           ctx.session.user.id,
           metadata.size,
         );
-        console.log("asdasds");
-        console.log(newEligiblity);
 
         if (newEligiblity && !newEligiblity.allowed) {
           console.log("not allowed new file");
-          return false;
+          return { status: "error", usage: { userUsage: 0, totalStorage: 0 } };
         }
 
         // Then upload the new file
@@ -443,7 +434,7 @@ export const awsRouter = createTRPCRouter({
 
         if (newEligiblity && !newEligiblity.allowed) {
           console.log("not allowed existing file");
-          return false;
+          return { status: "error", usage: { userUsage: 0, totalStorage: 0 } };
         }
 
         console.log(metadata.name + " already exists");
@@ -466,32 +457,25 @@ export const awsRouter = createTRPCRouter({
       if (fileChanged == true) {
         // Update the user's usage
 
-        calculateUsage(ctx.session.user.id)
-          .then((data) => {
-            if (data) {
-              updateUsage(ctx.session.user.id, data.size)
-                .then((data) => {
-                  if (data) {
-                    console.log("Updated usage for user");
-                  }
-                })
-                .catch((err) => {
-                  console.error("Error updating usage:", err);
-                });
-            }
-          })
-          .catch((err) => {
-            console.error("Error calculating usage:", err);
-          });
+        const user = await calculateUsage(ctx.session.user.id);
+
+        const updatedUser = await updateUsage(ctx.session.user.id, user.size);
 
         const data = Buffer.from(input.file, "base64");
-        return uploadObject(
+        await uploadObject(
           bucketName,
           folder?.path + metadata.name,
           data,
           metadata.type,
         );
+
+        return {
+          status: "success",
+          usage: getUserUsageStats(updatedUser.usage, updatedUser.tierId),
+        };
       }
+
+      return { status: "error", usage: { userUsage: 0, totalStorage: 0 } };
     }),
 
   createFolder: protectedProcedure
@@ -680,13 +664,6 @@ export const awsRouter = createTRPCRouter({
       }
     }),
 
-  // getFiles: publicProcedure.mutation(async ({ ctx }) => {
-  //   return listObjects(bucketName, "destination/").then((data) => {
-  //     console.log(data?.Contents);
-  //     return data?.Contents;
-  //   });
-  // }),
-
   getDownloadLink: protectedProcedure
     .input(
       z.object({
@@ -797,4 +774,14 @@ export const awsRouter = createTRPCRouter({
 
       return "";
     }),
+
+  getUsage: protectedProcedure.mutation(async ({ ctx }) => {
+    const user = await ctx.db.user.findUnique({
+      where: {
+        id: ctx.session.user.id,
+      },
+    });
+
+    return getUserUsageStats(user?.usage, user?.tierId);
+  }),
 });

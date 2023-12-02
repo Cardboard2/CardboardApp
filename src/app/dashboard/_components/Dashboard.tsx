@@ -2,6 +2,7 @@ import { type SubmitHandler, useForm } from "react-hook-form";
 import { api } from "~/trpc/react";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { UsageBarProps } from "~/app/_components/UsageBarProps";
 
 import {
   FolderIcon,
@@ -30,7 +31,10 @@ function validateName(name: string) {
   return name.match(/^[^a-zA-Z0-9]+$/) ? false : true;
 }
 
-export function Dashboard(props: { dashboardProps: DashboardProps }) {
+export function Dashboard(props: {
+  dashboardProps: DashboardProps;
+  usageBarProps: UsageBarProps;
+}) {
   const { data: session } = useSession();
   const [currFolderId, updateFolderId] = useState("");
   const [currItems, updateItems] = useState<Array<FileDetail>>([]);
@@ -81,8 +85,14 @@ export function Dashboard(props: { dashboardProps: DashboardProps }) {
   }, [currFolderId]);
 
   const deleteFileAPI = api.aws.deleteFile.useMutation({
-    onSuccess: () => {
-      // getFiles.mutate({ folderId: currFolderId });
+    onSuccess: (data) => {
+      console.log(data);
+
+      if (data && data.status == "success") {
+        console.log(data.usage);
+        props.usageBarProps.setUsage(data.usage.userUsage);
+        props.usageBarProps.setTotalSpace(data.usage.totalStorage);
+      }
     },
   });
   function deleteFile(name: string) {
@@ -133,8 +143,15 @@ export function Dashboard(props: { dashboardProps: DashboardProps }) {
   const { register, handleSubmit } = useForm<FormInput>();
 
   const uploadFile = api.aws.uploadFile.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       getFiles.mutate({ folderId: currFolderId });
+      console.log(data);
+
+      if (data && data.status == "success" && data.usage) {
+        console.log(data.usage);
+        props.usageBarProps.setUsage(data.usage.userUsage);
+        props.usageBarProps.setTotalSpace(data.usage.totalStorage);
+      }
     },
   });
 

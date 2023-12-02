@@ -4,6 +4,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { api } from "~/trpc/react";
 import AdminView from "./AdminView.tsx";
 import { Header } from "../../_components/Header.tsx";
+import { notFound } from "next/navigation";
 
 const Admin = () => {
   const { data: session } = useSession();
@@ -23,11 +24,11 @@ const Admin = () => {
     );
   }
 
-  return (
-    <button onClick={() => signIn("google")} className="ml-auto text-green-600">
-      Sign In
-    </button>
-  );
+  // return (
+  //   <button onClick={() => signIn("google")} className="ml-auto text-green-600">
+  //     Sign In
+  //   </button>
+  // );
 };
 
 export default Admin;

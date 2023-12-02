@@ -10,19 +10,36 @@ const UsageBar = ({ usage, totalSpace }: UsageBarInterface) => {
 
   useEffect(() => {
     const newPercent = (usage / totalSpace) * 100;
-    updateBar(newPercent);
+    if (newPercent > percent) {
+      incrementBar(newPercent);
+    } else {
+      decrementBar(newPercent);
+    }
   }, [usage, totalSpace]);
 
-  function updateBar(newPercent: number) {
-    for (let i = 0; i < newPercent; i++) {
+  function incrementBar(newPercent: number) {
+    for (let i = percent; i <= newPercent; i++) {
       setTimeout(function () {
-        updatePercent(Math.round(i));
+        updatePercent(Math.floor(i));
       }, i * 7);
     }
   }
 
+  function decrementBar(newPercent: number) {
+    console.log("new %: " + newPercent);
+    console.log("og %: " + percent);
+    for (let i = percent; i >= newPercent; i--) {
+      setTimeout(
+        function () {
+          updatePercent(Math.floor(i));
+        },
+        (percent - i) * 100,
+      );
+    }
+  }
+
   return (
-    <div className="w-full rounded-md bg-neutral-200 dark:bg-neutral-600">
+    <div className=" w-full rounded-md bg-neutral-200 dark:bg-neutral-600">
       <div
         className="bg-primary text-primary-100 rounded-md bg-amber-400 p-0.5 text-center text-xs font-medium leading-none"
         style={{ width: Math.round(percent) + "%" }}

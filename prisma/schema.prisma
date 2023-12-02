@@ -31,12 +31,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?  //@db.Text
-  access_token      String?  //@db.Text
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?  //@db.Text
+  id_token          String? @db.Text
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -96,13 +96,14 @@ model Folder {
 }
 
 model File {
-  id         String   @id @default(cuid())
-  name       String
-  type       String
-  awsKey     String   @unique
-  size       Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  name      String
+  type      String
+  awsKey    String   @unique
+  shared    Boolean  @default(false)
+  size      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   parentFolder Folder @relation("fileToFolderRelation", fields: [parentId], references: [id], onDelete: Cascade)
   parentId     String

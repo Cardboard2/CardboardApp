@@ -1,10 +1,9 @@
-import { z } from "zod"
 import { protectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
 export const userRouter = createTRPCRouter({
     getUser: protectedProcedure
         .query(async ({ ctx }) => {
-            const user = await ctx.db.user.findUniqueOrThrow({where: {id: ctx.session.user.id}});
+            const user = await ctx.db.user.findUnique({where: {id: ctx.session.user.id}});
             return user;
         }),
     setUserFreeTier: protectedProcedure 

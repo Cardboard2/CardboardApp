@@ -4,6 +4,6 @@ export interface FileListInterface {
   type: string;
   size: number;
   awsKey: string;
-  createdAt: Date || null;
-  modifiedAt: Date || null;
+  createdAt: Date | null;
+  modifiedAt: Date | null;
 }

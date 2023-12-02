@@ -6,6 +6,9 @@ import { api } from "~/trpc/react";
 import StatisticBox from "./StatisticBox";
 import UsageBar from "../../_components/UsageBar";
 
+import type { FileListInterface } from "~/app/admin/_components/FileList";
+import type { UserListInterface } from "~/app/admin/_components/UserList";
+
 export interface AdminStatsInterface {
   "Total users": number;
   "Total usage (Mb)": number;
@@ -75,29 +78,6 @@ function AdminStatsList(props: { AdminListProps: UserListInterface[] }) {
       </div>
     </div>
   );
-}
-
-export interface UserListInterface {
-  name: string;
-  id: string;
-  email: string;
-  role: string;
-  usage: {
-    userUsage: number;
-    totalStorage: number;
-  };
-  tierId: string;
-  tierExpiry: Date;
-}
-
-export interface FileListInterface {
-  id: string;
-  name: string;
-  type: string;
-  size: number;
-  awsKey: string;
-  createdAt: Date;
-  modifiedAt: Date;
 }
 
 function FileList(props: {

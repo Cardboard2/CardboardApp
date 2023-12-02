@@ -2,18 +2,8 @@ import { z } from "zod";
 import { protectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 import { convertToMb, getUserUsageStats, makePleb } from "./routerHelpers";
 
-export interface UserListInterface {
-  name: string | null | undefined;
-  id: string | null | undefined;
-  email: string | null | undefined;
-  role: string | null | undefined;
-  usage: {
-    userUsage: number | null | undefined;
-    totalStorage: number | null | undefined;
-  };
-  tierId: string | null | undefined;
-  tierExpiry: Date | null | undefined;
-}
+import type { FileListInterface } from "~/app/admin/_components/FileList";
+import type { UserListInterface } from "~/app/admin/_components/UserList";
 
 export const adminRouter = createTRPCRouter({
   isAdmin: protectedProcedure.query(async ({ ctx }) => {
@@ -50,12 +40,12 @@ export const adminRouter = createTRPCRouter({
         }
 
         const tmp: UserListInterface = {
-          name: currUser?.name,
+          name: currUser?.name ?? "Unknown",
           id: currUser?.id,
-          email: currUser?.email,
-          role: currUser?.role,
+          email: currUser?.email ?? "Unknown",
+          role: currUser?.role ?? "Unknown",
           usage: getUserUsageStats(currUser?.usage, currTier),
-          tierId: currUser?.tierId,
+          tierId: currTier ?? "Unknown",
           tierExpiry: currUser?.tierExpiry,
         };
 
@@ -84,13 +74,13 @@ export const adminRouter = createTRPCRouter({
           },
         });
 
-        let responseList = new Array();
+        let responseList: FileListInterface[] = [];
         if (userContents) {
           for (const currFile of userContents) {
-            const tmp = {
+            const tmp: FileListInterface = {
               id: currFile?.id,
-              name: currFile?.name,
-              type: currFile?.type,
+              name: currFile?.name ?? "Unknown",
+              type: currFile?.type ?? "Unknown",
               size: convertToMb(currFile?.size),
               awsKey: currFile?.awsKey,
               createdAt: currFile?.createdAt,

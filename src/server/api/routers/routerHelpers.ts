@@ -20,11 +20,18 @@ export function getUserUsageStats(
 ) {
   let ret = {
     userUsage: 0,
-    totalStorage: 0,
+    totalStorage: convertToMb(TierSize["tier-pleb"]), // Pleb by default
   };
 
   ret["userUsage"] = convertToMb(bytes);
-  ret["totalStorage"] = convertToMb(TierSize[tierId as keyof TierInterface]);
+  if (
+    tierId !== "" &&
+    tierId !== null &&
+    tierId !== undefined &&
+    tierId !== "tier-pleb"
+  ) {
+    ret["totalStorage"] = convertToMb(TierSize[tierId as keyof TierInterface]);
+  }
 
   return ret;
 }
@@ -104,7 +111,7 @@ export async function checkEligibity(userId: string, fileSize: number = 0) {
     }
 
     let newSize = fileSize + currSize;
-
+    console.log(user);
     if (checkStorageLimit(currTier, newSize) == false) {
       console.log("out of limit");
       return {
@@ -129,6 +136,17 @@ export async function checkEligibity(userId: string, fileSize: number = 0) {
       tierSize: TierSize[currTier as keyof TierInterface],
     };
   }
+}
+
+export async function makePleb(userId: string) {
+  return await db.user.update({
+    data: {
+      tierId: "tier-pleb",
+    },
+    where: {
+      id: userId,
+    },
+  });
 }
 
 // export interface UserListInterface {
@@ -172,15 +190,4 @@ export async function checkEligibity(userId: string, fileSize: number = 0) {
 //   } else {
 //     return false;
 //   }
-// }
-
-// function makePleb(userId: string) {
-//   db.user.update({
-//     data: {
-//       tierId: "tier-pleb",
-//     },
-//     where: {
-//       id: userId,
-//     },
-//   });
 // }

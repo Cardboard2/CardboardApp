@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { protectedProcedure, createTRPCRouter } from "~/server/api/trpc";
-import { convertToMb, getUserUsageStats } from "./routerHelpers";
+import { convertToMb, getUserUsageStats, makePleb } from "./routerHelpers";
 
 export const adminRouter = createTRPCRouter({
   isAdmin: protectedProcedure.query(async ({ ctx }) => {
@@ -27,13 +27,22 @@ export const adminRouter = createTRPCRouter({
 
       for (let i = 0; i < userList.length; i++) {
         let currUser = userList[i];
+        let currTier = currUser?.tierId;
+        if (
+          currUser?.tierId == undefined ||
+          currUser?.tierId == null ||
+          currUser?.tierId == ""
+        ) {
+          currTier = "tier-pleb";
+          if (currUser?.id !== undefined) makePleb(currUser?.id);
+        }
 
         let tmp = {
           name: currUser?.name,
           id: currUser?.id,
           email: currUser?.email,
           role: currUser?.role,
-          usage: getUserUsageStats(currUser?.usage, currUser?.tierId),
+          usage: getUserUsageStats(currUser?.usage, currTier),
           tierId: currUser?.tierId,
           tierExpiry: currUser?.tierExpiry,
         };

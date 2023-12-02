@@ -3,8 +3,8 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { api } from "~/trpc/react";
-import StatisticBox from "./_components/StatisticBox";
-import UsageBar from "../_components/UsageBar";
+import StatisticBox from "./StatisticBox";
+import UsageBar from "../../_components/UsageBar";
 
 export interface AdminStatsInterface {
   "Total users": number;
@@ -24,11 +24,7 @@ function AdminStatsList(props: { AdminListProps: UserListInterface[] }) {
   });
 
   useEffect(() => {
-    console.log("hi");
-    console.log(props.AdminListProps);
-
     let usage = 0;
-    let a = 0;
     let tiers = {
       "tier-pleb": 0,
       "tier-normal": 0,
@@ -45,10 +41,13 @@ function AdminStatsList(props: { AdminListProps: UserListInterface[] }) {
         switch (currUser.tierId) {
           case "tier-pleb":
             tiers["tier-pleb"] += 1;
+            break;
           case "tier-normal":
             tiers["tier-normal"] += 1;
+            break;
           case "tier-whale":
             tiers["tier-whale"] += 1;
+            break;
         }
       }
     }
@@ -243,7 +242,6 @@ export default function AdminView() {
   });
 
   useEffect(() => {
-    console.log("hi");
     getUsers.mutate();
   }, []);
 

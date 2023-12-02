@@ -8,7 +8,12 @@ import {
   CopyObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { calculateUsage, checkEligibity, updateUsage } from "./routerHelpers";
+import {
+  calculateUsage,
+  checkEligibity,
+  updateUsage,
+  makePleb,
+} from "./routerHelpers";
 
 // Set your AWS credentials and S3 bucket information
 const region = process.env.USER_AWS_REGION ?? "";
@@ -187,55 +192,26 @@ import {
 } from "~/server/api/trpc";
 
 export const awsRouter = createTRPCRouter({
-  // Get the root folder and return its contents
-  // If no root folder exists, create one and return nothing
-  getRootFiles: protectedProcedure.mutation(async ({ ctx }) => {
-    // TODO: Get the root folder for the current user
-    // Query user model for rootId, if null=create else get the folder files
+  // NOTE: a folder's path = {path}/currentfolderName/
 
-    await ctx.db.user
-      .findFirst({
-        where: { id: ctx.session.user.id },
-      })
-      .then(async (result) => {
-        if (result && result.rootId == null) {
-          console.log("creating folder");
-          console.log(String(ctx.session.user.id) + "/");
-          await ctx.db.folder
-            .create({
-              data: {
-                name: ctx.session.user.id,
-                ownedBy: { connect: { id: ctx.session.user.id } },
-                path: String(ctx.session.user.id) + "/",
-              },
-            })
-            .then(async (createResponse) => {
-              await ctx.db.user
-                .update({
-                  where: {
-                    id: ctx.session.user.id,
-                  },
-                  data: {
-                    rootId: createResponse.id,
-                  },
-                })
-                .then((res) => console.log(res));
-            });
-        } else {
-          console.log("yo");
-          //Get the root contents
-          //prob will be a list of files (hoping its json)
-        }
-      });
-  }),
+  // updateFolderName
+  // Check if folder path can exist or not (unique)
+  // Update the folder object's name  and path
+  // Get all files with parentFolderId
+  // For all files, run updateFileNames for each file (replacing and updateing each awsKey)
+  // Get all folders with parentFolderId
+  // For all folders, run updateFolderName
+  // Delete the current folder
 
-  // updateFileNames
-  // Path = AWS KEY
-  // Relative path in db will be parentFolderPath + name
-  // Sending to AWS will involve, moving from old awsKey to relativePath
-  // 1. just need to CopyObject() with awsKey and relativePath and DeleteObjectCommand() with awsKey
-  // 2. Update awsKey to reflect the relativePath
-  // 3. awsKey should match parentFolderPath + name
+  // delete files
+  // Get the file with with the parentId and name, delete using DeleteObjectCommand
+
+  // delete folder
+  // aws :  need to delete all entries within the folder then delete
+  // delete folder should cascade files/folders below
+
+  // download files
+  // presigned url something sometin
 
   renameFile: protectedProcedure
     .input(
@@ -323,26 +299,6 @@ export const awsRouter = createTRPCRouter({
         }
       }
     }),
-
-  // NOTE: a folder's path = {path}/currentfolderName/
-  // updateFolderName
-  // Check if folder path can exist or not (unique)
-  // Update the folder object's name  and path
-  // Get all files with parentFolderId
-  // For all files, run updateFileNames for each file (replacing and updateing each awsKey)
-  // Get all folders with parentFolderId
-  // For all folders, run updateFolderName
-  // Delete the current folder
-
-  // delete files
-  // Get the file with with the parentId and name, delete using DeleteObjectCommand
-
-  // delete folder
-  // aws :  need to delete all entries within the folder then delete
-  // delete folder should cascade files/folders below
-
-  // download files
-  // presigned url something sometin
 
   deleteFile: protectedProcedure
     .input(
@@ -545,6 +501,9 @@ export const awsRouter = createTRPCRouter({
       }
     }),
 
+  // This gets the folder contents for the current folder and user
+  // This runs on the dashboard page and on every folder load
+  // If the user is a first time user and has no folder, create one and update their tier if they don't have a tier
   getFolderContents: protectedProcedure
     .input(z.object({ folderId: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -570,33 +529,40 @@ export const awsRouter = createTRPCRouter({
         // If root doesn't exist, create it and use it
         if (folder == null) {
           // Root doesnt exist, create it
-          folder = await ctx.db.folder
-            .create({
+          let rootFolder = await ctx.db.folder.create({
+            data: {
+              name: ctx.session.user.id,
+              ownedBy: { connect: { id: ctx.session.user.id } },
+              path: String(ctx.session.user.id) + "/",
+            },
+            include: {
+              folders: true,
+              files: true,
+            },
+          });
+
+          folder = rootFolder;
+
+          if (rootFolder?.id !== null) {
+            let user = await ctx.db.user.update({
+              where: {
+                id: ctx.session.user.id,
+              },
               data: {
-                name: ctx.session.user.id,
-                ownedBy: { connect: { id: ctx.session.user.id } },
-                path: String(ctx.session.user.id) + "/",
+                rootId: rootFolder.id,
               },
-              include: {
-                folders: true,
-                files: true,
-              },
-            })
-            .then(async (res) => {
-              folder = res;
-              if (res?.id !== null) {
-                await ctx.db.user
-                  .update({
-                    where: {
-                      id: ctx.session.user.id,
-                    },
-                    data: {
-                      rootId: res.id,
-                    },
-                  })
-                  .then((res) => console.log(res));
-              }
             });
+
+            // As this may the first time the user is running app after signup, check if they have a tier, if not add one
+            if (
+              user?.tierId == null ||
+              user?.tierId == "" ||
+              user?.tierId == undefined
+            ) {
+              console.log("making pleb");
+              makePleb(ctx.session.user.id);
+            }
+          }
         }
       } else {
         // Non empty value for folderId

@@ -2,8 +2,8 @@
 import React from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { api } from "~/trpc/react";
-import AdminView from "./AdminView";
-import { Header } from "../_components/Header.tsx";
+import AdminView from "./AdminView.tsx";
+import { Header } from "../../_components/Header.tsx";
 
 const Admin = () => {
   const { data: session } = useSession();

@@ -1,6 +1,7 @@
 import { awsRouter } from "~/server/api/routers/aws";
-import { stripeRouter } from './routers/stripe';
-import { userRouter } from './routers/user';
+import { adminRouter } from "~/server/api/routers/admin";
+import { stripeRouter } from "./routers/stripe";
+import { userRouter } from "./routers/user";
 import { createTRPCRouter } from "~/server/api/trpc";
 
 /**
@@ -9,9 +10,10 @@ import { createTRPCRouter } from "~/server/api/trpc";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  aws     : awsRouter,
-  stripe  : stripeRouter,
-  user    : userRouter,
+  aws: awsRouter,
+  stripe: stripeRouter,
+  user: userRouter,
+  admin: adminRouter,
 });
 
 // export type definition of API

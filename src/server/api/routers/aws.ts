@@ -8,6 +8,7 @@ import {
   CopyObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { calculateUsage, checkEligibity, updateUsage } from "./routerHelpers";
 
 // Set your AWS credentials and S3 bucket information
 const region = process.env.AWS_REGION ?? "";
@@ -350,6 +351,12 @@ export const awsRouter = createTRPCRouter({
         });
 
         deleteObject(bucketName, deleted.awsKey);
+
+        const totalUsage = await calculateUsage(ctx.session.user.id);
+        console.log(totalUsage);
+        if (totalUsage !== null) {
+          updateUsage(ctx.session.user.id, totalUsage.size);
+        }
       }
     }),
 
@@ -368,6 +375,7 @@ export const awsRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       var metadata = input.metadata;
       console.log(metadata);
+
       // console.log(input.file.size);
       var fileChanged = false;
 
@@ -392,6 +400,22 @@ export const awsRouter = createTRPCRouter({
 
       if (existingFile == null) {
         // If yes, update metadata and upload to s3
+        // First check eligibity of new file
+
+        // First check eligibility to upload
+        const newEligiblity = await checkEligibity(
+          ctx.session.user.id,
+          metadata.size,
+        );
+        console.log("asdasds");
+        console.log(newEligiblity);
+
+        if (newEligiblity && !newEligiblity["allowed"]) {
+          console.log("not allowed new file");
+          return false;
+        }
+
+        // Then upload the new file
         const newFile = await ctx.db.file.create({
           data: {
             name: metadata.name,
@@ -406,8 +430,26 @@ export const awsRouter = createTRPCRouter({
         if (newFile.id) {
           fileChanged = true;
         }
-      } else if (existingFile.id !== "") {
+      } else {
+        // Update existing file
         // Update the metadata of the file
+
+        // First check eligibility to upload new file
+        // Calculate sizeDiff (this would be the updated usage with the old file replaced with the new one)
+        let sizeDiff = metadata.size - existingFile.size;
+
+        const newEligiblity = await checkEligibity(
+          ctx.session.user.id,
+          sizeDiff,
+        );
+        console.log("asdasds");
+        console.log(newEligiblity);
+
+        if (newEligiblity && !newEligiblity["allowed"]) {
+          console.log("not allowed existing file");
+          return false;
+        }
+
         console.log(metadata.name + " already exists");
 
         const newFile = await ctx.db.file.update({
@@ -426,6 +468,13 @@ export const awsRouter = createTRPCRouter({
 
       // If a file has been updated, upload the new object to s3
       if (fileChanged == true) {
+        // Update the user's usage
+        const totalUsage = await calculateUsage(ctx.session.user.id);
+        console.log(totalUsage);
+        if (totalUsage !== null) {
+          updateUsage(ctx.session.user.id, totalUsage.size);
+        }
+
         let data = Buffer.from(input.file, "base64");
         return uploadObject(
           bucketName,
@@ -547,11 +596,11 @@ export const awsRouter = createTRPCRouter({
       // 1) previous folder
       // 2) child folders
       // 3) child files
-      console.log("creating folder return");
-      console.log(folder);
+      // console.log("creating folder return");
+      // console.log(folder);
       if (folder) {
-        console.log("folder found");
-        console.log(folder);
+        // console.log("folder found");
+        // console.log(folder);
         var responseList = new Array();
 
         var response = {
@@ -616,19 +665,7 @@ export const awsRouter = createTRPCRouter({
   // }),
 
   getUserUsage: protectedProcedure.mutation(async ({ ctx }) => {
-    const sumResult = await ctx.db.file.aggregate({
-      _sum: {
-        size: true,
-      },
-      where: {
-        createdById: ctx.session.user.id,
-      },
-    });
-
-    if (sumResult._sum && sumResult._sum.size !== null) {
-      const sumMB = sumResult._sum.size / (1000 * 1000);
-      return sumMB;
-    }
+    console.log(await calculateUsage(ctx.session.user.id));
   }),
 
   getDownloadLink: protectedProcedure

@@ -36,7 +36,16 @@ export const adminRouter = createTRPCRouter({
           currUser?.tierId == ""
         ) {
           currTier = "tier-pleb";
-          if (currUser?.id !== undefined) makePleb(currUser?.id);
+          if (currUser?.id !== undefined)
+            makePleb(currUser?.id)
+              .then((data) => {
+                if (data) {
+                  console.log("Updated pleb-tier for user");
+                }
+              })
+              .catch((err) => {
+                console.error("Error updating tier:", err);
+              });
         }
 
         const tmp: UserListInterface = {

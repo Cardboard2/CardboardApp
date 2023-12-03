@@ -118,7 +118,7 @@ export function DisplayContent(type: string, url: string) {
   else if (type.includes("mp4"))
   {
 
-    return (<div className='w-11/12 h-3/4'><ReactPlayer url={url} playsinline controls width="100%" height="100%"/></div>)
+    return (<div className='w-11/12 h-5/6'> <ReactPlayer url={url} playsinline controls playing width="100%" height="100%"/> </div>)
   }
     
     

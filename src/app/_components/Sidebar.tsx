@@ -10,6 +10,7 @@ import {
 import { signOut } from 'next-auth/react'
 import CardboardLogo from './CardboardLogo'
 import { UserData } from '~/server/api/routers/user'
+import type { Session } from 'next-auth'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: true },
@@ -20,7 +21,7 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
-function SidebarComponent(props: {user: UserData}) {
+function SidebarComponent(props: {session: Session}) {
     return (
         <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-amber-400 border-r-2 border-amber-800 px-6">
             <div className="flex h-16 shrink-0 items-center">
@@ -52,11 +53,11 @@ function SidebarComponent(props: {user: UserData}) {
                         <a href="/profile" className="flex items-center truncate w-full gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-800 hover:text-white hover:bg-amber-800 duration-300">
                             <img
                                 className="h-8 w-8 rounded-full bg-gray-800 ring-2 ring-amber-700"
-                                src={props.user.image}
+                                src={props.session.user.image ?? ""}
                                 alt=""
                             />
                             <span className="sr-only">Your profile</span>
-                            <span aria-hidden="true" className="max-w-full truncate">{props.user.name}</span>
+                            <span aria-hidden="true" className="max-w-full truncate">{props.session.user.name}</span>
                         </a>
                         <button
                             onClick={()=>signOut()}
@@ -72,7 +73,7 @@ function SidebarComponent(props: {user: UserData}) {
     );
 }
 
-export default function Sidebar(props : {user: UserData}) {
+export default function Sidebar(props: {session: Session}) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
@@ -119,7 +120,7 @@ export default function Sidebar(props : {user: UserData}) {
                       </button>
                     </div>
                   </Transition.Child>
-                  <SidebarComponent user={props.user}/>
+                  <SidebarComponent session={props.session}/>
                 </Dialog.Panel>
               </Transition.Child>
             </div>
@@ -127,7 +128,7 @@ export default function Sidebar(props : {user: UserData}) {
         </Transition.Root>
 
         <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-          <SidebarComponent user={props.user}/>
+          <SidebarComponent session={props.session}/>
         </div>
 
         <div className="fixed w-full top-0 z-40 flex items-center gap-x-6 bg-amber-400 px-4 py-4 shadow-sm sm:px-6 lg:hidden">

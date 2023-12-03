@@ -8,6 +8,7 @@ import UsageBar from "../../_components/UsageBar";
 
 import type { FileListInterface } from "~/app/admin/_components/FileList";
 import type { UserListInterface } from "~/app/admin/_components/UserList";
+import type { PaymentListInterface } from "~/app/admin/_components/PaymentList";
 
 export interface AdminStatsInterface {
   "Total users": number;
@@ -65,7 +66,7 @@ function AdminStatsList(props: { AdminListProps: UserListInterface[] }) {
   return (
     <div>
       <div className="">
-        <dl className="lg:grid-cols-0 mx-auto max-w-7xl grid-cols-1 sm:grid-cols-5 md:grid lg:px-2 xl:px-0">
+        <dl className="lg:grid-cols-0 mx-auto max-w-7xl grid-cols-1 bg-amber-100 px-2 py-5 shadow-md sm:grid-cols-5 md:grid xl:px-0">
           {Object.keys(adminStats).map((key) => (
             <StatisticBox
               key={key}
@@ -81,21 +82,22 @@ function AdminStatsList(props: { AdminListProps: UserListInterface[] }) {
 
 function FileList(props: {
   FileListProps: FileListInterface[];
+  PaymentListProps: PaymentListInterface[];
   SelectedUser: UserListInterface;
 }) {
   return (
     <div>
       <div>
-        <div className="px-4 sm:px-6 lg:px-8">
-          <div className="sm:flex sm:items-center">
-            <div className="sm:flex-auto">
-              <b className=" leading-6 text-gray-900">
-                User {props.SelectedUser.name} Files:
-              </b>
-            </div>
-          </div>
-          <div className="md: flex flex-col justify-between md:flex-row">
+        <div className="px-4 sm:px-6 lg:px-8 ">
+          <div className="md: flex flex-col justify-between bg-amber-200 md:flex-row">
             <div className="flex-col">
+              <div className="sm:flex sm:items-center">
+                <div className="sm:flex-auto">
+                  <b className=" leading-6 text-gray-900">
+                    User {props.SelectedUser.name} Files:
+                  </b>
+                </div>
+              </div>
               <p>
                 <b>Email: </b>
                 {props.SelectedUser.email}
@@ -142,6 +144,7 @@ function FileList(props: {
           <div className="mt-5 flow-root">
             <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
               <div className="inline-block min-w-full overflow-hidden overflow-y-scroll py-2 align-middle sm:px-6 lg:px-8">
+                <h1>File List</h1>
                 <table className="min-w-full divide-y divide-gray-300">
                   <thead>
                     <tr>
@@ -196,6 +199,59 @@ function FileList(props: {
               </div>
             </div>
           </div>
+
+          <div></div>
+          <div className="mt-5 flow-root">
+            <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+              <div className="inline-block min-w-full overflow-hidden overflow-y-scroll py-2 align-middle sm:px-6 lg:px-8">
+                <h1>Payments List</h1>
+                <table className="min-w-full divide-y divide-gray-300">
+                  <thead>
+                    <tr>
+                      <th
+                        scope="col"
+                        className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+                      >
+                        Payment ID
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
+                        Status
+                      </th>
+                      <th
+                        scope="col"
+                        className="float-right px-3 py-3.5 text-sm font-semibold text-gray-900"
+                      >
+                        Tier
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody className="divide-y divide-gray-200 ">
+                    {props.PaymentListProps?.map(
+                      (payment: PaymentListInterface) => {
+                        return (
+                          <tr key={payment.id}>
+                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                              {payment.id}
+                            </td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                              {payment.status}
+                            </td>
+                            <td className="float-right whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                              {payment.tierId}
+                            </td>
+                          </tr>
+                        );
+                      },
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -204,9 +260,12 @@ function FileList(props: {
 
 export default function AdminView() {
   const [isAdmin, updateAdmin] = useState(false);
-  const [fileView, setFileView] = useState(false);
+  const [userInfoView, setUserInfoView] = useState(false);
   const [userList, updateItems] = useState<Array<UserListInterface>>([]);
   const [fileList, updateFileList] = useState<Array<FileListInterface>>([]);
+  const [paymentList, updatePaymentList] = useState<
+    Array<PaymentListInterface>
+  >([]);
   const [selectedUser, updateSelectedUser] = useState<UserListInterface>({
     name: "",
     id: "",
@@ -224,9 +283,10 @@ export default function AdminView() {
     getUsers.mutate();
   }, []);
 
-  function getUserFiles(userId: string, user: UserListInterface) {
-    getUserContents.mutate({ userId: userId });
-    setFileView(true);
+  function getUserDetails(userId: string, user: UserListInterface) {
+    requestUserFiles.mutate({ userId: userId });
+    requestUserPayments.mutate({ userId: userId }); // This should be one call lmao but runnin out of tim eXDD
+    setUserInfoView(true);
     updateSelectedUser(user);
   }
 
@@ -248,11 +308,20 @@ export default function AdminView() {
     },
   });
 
-  const getUserContents = api.admin.getUserContents.useMutation({
+  const requestUserFiles = api.admin.getUserFiles.useMutation({
     onSuccess: (data) => {
       if (data !== undefined && data !== null) {
         console.log(data);
         updateFileList(data);
+      }
+    },
+  });
+
+  const requestUserPayments = api.admin.getUserPayments.useMutation({
+    onSuccess: (data) => {
+      if (data !== undefined && data !== null) {
+        console.log(data);
+        updatePaymentList(data);
       }
     },
   });
@@ -282,7 +351,7 @@ export default function AdminView() {
   }
 
   if (isAdmin == true) {
-    if (fileView == false) {
+    if (userInfoView == false) {
       return (
         <div>
           <div className="flex flex-col gap-10 px-4 sm:px-6 lg:px-8">
@@ -300,7 +369,7 @@ export default function AdminView() {
               </button>
             </div>
             <AdminStatsList AdminListProps={userList} />
-            <div className="mt-3 flow-root lg:px-20">
+            <div className="mt-3 flow-root  pt-5 sm:px-5 md:px-10 lg:px-20">
               <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                   <table className="min-w-full divide-y divide-gray-300">
@@ -354,19 +423,19 @@ export default function AdminView() {
                       {userList?.map((user: UserListInterface) => {
                         return (
                           <tr key={user.email}>
-                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                            <td className="whitespace py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
                               {user.name}
                             </td>
-                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            <td className="whitespace px-3 py-4 text-sm text-gray-500">
                               {user.email}
                             </td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                               {user.role}
                             </td>
-                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            <td className=" px-3 py-4 text-sm text-gray-500">
                               {user.tierId}
                             </td>
-                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            <td className="px-3 py-4 text-sm text-gray-500">
                               {user.tierExpiry == null
                                 ? ""
                                 : user.tierExpiry.toLocaleString()}
@@ -384,7 +453,7 @@ export default function AdminView() {
                             </td>
                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                               <a
-                                onClick={() => getUserFiles(user.id, user)}
+                                onClick={() => getUserDetails(user.id, user)}
                                 className="cursor-pointer text-indigo-600 hover:text-indigo-900"
                               >
                                 View
@@ -408,18 +477,22 @@ export default function AdminView() {
           <div className="flex flex-col gap-5 px-4 sm:px-6 lg:px-8">
             <button
               className=" width: auto mt-3 rounded-md bg-amber-300 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 "
-              onClick={() => setFileView(false)}
+              onClick={() => setUserInfoView(false)}
             >
               Return to Users Page
             </button>
             <div className="sm:flex sm:items-center">
               <div className="sm:flex-auto">
                 <h1 className=" text-xl font-semibold leading-6 text-gray-900">
-                  Admin Page | User Files
+                  Admin Page | User Info
                 </h1>
               </div>
             </div>
-            <FileList FileListProps={fileList} SelectedUser={selectedUser} />
+            <FileList
+              FileListProps={fileList}
+              PaymentListProps={paymentList}
+              SelectedUser={selectedUser}
+            />
           </div>
         </div>
       );

@@ -4,6 +4,7 @@ import { convertToMb, getUserUsageStats, makePleb } from "./routerHelpers";
 
 import type { FileListInterface } from "~/app/admin/_components/FileList";
 import type { UserListInterface } from "~/app/admin/_components/UserList";
+import type { PaymentListInterface } from "~/app/admin/_components/PaymentList";
 
 export const adminRouter = createTRPCRouter({
   isAdmin: protectedProcedure.query(async ({ ctx }) => {
@@ -67,7 +68,7 @@ export const adminRouter = createTRPCRouter({
     }
   }),
 
-  getUserContents: protectedProcedure
+  getUserFiles: protectedProcedure
     .input(z.object({ userId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const user = await ctx.db.user.findUniqueOrThrow({
@@ -94,6 +95,42 @@ export const adminRouter = createTRPCRouter({
               awsKey: currFile?.awsKey ?? "Unknown",
               createdAt: currFile?.createdAt,
               modifiedAt: currFile?.updatedAt,
+            };
+
+            responseList.push(tmp);
+          }
+        }
+
+        return responseList;
+
+        // console.log(userList);
+      }
+    }),
+
+  getUserPayments: protectedProcedure
+    .input(z.object({ userId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findUniqueOrThrow({
+        where: { id: ctx.session.user.id },
+      });
+
+      if (user && user.role == "Admin") {
+        console.log("wow an admin!!");
+
+        const userContents = await ctx.db.payment.findMany({
+          where: {
+            userId: input.userId,
+          },
+        });
+
+        const responseList: PaymentListInterface[] = [];
+        if (userContents) {
+          for (const currPayment of userContents) {
+            const tmp: PaymentListInterface = {
+              id: currPayment?.id,
+              status: currPayment?.status,
+              userId: currPayment?.userId,
+              tierId: currPayment?.tierId,
             };
 
             responseList.push(tmp);

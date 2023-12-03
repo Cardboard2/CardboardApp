@@ -116,12 +116,8 @@ export function DisplayContent(type: string, url: string) {
     return (<img src={url} alt="Image" className='object-contain max-w-full max-h-full p-1'/>);
   
   else if (type.includes("mp4"))
-  {
-
     return (<div className='w-11/12 h-5/6'> <ReactPlayer url={url} playsinline controls playing width="100%" height="100%"/> </div>)
-  }
-    
-    
+
   else
     return (<iframe src={url} allowFullScreen={true} className={`h-full w-full p-1 flex items-center justify-center ${type.includes("text") ? "bg-slate-100" : ""}`}/>);
 }
@@ -145,7 +141,12 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
   return (
     <>
       <Transition appear show={props.dashboardProps.dialogOpen} as={Fragment}>
-        <Dialog static={true} as="div" className="absolute top-0 left-0 z-50 h-screen w-screen" onClose={()=>{return}}>
+        <Dialog as="div" className="absolute top-0 left-0 z-50 h-screen w-screen" onClose={()=>{
+                                                                                                              props.dashboardProps.setDialogOpen(false);
+                                                                                                              setShowMetadata(false);
+                                                                                                              setShareFile(false);
+                                                                                                              setShareFileUrl("");
+                                                                                                            }}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -170,7 +171,7 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
                 leaveTo="opacity-0 scale-95"
               >
                 
-                <Dialog.Panel className="relative w-full max-w-6xl transform overflow-hidden rounded-2xl bg-black bg-opacity-20 shadow-xl h-full max-h-[48rem] p-1 flex items-center justify-center ">
+                <Dialog.Panel className="relative w-full max-w-7xl transform overflow-hidden rounded-2xl bg-black bg-opacity-20 shadow-xl h-full max-h-[48rem] p-1 flex items-center justify-center ">
                   <div className='absolute right-2 top-2 inline-block'>
                     <button onClick={()=>{
                                         shareFileUrl == "" ? shareableLink.mutate({id: props.dashboardProps.fileDetail.id}) : "";

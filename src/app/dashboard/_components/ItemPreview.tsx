@@ -102,8 +102,7 @@ export function DownloadFile(downloadUrl: string) {
 }
 
 
-export function DisplayContent(container: RefObject<HTMLDivElement>, type: string, url: string) {
-  console.log("Div width: ", container.current?.offsetWidth, "Div height: ", container.current?.offsetHeight)
+export function DisplayContent(type: string, url: string) {
   if (type == "Unknown")
     return (<p className='text-2xl font-bold text-gray-50'>File does not exist ❌</p>);
 
@@ -118,10 +117,8 @@ export function DisplayContent(container: RefObject<HTMLDivElement>, type: strin
   
   else if (type.includes("mp4"))
   {
-    if (!container.current?.offsetWidth || !container.current?.offsetHeight)
-      return;
 
-    return (<ReactPlayer url={url} playsinline controls width={container.current.offsetWidth * 11/12} height={container.current.offsetHeight * 3/4}/>)
+    return (<div className='w-11/12 h-3/4'><ReactPlayer url={url} playsinline controls width="100%" height="100%"/></div>)
   }
     
     
@@ -144,8 +141,6 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
       setShareFileUrl(data ?? "err");
     }
   });
-  
-  const containerRef = useRef<HTMLDivElement>(null);
 
   return (
     <>
@@ -210,8 +205,8 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
                   {DisplayMetadata(showMetadata, props.dashboardProps.fileDetail)}
                   {ShareFile(shareFile, shareFileUrl)}
 
-                  <div ref={containerRef} className='h-full w-full pt-12 flex items-center justify-center'>
-                    {DisplayContent(containerRef, props.dashboardProps.fileDetail.type ?? "", url ?? "")}
+                  <div className='h-full w-full pt-12 flex items-center justify-center'>
+                    {DisplayContent(props.dashboardProps.fileDetail.type ?? "", url ?? "")}
                   </div>
                 </Dialog.Panel>
               </Transition.Child>

@@ -19,7 +19,6 @@ export default function SharedFile() {
     const id = searchParams.get("id") ?? "";
 
     const ret = api.file.getSharedFile.useQuery({id: id});
-    const containerRef = useRef<HTMLDivElement>(null);
 
     return(
         <div>
@@ -73,8 +72,8 @@ export default function SharedFile() {
                                 <XCircleIcon/>
                             </button>
                         </div>
-                        <div ref={containerRef} className='h-full w-full pt-12 flex items-center justify-center'>
-                            {DisplayContent(containerRef, ret.data?.file.type ?? "", ret.data?.inlineUrl ?? "")}
+                        <div className='h-full w-full pt-12 flex items-center justify-center'>
+                            {DisplayContent(ret.data?.file.type ?? "", ret.data?.inlineUrl ?? "")}
                         </div>
                         {DisplayMetadata(showMetadata, ret.data?.file ?? defaultFileDetail)}
                         </Dialog.Panel>

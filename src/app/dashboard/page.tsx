@@ -9,6 +9,7 @@ import { DisplayFiles } from "./_components/DisplayFiles";
 import { useState } from "react";
 import { defaultFileDetail } from "./_components/FileDetail";
 import { DashboardProps } from "./_components/DashboardProps";
+import { ItemPreview } from "./_components/ItemPreview";
 
 function DashboardPage() {
   const router = useRouter();
@@ -43,6 +44,7 @@ function DashboardPage() {
       <div className="bg-amber-200 h-full w-full z-0 pt-14 lg:pt-0 lg:pl-72 flex">
         <div className="w-full md:w-7/12 h-full "> 
           <DisplayFiles dashboardProps={dashboardProps}/>
+          {dialogOpen ? <ItemPreview dashboardProps={dashboardProps}/> : ""}
         </div>
         <div className="hidden md:block md:w-5/12 h-full border-l-2 border-amber-800 bg-white"></div>
       </div>

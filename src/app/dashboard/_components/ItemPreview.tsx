@@ -102,7 +102,7 @@ export function DownloadFile(downloadUrl: string) {
 
 export function DisplayContent(type: string, url: string) {
   if (type == "Unknown")
-    return (<p className='text-2xl font-bold text-gray-50'>File does not exist or was not shared ❌</p>);
+    return (<p className='text-2xl font-bold text-gray-50'>File does not exist ❌</p>);
 
   else if (type == "" || url == "")
     return (<Spinner/>);
@@ -114,7 +114,7 @@ export function DisplayContent(type: string, url: string) {
     return (<img src={url} className='object-contain max-w-full max-h-full p-3 pt-10'/>);
     
   else
-    return (<iframe src={url} allowFullScreen={true} className={`h-full w-full p-3 flex items-center justify-center pt-10 ${type.includes("text") ? "bg-slate-100" : ""}`}/>);
+    return (<iframe src={url} allowFullScreen={true} className={`h-screen w-screen p-3 flex items-center justify-center pt-10 ${type.includes("text") ? "bg-slate-100" : ""}`}/>);
 }
 
 export function ItemPreview(props: {dashboardProps : DashboardProps}) {
@@ -136,11 +136,7 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
   return (
     <>
       <Transition appear show={props.dashboardProps.dialogOpen} as={Fragment}>
-        <Dialog as="div" className="absolute top-0 left-0 z-50 h-screen w-screen" onClose={()=>{
-                                                                                              props.dashboardProps.setDialogOpen(false);
-                                                                                              setShowMetadata(false);
-                                                                                              setShareFile(false);
-                                                                                              setShareFileUrl("");}}>
+        <Dialog static={true} as="div" className="absolute top-0 left-0 z-50 h-screen w-screen" onClose={()=>{}}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -150,7 +146,7 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-slate-900 opacity-80" />
+            <div className="fixed inset-0 bg-gray-900 opacity-80" />
           </Transition.Child>
 
           <div className="fixed h-full w-full inset-0 overflow-y-auto">

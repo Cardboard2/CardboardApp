@@ -7,6 +7,7 @@ import { DocumentIcon, ShareIcon } from '@heroicons/react/20/solid';
 import { FileDetail } from './FileDetail';
 import { Spinner } from '~/app/_components/Spinner';
 import ReactPlayer from 'react-player';
+import Image from 'next/image';
 
 const SIZE_KILO = 1024;
 const SIZE_MEGA = 1048576;
@@ -113,10 +114,10 @@ export function DisplayContent(container: RefObject<HTMLDivElement>, type: strin
     return (<DocumentIcon className='h-24 w-24 text-slate-200'/>)
 
   else if (type.includes("image"))
-    return (<img src={url} className='object-contain max-w-full max-h-full p-1'/>);
+    return (<Image src={url} alt="Image" className='object-contain max-w-full max-h-full p-1'/>);
   
   else if (type.includes("mp4"))
-    return (<ReactPlayer url={url} playsinline controls width={container.current?.offsetWidth!*11/12} height={container.current?.offsetHeight!*3/4}/>)
+    return (<ReactPlayer url={url} playsinline controls width={container.current?.offsetWidth ?? 0 *11/12} height={container.current?.offsetHeight ?? 0 !*3/4}/>)
     
   else
     return (<iframe src={url} allowFullScreen={true} className={`h-full w-full p-1 flex items-center justify-center ${type.includes("text") ? "bg-slate-100" : ""}`}/>);

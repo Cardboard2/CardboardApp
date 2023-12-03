@@ -119,7 +119,7 @@ export function DisplayContent(type: string, url: string) {
     return (<ReactPlayer url={url} playsinline controls/>)
     
   else
-    return (<iframe src={url} allowFullScreen={true} className={`h-screen w-screen p-3 flex items-center justify-center pt-10 ${type.includes("text") ? "bg-slate-100" : ""}`}/>);
+    return (<iframe src={url} allowFullScreen={true} className={`h-full w-full p-3 flex items-center justify-center pt-10 ${type.includes("text") ? "bg-slate-100" : ""}`}/>);
 }
 
 export function ItemPreview(props: {dashboardProps : DashboardProps}) {
@@ -169,7 +169,7 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
                 <Dialog.Panel className="relative w-full max-w-6xl transform overflow-hidden rounded-2xl bg-black bg-opacity-20 shadow-xl h-full max-h-[48rem] p-1 flex items-center justify-center ">
                   <div className='absolute right-2 top-2'>
                     <button onClick={()=>{
-                                        shareableLink.mutate({id: props.dashboardProps.fileDetail.id});
+                                        shareFileUrl == "" ? shareableLink.mutate({id: props.dashboardProps.fileDetail.id}) : "";
                                         setShowMetadata(false);
                                         setTimeout(() => {
                                           setShareFile(!shareFile);

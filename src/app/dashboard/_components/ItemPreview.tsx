@@ -136,7 +136,7 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
   return (
     <>
       <Transition appear show={props.dashboardProps.dialogOpen} as={Fragment}>
-        <Dialog static={true} as="div" className="absolute top-0 left-0 z-50 h-screen w-screen">
+        <Dialog static={true} as="div" className="absolute top-0 left-0 z-50 h-screen w-screen" onClose={()=>{return}}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"

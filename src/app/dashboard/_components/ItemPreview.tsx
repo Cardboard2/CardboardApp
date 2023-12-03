@@ -114,10 +114,16 @@ export function DisplayContent(container: RefObject<HTMLDivElement>, type: strin
     return (<DocumentIcon className='h-24 w-24 text-slate-200'/>)
 
   else if (type.includes("image"))
-    return (<Image src={url} alt="Image" className='object-contain max-w-full max-h-full p-1'/>);
+    return (<img src={url} alt="Image" className='object-contain max-w-full max-h-full p-1'/>);
   
   else if (type.includes("mp4"))
-    return (<ReactPlayer url={url} playsinline controls width={container.current?.offsetWidth ?? 0 *11/12} height={container.current?.offsetHeight ?? 0 !*3/4}/>)
+  {
+    if (!container.current?.offsetWidth || !container.current?.offsetHeight)
+      return;
+
+    return (<ReactPlayer url={url} playsinline controls width={container.current.offsetWidth * 11/12} height={container.current.offsetHeight * 3/4}/>)
+  }
+    
     
   else
     return (<iframe src={url} allowFullScreen={true} className={`h-full w-full p-1 flex items-center justify-center ${type.includes("text") ? "bg-slate-100" : ""}`}/>);

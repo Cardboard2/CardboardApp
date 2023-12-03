@@ -55,7 +55,7 @@ export default function SharedFile() {
                         leaveTo="opacity-0 scale-95"
                     >
                         
-                        <Dialog.Panel className="relative w-full max-w-6xl transform overflow-hidden rounded-2xl bg-black bg-opacity-20 shadow-xl h-full max-h-[48rem] p-1 flex items-center justify-center ">
+                        <Dialog.Panel className="relative w-11/12 md:w-4/5 transform overflow-hidden rounded-2xl bg-black bg-opacity-20 shadow-xl h-5/6 p-1 flex items-center justify-center ">
                         <div className='absolute right-2 top-2'>
                             
                             <button onClick={()=>{DownloadFile(ret.data?.url ?? "")}} className='h-10 w-10 p-2 ml-2 shadow-xl text-amber-500 hover:text-amber-700 active:opacity-80 duration-200 bg-gray-900 rounded-full'>

@@ -1,7 +1,7 @@
 "use client"
 import { SimpleHeader } from "../_components/SimpleHeader";
 import { Transition, Dialog } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { api } from "~/trpc/react";
 
 import { ArrowDownCircleIcon, InformationCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
@@ -19,6 +19,7 @@ export default function SharedFile() {
     const id = searchParams.get("id") ?? "";
 
     const ret = api.file.getSharedFile.useQuery({id: id});
+    const containerRef = useRef<HTMLDivElement>(null);
 
     return(
         <div>
@@ -58,21 +59,23 @@ export default function SharedFile() {
                         <Dialog.Panel className="relative w-full max-w-6xl transform overflow-hidden rounded-2xl bg-black bg-opacity-20 shadow-xl h-full max-h-[48rem] p-1 flex items-center justify-center ">
                         <div className='absolute right-2 top-2'>
                             
-                            <button onClick={()=>{DownloadFile(ret.data?.downloadUrl ?? "")}} className='h-10 w-10 p-2 text-amber-500 hover:text-amber-700 active:opacity-80 duration-200'>
-                            <ArrowDownCircleIcon/>
+                            <button onClick={()=>{DownloadFile(ret.data?.downloadUrl ?? "")}} className='h-10 w-10 p-2 ml-2 shadow-xl text-amber-500 hover:text-amber-700 active:opacity-80 duration-200 bg-gray-900 rounded-full'>
+                                <ArrowDownCircleIcon/>
                             </button>
-                            <button onClick={()=>{setShowMetadata(!showMetadata)}} className='h-10 w-10 p-2 text-amber-500 hover:text-amber-700 active:opacity-80 duration-200'>
-                            <InformationCircleIcon/>
+                            <button onClick={()=>{setShowMetadata(!showMetadata)}} className='h-10 w-10 p-2 ml-2 shadow-xl text-amber-500 hover:text-amber-700 active:opacity-80 duration-200 bg-gray-900 rounded-full'>
+                                <InformationCircleIcon/>
                             </button>
                             <button onClick={()=>{
                                                 setShowing(false);
                                                 setShowMetadata(false);
                                                 router.push("/dashboard");
-                            }} className='h-10 w-10 p-2 text-amber-500 hover:text-amber-700 active:opacity-80 duration-200'>
-                            <XCircleIcon/>
+                            }} className='h-10 w-10 p-2 mx-2 shadow-xl text-red-500 hover:text-red-700 active:opacity-80 duration-200 bg-gray-900 rounded-full'>
+                                <XCircleIcon/>
                             </button>
                         </div>
-                        {DisplayContent(ret.data?.file.type ?? "", ret.data?.inlineUrl ?? "")}
+                        <div ref={containerRef} className='h-full w-full pt-12 flex items-center justify-center'>
+                            {DisplayContent(containerRef, ret.data?.file.type ?? "", ret.data?.inlineUrl ?? "")}
+                        </div>
                         {DisplayMetadata(showMetadata, ret.data?.file ?? defaultFileDetail)}
                         </Dialog.Panel>
                     </Transition.Child>

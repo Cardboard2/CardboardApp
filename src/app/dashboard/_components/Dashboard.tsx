@@ -2,6 +2,7 @@ import { type SubmitHandler, useForm } from "react-hook-form";
 import { api } from "~/trpc/react";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { UsageBarProps } from "~/app/_components/UsageBarProps";
 
 import {
   FolderIcon,
@@ -30,9 +31,11 @@ function validateName(name: string) {
   return name.match(/^[^a-zA-Z0-9]+$/) ? false : true;
 }
 
-export function Dashboard(props : {dashboardProps: DashboardProps}){
+export function Dashboard(props: {
+  dashboardProps: DashboardProps;
+  usageBarProps: UsageBarProps;
+}) {
   const { data: session } = useSession();
-  const [currFolderName, updateFolderName] = useState("root");
   const [currFolderId, updateFolderId] = useState("");
   const [currItems, updateItems] = useState<Array<FileDetail>>([]);
 
@@ -58,15 +61,7 @@ export function Dashboard(props : {dashboardProps: DashboardProps}){
     onSuccess: (data) => {
       if (data) {
         updateItems(data.childList);
-
-        if (session) {
-          console.log(data.name == session.user.id);
-          if (data.name == session.user.id) {
-            updateFolderId(data.folderId);
-          } else {
-            updateFolderName(data.name);
-          }
-        }
+        updateFolderId(data.folderId);
       } else {
         if (retry < 5) {
           updateFolderInfo(currFolderId);
@@ -87,11 +82,17 @@ export function Dashboard(props : {dashboardProps: DashboardProps}){
 
   useEffect(() => {
     console.log("currFolderId is now " + currFolderId);
-  }, []);
+  }, [currFolderId]);
 
   const deleteFileAPI = api.aws.deleteFile.useMutation({
-    onSuccess: () => {
-      // getFiles.mutate({ folderId: currFolderId });
+    onSuccess: (data) => {
+      console.log(data);
+
+      if (data && data.status == "success") {
+        console.log(data.usage);
+        props.usageBarProps.setUsage(data.usage.userUsage);
+        props.usageBarProps.setTotalSpace(data.usage.totalStorage);
+      }
     },
   });
   function deleteFile(name: string) {
@@ -142,15 +143,21 @@ export function Dashboard(props : {dashboardProps: DashboardProps}){
   const { register, handleSubmit } = useForm<FormInput>();
 
   const uploadFile = api.aws.uploadFile.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       getFiles.mutate({ folderId: currFolderId });
+      console.log(data);
+
+      if (data && data.status == "success" && data.usage) {
+        console.log(data.usage);
+        props.usageBarProps.setUsage(data.usage.userUsage);
+        props.usageBarProps.setTotalSpace(data.usage.totalStorage);
+      }
     },
   });
 
   const onSubmit: SubmitHandler<FormInput> = async (data) => {
     for (const currFile of data.files) {
-      if (!currFile.name || !currFile.size || !currFile.type )
-        return;
+      if (!currFile.name || !currFile.size || !currFile.type) return;
 
       await new Promise((r) => setTimeout(r, 1000));
       await readFile(currFile).then((file) => {
@@ -193,13 +200,16 @@ export function Dashboard(props : {dashboardProps: DashboardProps}){
           <div className="justify-content mt-5 flex flex-col gap-1">
             {currItems?.map((item) => {
               return (
-                <div key={item.name} onClick={() => {
-                  if (item.objectType != "Folder"){
-                    props.dashboardProps.setDialogOpen(true);
-                    props.dashboardProps.setFileDetail(item);
-                    props.dashboardProps.setFolderId(currFolderId);
-                  }
-                }}>
+                <div
+                  key={item.name}
+                  onClick={() => {
+                    if (item.objectType != "Folder") {
+                      props.dashboardProps.setDialogOpen(true);
+                      props.dashboardProps.setFileDetail(item);
+                      props.dashboardProps.setFolderId(currFolderId);
+                    }
+                  }}
+                >
                   {item.objectType == "Folder" ? (
                     <div className="flex flex-row border-[1px] border-black p-1">
                       <FolderIcon
@@ -226,7 +236,11 @@ export function Dashboard(props : {dashboardProps: DashboardProps}){
                       ) : (
                         <DocumentIcon className="float-left h-6 w-6 "></DocumentIcon>
                       )}
-                      <button className="ml-1" key={item.name} title={item.name}>
+                      <button
+                        className="ml-1"
+                        key={item.name}
+                        title={item.name}
+                      >
                         {item.name}
                       </button>
                       <div className="float-right inline-flex gap-1">
@@ -258,4 +272,4 @@ export function Dashboard(props : {dashboardProps: DashboardProps}){
   } else {
     return <></>;
   }
-};
+}

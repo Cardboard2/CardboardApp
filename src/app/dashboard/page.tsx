@@ -4,8 +4,10 @@ import { SessionProvider } from "next-auth/react";
 import { Dashboard } from "./_components/Dashboard";
 import { ItemPreview } from "./_components/ItemPreview";
 import Profile from "../profile/Profile";
+import UsageBar from "../_components/UsageBar";
+import { UsageBarProps } from "../_components/UsageBarProps";
 
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import {
   Bars3Icon,
@@ -20,6 +22,7 @@ import {
 import CardboardLogo from "~/app/_components/CardboardLogo";
 import { defaultFileDetail } from "./_components/FileDetail";
 import { DashboardProps } from "./_components/DashboardProps";
+import { api } from "~/trpc/react";
 
 const navigation = [
   { name: "Dashboard", href: "#", icon: HomeIcon, current: true },
@@ -36,9 +39,9 @@ function classNames(...classes: string[]) {
 
 export default function Example() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [ dialogOpen, setDialogOpen ] = useState(false);
-  const [ folderId, setFolderId ] = useState("");
-  const [ fileDetail, setFileDetail ] = useState(defaultFileDetail);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [folderId, setFolderId] = useState("");
+  const [fileDetail, setFileDetail] = useState(defaultFileDetail);
 
   const dashboardProps: DashboardProps = {
     fileDetail: fileDetail,
@@ -46,8 +49,26 @@ export default function Example() {
     folderId: folderId,
     setDialogOpen: setDialogOpen,
     setFileDetail: setFileDetail,
-    setFolderId: setFolderId
-  }
+    setFolderId: setFolderId,
+  };
+
+  const [usage, setUsage] = useState(0);
+  const [totalSpace, setTotalSpace] = useState(0);
+
+  const usageBarProps: UsageBarProps = {
+    setUsage: setUsage,
+    setTotalSpace: setTotalSpace,
+  };
+
+  const getUsage = api.aws.getUsage.useMutation({
+    onSuccess: (data) => {
+      setUsage(data.userUsage);
+      setTotalSpace(data.totalStorage);
+    },
+  });
+  useEffect(() => {
+    getUsage.mutate();
+  }, []);
 
   return (
     <>
@@ -239,7 +260,17 @@ export default function Example() {
                       ))}
                     </ul>
                   </li>
-                  <li className="-mx-6 mb-2 mt-auto px-5">
+                  <li className="-mx-6 mb-2 mt-auto flex-col gap-5 px-5">
+                    <div className="mb-5 rounded-md bg-amber-300 px-3 pb-2 pt-3 ">
+                      <UsageBar usage={usage} totalSpace={totalSpace} />
+
+                      <div className="mt-1">
+                        <a className=" pl-1 text-[12px]">
+                          {usage} MB of {totalSpace} MB used
+                        </a>
+                      </div>
+                    </div>
+
                     <Profile></Profile>
                   </li>
                 </ul>
@@ -269,8 +300,15 @@ export default function Example() {
                   Dashboard
                 </h2>
               </div>
-              <Dashboard dashboardProps={dashboardProps}/>
-              {dialogOpen? <ItemPreview dashboardProps={dashboardProps}/> : <></>}
+              <Dashboard
+                dashboardProps={dashboardProps}
+                usageBarProps={usageBarProps}
+              />
+              {dialogOpen ? (
+                <ItemPreview dashboardProps={dashboardProps} />
+              ) : (
+                <></>
+              )}
             </div>
           </main>
         </div>

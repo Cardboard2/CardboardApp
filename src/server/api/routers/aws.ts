@@ -8,6 +8,13 @@ import {
   CopyObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import {
+  calculateUsage,
+  checkEligibity,
+  updateUsage,
+  makePleb,
+  getUserUsageStats,
+} from "./routerHelpers";
 
 // Set your AWS credentials and S3 bucket information
 const region = process.env.USER_AWS_REGION ?? "";
@@ -154,14 +161,13 @@ async function createPresignedUrl(
 
   const command = new GetObjectCommand(input);
 
-  return await getSignedUrl(s3Client, command, { expiresIn: 60 * expiryMinutes });
+  return await getSignedUrl(s3Client, command, {
+    expiresIn: 60 * expiryMinutes,
+  });
 }
 
 // // ============= create presigned url ======================
-async function getInlineUrl(
-  bucketName: string,
-  key: string,
-) {
+async function getInlineUrl(bucketName: string, key: string) {
   const expiryMinutes = 15;
   const input = {
     Bucket: bucketName, // required
@@ -171,66 +177,42 @@ async function getInlineUrl(
 
   const command = new GetObjectCommand(input);
 
-  return await getSignedUrl(s3Client, command, { expiresIn: 60 * expiryMinutes });
+  return await getSignedUrl(s3Client, command, {
+    expiresIn: 60 * expiryMinutes,
+  });
 }
 
 // TPRC Imports
 import { z } from "zod";
 import type { FileDetail } from "~/app/dashboard/_components/FileDetail";
 
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
-
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 
 export const awsRouter = createTRPCRouter({
-  // Get the root folder and return its contents
-  // If no root folder exists, create one and return nothing
-  getRootFiles: protectedProcedure.mutation(async ({ ctx }) => {
-    // TODO: Get the root folder for the current user
-    // Query user model for rootId, if null=create else get the folder files
+  // NOTE: a folder's path = {path}/currentfolderName/
 
-    await ctx.db.user
-      .findFirst({
-        where: { id: ctx.session.user.id },
-      })
-      .then(async (result) => {
-        if (result && result.rootId == null) {
-          console.log("creating folder");
-          console.log(String(ctx.session.user.id) + "/");
-          await ctx.db.folder
-            .create({
-              data: {
-                name: ctx.session.user.id,
-                ownedBy: { connect: { id: ctx.session.user.id } },
-                path: String(ctx.session.user.id) + "/",
-              },
-            })
-            .then(async (createResponse) => {
-              await ctx.db.user
-                .update({
-                  where: {
-                    id: ctx.session.user.id,
-                  },
-                  data: {
-                    rootId: createResponse.id,
-                  },
-                })
-                .then((res) => console.log(res));
-            });
-        } else {
-          console.log("yo");
-          //Get the root contents
-          //prob will be a list of files (hoping its json)
-        }
-      });
-  }),
+  // updateFolderName
+  // Check if folder path can exist or not (unique)
+  // Update the folder object's name  and path
+  // Get all files with parentFolderId
+  // For all files, run updateFileNames for each file (replacing and updateing each awsKey)
+  // Get all folders with parentFolderId
+  // For all folders, run updateFolderName
+  // Delete the current folder
 
-  // updateFileNames
-  // Path = AWS KEY
-  // Relative path in db will be parentFolderPath + name
-  // Sending to AWS will involve, moving from old awsKey to relativePath
-  // 1. just need to CopyObject() with awsKey and relativePath and DeleteObjectCommand() with awsKey
-  // 2. Update awsKey to reflect the relativePath
-  // 3. awsKey should match parentFolderPath + name
+  // delete files
+  // Get the file with with the parentId and name, delete using DeleteObjectCommand
+
+  // delete folder
+  // aws :  need to delete all entries within the folder then delete
+  // delete folder should cascade files/folders below
+
+  // download files
+  // presigned url something sometin
 
   renameFile: protectedProcedure
     .input(
@@ -319,26 +301,6 @@ export const awsRouter = createTRPCRouter({
       }
     }),
 
-  // NOTE: a folder's path = {path}/currentfolderName/
-  // updateFolderName
-  // Check if folder path can exist or not (unique)
-  // Update the folder object's name  and path
-  // Get all files with parentFolderId
-  // For all files, run updateFileNames for each file (replacing and updateing each awsKey)
-  // Get all folders with parentFolderId
-  // For all folders, run updateFolderName
-  // Delete the current folder
-
-  // delete files
-  // Get the file with with the parentId and name, delete using DeleteObjectCommand
-
-  // delete folder
-  // aws :  need to delete all entries within the folder then delete
-  // delete folder should cascade files/folders below
-
-  // download files
-  // presigned url something sometin
-
   deleteFile: protectedProcedure
     .input(
       z.object({
@@ -350,6 +312,7 @@ export const awsRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       console.log("deleting file");
+
       const file = await ctx.db.file.findFirst({
         where: {
           createdById: ctx.session.user.id,
@@ -366,7 +329,23 @@ export const awsRouter = createTRPCRouter({
           },
         });
 
-        await deleteObject(bucketName, deleted.awsKey);
+        deleteObject(bucketName, deleted.awsKey)
+          .then((data) => {
+            console.log("Delete successful");
+            console.log(data);
+          })
+          .catch((err) => {
+            console.error("Error deleting file:", err);
+          });
+
+        const user = await calculateUsage(ctx.session.user.id);
+
+        const updatedUser = await updateUsage(ctx.session.user.id, user.size);
+
+        return {
+          status: "success",
+          usage: getUserUsageStats(updatedUser.usage, updatedUser.tierId),
+        };
       }
     }),
 
@@ -385,6 +364,7 @@ export const awsRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const metadata = input.metadata;
       console.log(metadata);
+
       // console.log(input.file.size);
       let fileChanged = false;
 
@@ -409,6 +389,20 @@ export const awsRouter = createTRPCRouter({
 
       if (existingFile == null) {
         // If yes, update metadata and upload to s3
+        // First check eligibity of new file
+
+        // First check eligibility to upload
+        const newEligiblity = await checkEligibity(
+          ctx.session.user.id,
+          metadata.size,
+        );
+
+        if (newEligiblity && !newEligiblity.allowed) {
+          console.log("not allowed new file");
+          return { status: "error", usage: { userUsage: 0, totalStorage: 0 } };
+        }
+
+        // Then upload the new file
         const newFile = await ctx.db.file.create({
           data: {
             name: metadata.name,
@@ -423,8 +417,26 @@ export const awsRouter = createTRPCRouter({
         if (newFile.id) {
           fileChanged = true;
         }
-      } else if (existingFile.id !== "") {
+      } else {
+        // Update existing file
         // Update the metadata of the file
+
+        // First check eligibility to upload new file
+        // Calculate sizeDiff (this would be the updated usage with the old file replaced with the new one)
+        const sizeDiff = metadata.size - existingFile.size;
+
+        const newEligiblity = await checkEligibity(
+          ctx.session.user.id,
+          sizeDiff,
+        );
+        console.log("asdasds");
+        console.log(newEligiblity);
+
+        if (newEligiblity && !newEligiblity.allowed) {
+          console.log("not allowed existing file");
+          return { status: "error", usage: { userUsage: 0, totalStorage: 0 } };
+        }
+
         console.log(metadata.name + " already exists");
 
         await ctx.db.file.update({
@@ -443,14 +455,27 @@ export const awsRouter = createTRPCRouter({
 
       // If a file has been updated, upload the new object to s3
       if (fileChanged == true) {
+        // Update the user's usage
+
+        const user = await calculateUsage(ctx.session.user.id);
+
+        const updatedUser = await updateUsage(ctx.session.user.id, user.size);
+
         const data = Buffer.from(input.file, "base64");
-        return uploadObject(
+        await uploadObject(
           bucketName,
           folder?.path + metadata.name,
           data,
           metadata.type,
         );
+
+        return {
+          status: "success",
+          usage: getUserUsageStats(updatedUser.usage, updatedUser.tierId),
+        };
       }
+
+      return { status: "error", usage: { userUsage: 0, totalStorage: 0 } };
     }),
 
   createFolder: protectedProcedure
@@ -492,6 +517,9 @@ export const awsRouter = createTRPCRouter({
       }
     }),
 
+  // This gets the folder contents for the current folder and user
+  // This runs on the dashboard page and on every folder load
+  // If the user is a first time user and has no folder, create one and update their tier if they don't have a tier
   getFolderContents: protectedProcedure
     .input(z.object({ folderId: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -517,33 +545,48 @@ export const awsRouter = createTRPCRouter({
         // If root doesn't exist, create it and use it
         if (folder == null) {
           // Root doesnt exist, create it
-          folder = await ctx.db.folder
-            .create({
+          const rootFolder = await ctx.db.folder.create({
+            data: {
+              name: ctx.session.user.id,
+              ownedBy: { connect: { id: ctx.session.user.id } },
+              path: String(ctx.session.user.id) + "/",
+            },
+            include: {
+              folders: true,
+              files: true,
+            },
+          });
+
+          folder = rootFolder;
+
+          if (rootFolder?.id !== null) {
+            const user = await ctx.db.user.update({
+              where: {
+                id: ctx.session.user.id,
+              },
               data: {
-                name: ctx.session.user.id,
-                ownedBy: { connect: { id: ctx.session.user.id } },
-                path: String(ctx.session.user.id) + "/",
+                rootId: rootFolder.id,
               },
-              include: {
-                folders: true,
-                files: true,
-              },
-            })
-            .then(async (res) => {
-              folder = res;
-              if (res?.id !== null) {
-                await ctx.db.user
-                  .update({
-                    where: {
-                      id: ctx.session.user.id,
-                    },
-                    data: {
-                      rootId: res.id,
-                    },
-                  })
-                  .then((res) => console.log(res));
-              }
             });
+
+            // As this may the first time the user is running app after signup, check if they have a tier, if not add one
+            if (
+              user?.tierId == null ||
+              user?.tierId == "" ||
+              user?.tierId == undefined
+            ) {
+              console.log("making pleb");
+              makePleb(ctx.session.user.id)
+                .then((data) => {
+                  if (data) {
+                    console.log("Updated pleb-tier for user");
+                  }
+                })
+                .catch((err) => {
+                  console.error("Error updating tier:", err);
+                });
+            }
+          }
         }
       } else {
         // Non empty value for folderId
@@ -564,12 +607,12 @@ export const awsRouter = createTRPCRouter({
       // 1) previous folder
       // 2) child folders
       // 3) child files
-      console.log("creating folder return");
-      console.log(folder);
+      // console.log("creating folder return");
+      // console.log(folder);
       if (folder) {
         console.log("folder found");
         console.log(folder);
-        const responseList : FileDetail[] = [];
+        const responseList: FileDetail[] = [];
 
         const response = {
           name: folder.name,
@@ -621,29 +664,6 @@ export const awsRouter = createTRPCRouter({
       }
     }),
 
-  // getFiles: publicProcedure.mutation(async ({ ctx }) => {
-  //   return listObjects(bucketName, "destination/").then((data) => {
-  //     console.log(data?.Contents);
-  //     return data?.Contents;
-  //   });
-  // }),
-
-  getUserUsage: protectedProcedure.mutation(async ({ ctx }) => {
-    const sumResult = await ctx.db.file.aggregate({
-      _sum: {
-        size: true,
-      },
-      where: {
-        createdById: ctx.session.user.id,
-      },
-    });
-
-    if (sumResult._sum?.size !== null) {
-      const sumMB = sumResult._sum.size / (1000 * 1000);
-      return sumMB;
-    }
-  }),
-
   getDownloadLink: protectedProcedure
     .input(
       z.object({
@@ -668,7 +688,11 @@ export const awsRouter = createTRPCRouter({
 
       if (file?.awsKey) {
         console.log(file);
-        const url = await createPresignedUrl(bucketName, file?.awsKey, file.name);
+        const url = await createPresignedUrl(
+          bucketName,
+          file?.awsKey,
+          file.name,
+        );
         return {
           fileName: file.name,
           link: url,
@@ -677,8 +701,8 @@ export const awsRouter = createTRPCRouter({
     }),
 
   getInlineUrl: protectedProcedure
-    .input(z.object({id: z.string()}))
-    .query(async ({ctx, input}) => {
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
       const ret = await ctx.db.user.findUnique({
         where: {
           id: ctx.session.user.id,
@@ -693,22 +717,19 @@ export const awsRouter = createTRPCRouter({
       });
       if (ret?.files?.length) {
         const file = ret.files[0];
-        if (file?.awsKey)
-          return (await getInlineUrl(bucketName, file.awsKey));
-      }
-      else {
-        const file = await ctx.db.file.findUnique({where: {id: input.id}});
+        if (file?.awsKey) return await getInlineUrl(bucketName, file.awsKey);
+      } else {
+        const file = await ctx.db.file.findUnique({ where: { id: input.id } });
         if (file?.shared && file.awsKey)
-          return (await getInlineUrl(bucketName, file.awsKey));
+          return await getInlineUrl(bucketName, file.awsKey);
       }
 
       return "";
     }),
 
   queryDownloadLink: protectedProcedure
-    .input(z.object({id: z.string()}))
+    .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-
       const ret = await ctx.db.user.findUnique({
         where: {
           id: ctx.session.user.id,
@@ -724,34 +745,43 @@ export const awsRouter = createTRPCRouter({
       if (ret?.files?.length) {
         const file = ret.files[0];
         if (file?.awsKey)
-          return (await createPresignedUrl(bucketName, file.awsKey, file.name));
-      }
-      else {
-        const file = await ctx.db.file.findUnique({where: {id: input.id}});
+          return await createPresignedUrl(bucketName, file.awsKey, file.name);
+      } else {
+        const file = await ctx.db.file.findUnique({ where: { id: input.id } });
         if (file?.shared && file.awsKey)
-          return (await getInlineUrl(bucketName, file.awsKey));
+          return await getInlineUrl(bucketName, file.awsKey);
       }
 
       return "";
     }),
 
-    getSharedFileDownloadUrl: publicProcedure
-      .input(z.object({id: z.string()}))
-      .query(async ({ ctx, input }) => {
-        const file = await ctx.db.file.findUnique({where: {id: input.id}});
-          if (file?.shared && file.awsKey)
-            return (await createPresignedUrl(bucketName, file.awsKey, file.name));
+  getSharedFileDownloadUrl: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const file = await ctx.db.file.findUnique({ where: { id: input.id } });
+      if (file?.shared && file.awsKey)
+        return await createPresignedUrl(bucketName, file.awsKey, file.name);
 
-        return "";
-      }),
+      return "";
+    }),
 
-    getSharedFileInlineUrl: publicProcedure
-      .input(z.object({id: z.string()}))
-      .query(async ({ ctx, input }) => {
-        const file = await ctx.db.file.findUnique({where: {id: input.id}});
-          if (file?.shared && file.awsKey)
-            return (await getInlineUrl(bucketName, file.awsKey));
+  getSharedFileInlineUrl: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const file = await ctx.db.file.findUnique({ where: { id: input.id } });
+      if (file?.shared && file.awsKey)
+        return await getInlineUrl(bucketName, file.awsKey);
 
-        return "";
-      }),
+      return "";
+    }),
+
+  getUsage: protectedProcedure.mutation(async ({ ctx }) => {
+    const user = await ctx.db.user.findUnique({
+      where: {
+        id: ctx.session.user.id,
+      },
+    });
+
+    return getUserUsageStats(user?.usage, user?.tierId);
+  }),
 });

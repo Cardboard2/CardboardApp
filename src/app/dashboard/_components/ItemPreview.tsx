@@ -6,6 +6,7 @@ import { ArrowDownCircleIcon, InformationCircleIcon, XCircleIcon, ClipboardDocum
 import { DocumentIcon, ShareIcon } from '@heroicons/react/20/solid';
 import { FileDetail } from './FileDetail';
 import { Spinner } from '~/app/_components/Spinner';
+import ReactPlayer from 'react-player';
 
 const SIZE_KILO = 1024;
 const SIZE_MEGA = 1048576;
@@ -37,7 +38,7 @@ export function DisplayMetadata(showMetadata: boolean, fileDetail: FileDetail) {
           leaveFrom="opacity-100 scale-100 translate-y-0"
           leaveTo="opacity-0 scale-0 -translate-y-full"
         >
-          <div className="absolute right-2 top-12 p-2 rounded-xl w-[20rem] md:w-[42rem] bg-amber-300 text-left shadow-xl">
+          <div className="absolute right-2 top-16 p-2 rounded-xl w-[20rem] md:w-[42rem] bg-amber-300 text-left shadow-xl">
             <p className="text-lg font-bold text-amber-950 p-1 mb-2">File info</p>
             <p className="truncate"><span className='font-extrabold text-gray-600 text-xs'>Name: </span><span className="text-sm text-gray-800 font-semibold">{fileDetail.name}</span></p>
             <p className="truncate"><span className='font-extrabold text-gray-600 text-xs'>Type: </span><span className="text-sm text-gray-800 font-semibold">{fileDetail.type}</span></p>
@@ -81,7 +82,7 @@ function ShareFile(showSharing: boolean, url: string) {
           leaveFrom="opacity-100 scale-100 translate-y-0"
           leaveTo="opacity-0 scale-0 -translate-y-full"
         >
-          <div className="absolute right-2 top-12 p-2 rounded-xl w-[20rem] md:w-[42rem] bg-amber-300 text-left shadow-xl">
+          <div className="absolute right-2 top-16 p-2 rounded-xl w-[20rem] md:w-[42rem] bg-amber-300 text-left shadow-xl">
             <p className="text-lg font-bold text-amber-950 p-1 mb-2">Share your files</p>
             {url == "" ? <Spinner width={14} height={14}/> : url == "err" ? ErrorMessage() : SuccessMessage(url)}
           </div>
@@ -101,6 +102,7 @@ export function DownloadFile(downloadUrl: string) {
 
 
 export function DisplayContent(type: string, url: string) {
+  console.log("Div height: ", parent.innerWidth, "Div width: ", parent.innerHeight)
   if (type == "Unknown")
     return (<p className='text-2xl font-bold text-gray-50'>File does not exist ❌</p>);
 
@@ -112,6 +114,9 @@ export function DisplayContent(type: string, url: string) {
 
   else if (type.includes("image"))
     return (<img src={url} className='object-contain max-w-full max-h-full p-3 pt-10'/>);
+  
+  else if (type.includes("mp4"))
+    return (<ReactPlayer url={url} playsinline controls/>)
     
   else
     return (<iframe src={url} allowFullScreen={true} className={`h-screen w-screen p-3 flex items-center justify-center pt-10 ${type.includes("text") ? "bg-slate-100" : ""}`}/>);
@@ -166,18 +171,22 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
                     <button onClick={()=>{
                                         shareableLink.mutate({id: props.dashboardProps.fileDetail.id});
                                         setShowMetadata(false);
-                                        setShareFile(!shareFile);
-                      }} className='h-10 w-10 p-2 text-amber-500 hover:text-amber-700 active:opacity-80 duration-200'>
+                                        setTimeout(() => {
+                                          setShareFile(!shareFile);
+                                        }, 300);
+                                        
+                      }} className='h-10 w-10 p-2 ml-2 mt-2 shadow-xl text-amber-500 hover:text-amber-700 active:opacity-80 duration-200 bg-gray-900 rounded-full'>
                       <ShareIcon/>
                     </button>
-                    <button onClick={()=>DownloadFile(downloadUrl ?? "")} className='h-10 w-10 p-2 text-amber-500 hover:text-amber-700 active:opacity-80 duration-200'>
+                    <button onClick={()=>DownloadFile(downloadUrl ?? "")} className='h-10 w-10 p-2 ml-2 mt-2 shadow-xl bg-gray-900 rounded-full text-amber-500 hover:text-amber-700 active:opacity-80 duration-200'>
                       <ArrowDownCircleIcon/>
                     </button>
                     <button onClick={()=>{
                                         setShareFile(false);
-                                        setShareFileUrl("");
-                                        setShowMetadata(!showMetadata);
-                      }} className='h-10 w-10 p-2 text-amber-500 hover:text-amber-700 active:opacity-80 duration-200'>
+                                        setTimeout(() => {
+                                          setShowMetadata(!showMetadata);
+                                        }, 300);
+                      }} className='h-10 w-10 p-2 ml-2 mt-2 shadow-xl text-amber-500 hover:text-amber-700 active:opacity-80 duration-200 bg-gray-900 rounded-full'>
                       <InformationCircleIcon/>
                     </button>
                     <button onClick={()=>{
@@ -185,7 +194,7 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
                                         setShowMetadata(false);
                                         setShareFile(false);
                                         setShareFileUrl("");
-                      }} className='h-10 w-10 p-2 text-amber-500 hover:text-amber-700 active:opacity-80 duration-200'>
+                      }} className='h-10 w-10 p-2 ml-2 mt-2 shadow-xl text-amber-500 hover:text-amber-700 active:opacity-80 duration-200 bg-gray-900 rounded-full'>
                       <XCircleIcon/>
                     </button>
                   </div>

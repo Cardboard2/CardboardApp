@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import PromptBox from "./PromptBox";
 import { Spinner } from "~/app/_components/Spinner";
+import Image from "next/image";
 
 type CallbackFunction = () => void;
 
@@ -193,15 +194,13 @@ export default function ProfileMain() {
                   <form className="md:col-span-2">
                     <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
                       <div className="col-span-full flex items-center gap-x-8">
-                        <img
-                          src={
-                            user.data?.image !== null && user.data?.image !== undefined
-                              ? encodeURI(user.data?.image)
-                              : "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/271deea8-e28c-41a3-aaf5-2913f5f48be6/de7834s-6515bd40-8b2c-4dc6-a843-5ac1a95a8b55.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzI3MWRlZWE4LWUyOGMtNDFhMy1hYWY1LTI5MTNmNWY0OGJlNlwvZGU3ODM0cy02NTE1YmQ0MC04YjJjLTRkYzYtYTg0My01YWMxYTk1YThiNTUuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.BopkDn1ptIwbmcKHdAOlYHyAOOACXW0Zfgbs0-6BY-E"
-                          }
-                          alt=""
-                          className="h-24 w-24 flex-none rounded-lg bg-gray-800 object-cover"
-                        />
+                        <Image
+                                  className=" rounded-xl bg-gray-800 ring-2 ring-amber-700"
+                                  src={user.data?.image ?? "/Cardboard_Normal.png"}
+                                  alt=""
+                                  height={96}
+                                  width={96}
+                              />
                       </div>
 
                       <div className="sm:col-span-full">

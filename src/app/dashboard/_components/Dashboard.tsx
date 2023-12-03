@@ -206,7 +206,6 @@ export function Dashboard(props: {
                     if (item.objectType != "Folder") {
                       props.dashboardProps.setDialogOpen(true);
                       props.dashboardProps.setFileDetail(item);
-                      props.dashboardProps.setFolderId(currFolderId);
                     }
                   }}
                 >

@@ -10,6 +10,7 @@ import {
 import { signOut } from 'next-auth/react'
 import CardboardLogo from '~/app/_components/CardboardLogo'
 import type { Session } from 'next-auth'
+import Image from 'next/image'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: false },
@@ -50,10 +51,12 @@ function SidebarComponent(props: {session: Session}) {
                     </li>
                     <li className="-mx-6 mt-auto">
                         <a href="/profile" className="flex items-center truncate w-full gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white bg-amber-800 duration-300">
-                            <img
+                            <Image
                                 className="h-8 w-8 rounded-full bg-gray-800 ring-2 ring-amber-700"
-                                src={props.session.user.image ?? ""}
+                                src={ props.session.user.image ?? "/Cardboard_Normal.png"}
                                 alt=""
+                                height={32}
+                                width={32}
                             />
                             <span className="sr-only">Your profile</span>
                             <span aria-hidden="true" className="max-w-full truncate">{props.session.user.name}</span>

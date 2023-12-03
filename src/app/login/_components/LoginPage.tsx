@@ -1,17 +1,26 @@
 "use client";
 
 import React from "react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 import CardboardLogo from "~/app/_components/CardboardLogo";
 import LoginForm from "./LoginForm";
 import SignUpForm from "./SignUpForm";
 import Image from "next/image";
+import { Spinner } from "~/app/_components/Spinner";
 
 export default function LoginWrapper() {
   const [isLogin, setIsLogin] = React.useState(true);
-  const router = useRouter()
+  const session = useSession();
+  const router = useRouter();
+
+  if (session.status == "loading") {
+    return <div className="w-screen h-screen flex items-center justify-center"> <Spinner/> </div> 
+  };
+
+  if (session.data?.user)
+    router.push("/dashboard");
 
 
   return (

@@ -171,7 +171,7 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
                 leaveTo="opacity-0 scale-95"
               >
                 
-                <Dialog.Panel className="relative w-full max-w-7xl transform overflow-hidden rounded-2xl bg-black bg-opacity-20 shadow-xl h-full max-h-[48rem] p-1 flex items-center justify-center ">
+                <Dialog.Panel className="relative w-11/12 md:w-4/5 transform overflow-hidden rounded-2xl bg-black bg-opacity-20 shadow-xl h-5/6 p-1 flex items-center justify-center ">
                   <div className='absolute right-2 top-2 inline-block'>
                     <button onClick={()=>{
                                         shareFileUrl == "" ? shareableLink.mutate({id: props.dashboardProps.fileDetail.id}) : "";

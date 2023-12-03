@@ -175,10 +175,10 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
                                           setShareFile(!shareFile);
                                         }, 300);
                                         
-                      }} className='h-10 w-10 p-2 ml-2 mt-2 shadow-xl text-amber-500 hover:text-amber-700 active:opacity-80 duration-200 bg-gray-900 rounded-full'>
+                      }} className='h-10 w-10 p-2 ml-2 shadow-xl text-amber-500 hover:text-amber-700 active:opacity-80 duration-200 bg-gray-900 rounded-full'>
                       <ShareIcon/>
                     </button>
-                    <button onClick={()=>DownloadFile(downloadUrl ?? "")} className='h-10 w-10 p-2 ml-2 mt-2 shadow-xl bg-gray-900 rounded-full text-amber-500 hover:text-amber-700 active:opacity-80 duration-200'>
+                    <button onClick={()=>DownloadFile(downloadUrl ?? "")} className='h-10 w-10 p-2 ml-2 shadow-xl bg-gray-900 rounded-full text-amber-500 hover:text-amber-700 active:opacity-80 duration-200'>
                       <ArrowDownCircleIcon/>
                     </button>
                     <button onClick={()=>{
@@ -186,7 +186,7 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
                                         setTimeout(() => {
                                           setShowMetadata(!showMetadata);
                                         }, 300);
-                      }} className='h-10 w-10 p-2 ml-2 mt-2 shadow-xl text-amber-500 hover:text-amber-700 active:opacity-80 duration-200 bg-gray-900 rounded-full'>
+                      }} className='h-10 w-10 p-2 ml-2 shadow-xl text-amber-500 hover:text-amber-700 active:opacity-80 duration-200 bg-gray-900 rounded-full'>
                       <InformationCircleIcon/>
                     </button>
                     <button onClick={()=>{
@@ -194,7 +194,7 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
                                         setShowMetadata(false);
                                         setShareFile(false);
                                         setShareFileUrl("");
-                      }} className='h-10 w-10 p-2 ml-2 mt-2 shadow-xl text-amber-500 hover:text-amber-700 active:opacity-80 duration-200 bg-gray-900 rounded-full'>
+                      }} className='h-10 w-10 p-2 mx-2 shadow-xl text-red-500 hover:text-red-700 active:opacity-80 duration-200 bg-gray-900 rounded-full'>
                       <XCircleIcon/>
                     </button>
                   </div>

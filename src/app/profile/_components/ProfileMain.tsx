@@ -2,12 +2,13 @@ import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import PromptBox from "./PromptBox";
+import { Spinner } from "~/app/_components/Spinner";
 
 type CallbackFunction = () => void;
 
 export default function ProfileMain() {
   const router = useRouter();
-  const { data: user } = api.user.getUser.useQuery();
+  const user = api.user.getUser.useQuery();
   const [promptVisible, setPromptVisability] = useState(false);
   const [promptTitle, setPromptTitle] = useState("");
   const [promptMessage, setPromptMessage] = useState("");
@@ -64,6 +65,9 @@ export default function ProfileMain() {
     });
   }
 
+  if (user.isLoading)
+    return <div className="w-screen h-screen flex items-center justify-center"> <Spinner/> </div> 
+
   return (
     <>
       <div className="pt-20 lg:pt-10">
@@ -112,7 +116,7 @@ export default function ProfileMain() {
                             id="tierId"
                             value={
                               newSubscription == ""
-                                ? user?.tierId ?? ""
+                                ? user.data?.tierId ?? ""
                                 : newSubscription
                             }
                             className="block w-full rounded-md border-0 bg-black/5 px-2 py-1.5 text-black shadow-sm ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-amber-500 sm:text-sm sm:leading-6"
@@ -134,9 +138,9 @@ export default function ProfileMain() {
                               newSubscriptionExpiry?.toString() !==
                               new Date(0).toString()
                                 ? ""
-                                : user?.tierExpiry == null
+                                : user.data?.tierExpiry == null
                                 ? ""
-                                : user?.tierExpiry.toLocaleString()
+                                : user.data?.tierExpiry.toLocaleString()
                             }
                             className="block w-full rounded-md border-0 bg-black/5 px-2 py-1.5 text-black shadow-sm ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
                             disabled
@@ -146,8 +150,8 @@ export default function ProfileMain() {
                       </div>
                     </div>
 
-                    {user?.tierId !== "tier-pleb" &&
-                    user?.tierId !== "" &&
+                    {user.data?.tierId !== "tier-pleb" &&
+                    user.data?.tierId !== "" &&
                     newSubscription == "" ? (
                       <div className="mt-8">
                         <button
@@ -156,9 +160,9 @@ export default function ProfileMain() {
                             showPrompt(
                               "Cancel Subscription",
                               `Are you sure you want to cancel your subscription? You can cancel anytime before ${
-                                user?.tierExpiry == null
+                                user.data?.tierExpiry == null
                                   ? "your expiry date "
-                                  : user?.tierExpiry.toLocaleString()
+                                  : user.data?.tierExpiry.toLocaleString()
                               } or cancel now and lose all benefits.`,
                               function () {
                                 return cancelSubscriptionConfirm;
@@ -191,8 +195,8 @@ export default function ProfileMain() {
                       <div className="col-span-full flex items-center gap-x-8">
                         <img
                           src={
-                            user?.image !== null && user?.image !== undefined
-                              ? encodeURI(user?.image)
+                            user.data?.image !== null && user.data?.image !== undefined
+                              ? encodeURI(user.data?.image)
                               : "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/271deea8-e28c-41a3-aaf5-2913f5f48be6/de7834s-6515bd40-8b2c-4dc6-a843-5ac1a95a8b55.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzI3MWRlZWE4LWUyOGMtNDFhMy1hYWY1LTI5MTNmNWY0OGJlNlwvZGU3ODM0cy02NTE1YmQ0MC04YjJjLTRkYzYtYTg0My01YWMxYTk1YThiNTUuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.BopkDn1ptIwbmcKHdAOlYHyAOOACXW0Zfgbs0-6BY-E"
                           }
                           alt=""
@@ -210,7 +214,7 @@ export default function ProfileMain() {
                             type="text"
                             name="name"
                             id="name"
-                            value={user?.name ?? ""}
+                            value={user.data?.name ?? ""}
                             className="block w-full rounded-md border-0 bg-black/5 px-2 py-1.5 text-black shadow-sm ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
                           />
                         </div>
@@ -226,7 +230,7 @@ export default function ProfileMain() {
                             name="email"
                             type="email"
                             disabled
-                            value={user?.email ?? ""}
+                            value={user.data?.email ?? ""}
                             className="block w-full rounded-md border-0 bg-black/5 px-2 py-1.5 text-black shadow-sm ring-1 ring-inset ring-black/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
                           />
                         </div>

@@ -2,6 +2,7 @@
 import React from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { api } from "~/trpc/react";
+import ProfileMain from "./_components/ProfileMain";
 
 const Profile = () => {
   const { data: session } = useSession();
@@ -15,6 +16,7 @@ const Profile = () => {
             Sign Out
           </button>
         </div>
+        <ProfileMain></ProfileMain>
       </div>
     );
   }

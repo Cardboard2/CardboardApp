@@ -5,6 +5,7 @@
 await import("./src/env.mjs");
 
 /** @type {import("next").NextConfig} */
+
 const config = {
     async rewrites() {
         return [
@@ -21,7 +22,12 @@ const config = {
                 destination: '/upgrade/success'
             },
         ];
-    }
+    },
+    
+    webpack: (config) => {
+        config.resolve.alias.canvas = false;
+        return config;
+    },
 };
 
 export default config;

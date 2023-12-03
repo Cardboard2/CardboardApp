@@ -3,7 +3,7 @@ import React from 'react'
 import CardboardLogo from '~/app/_components/CardboardLogo'
 
 
-export function LoginHeader() {
+export function SimpleHeader() {
 
   return (
     <header className="bg-amber-400 w-full bg-opacity-90">

@@ -1,5 +1,4 @@
 "use client"
-import React, { useEffect, useRef, useState } from 'react';
 
 import { TierSelect } from "./_components/TierSelect.tsx"
 import { Header } from "../_components/Header.tsx"

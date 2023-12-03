@@ -128,10 +128,7 @@ export function DisplayContent(type: string, url: string) {
         <Viewer fileUrl={url} plugins={[defaultLayoutPluginInstance,]}/>
       </Worker>
     );
-
-  else if (type.includes("text"))
-    return (<iframe src={url} allowFullScreen={true} className={`h-full w-full p-1 flex items-center justify-center "bg-slate-100"`}/>);
-  
+    
   else
     return (<DocumentIcon className='h-24 w-24 text-slate-200'/>)
 }

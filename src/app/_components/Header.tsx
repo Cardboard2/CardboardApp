@@ -9,9 +9,8 @@ import { useRouter } from 'next/navigation'
 
 
 const navigation = [
-  { name: 'Services', href: '/services' },
   { name: 'Pricing', href: '/pricing' },
-  { name: 'Company', href: '/company' },
+  { name: 'Dashboard', href: '/dashboard' },
 ]
 
 export interface MobileMenuProps {

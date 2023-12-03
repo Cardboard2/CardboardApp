@@ -66,13 +66,13 @@ export default function ProfileMain() {
 
   return (
     <>
-      <div>
-        <div className="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-72 xl:flex-col ">
+      <div className="pt-20 lg:pt-10">
+        <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col ">
           <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-black/10 px-6 ring-1 ring-black/5">
             <div className="flex h-16 shrink-0 items-center"></div>
           </div>
         </div>
-        <div className="xl:pl-72 ">
+        <div className="lg:pl-72 ">
           <main>
             {promptVisible ? (
               <PromptBox
@@ -89,7 +89,7 @@ export default function ProfileMain() {
             </h1>
             <div className=" divide-y divide-black/5 bg-amber-200">
               <div>
-                <div className="mx-10 mt-8 grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 bg-amber-100 px-4 py-10 shadow-lg sm:px-6 md:grid-cols-3 lg:px-8">
+                <div className="mx-10 mt-8 grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 bg-amber-100 px-4 py-10 shadow-lg sm:px-6 md:grid-cols-3 lg:px-8 rounded-2xl">
                   <div>
                     <h2 className="text-base font-semibold leading-7 text-black">
                       Cardboard Information
@@ -176,7 +176,7 @@ export default function ProfileMain() {
                   </div>
                 </div>
 
-                <div className="mx-10 my-5 grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 bg-amber-100 px-4 py-10 shadow-lg sm:px-6 md:grid-cols-3 lg:px-8">
+                <div className="mx-10 my-5 grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 bg-amber-100 px-4 py-10 shadow-lg sm:px-6 md:grid-cols-3 lg:px-8 rounded-2xl">
                   <div>
                     <h2 className="text-base font-semibold leading-7 text-black">
                       Personal Information

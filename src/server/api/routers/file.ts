@@ -6,8 +6,7 @@ import { getBaseUrl } from "~/trpc/shared";
 
 interface SharedFileObject {
     file: FileDetail
-    downloadUrl: string
-    inlineUrl: string
+    url: string
 }
 
 export const fileRouter = createTRPCRouter({
@@ -36,7 +35,6 @@ export const fileRouter = createTRPCRouter({
                 const ret = await ctx.db.file.findUnique({where: {id: input.id, shared: true}});
 
                 if (ret) {
-                    const inlineUrl = await api.aws.getSharedFileInlineUrl.query({id: ret.id});
                     const downloadUrl = await api.aws.getSharedFileDownloadUrl.query({id: ret.id});
 
                     const returnObj : SharedFileObject = {
@@ -49,8 +47,7 @@ export const fileRouter = createTRPCRouter({
                             createdAt: ret.createdAt,
                             modifiedAt: ret.updatedAt
                         },
-                        downloadUrl: downloadUrl,
-                        inlineUrl: inlineUrl
+                        url: downloadUrl
                     };
 
                     return returnObj;
@@ -59,8 +56,7 @@ export const fileRouter = createTRPCRouter({
             
             const defaultReturn : SharedFileObject = {
                 file: defaultFileDetail,
-                downloadUrl: "",
-                inlineUrl: ""
+                url: ""
             };
 
             return defaultReturn;

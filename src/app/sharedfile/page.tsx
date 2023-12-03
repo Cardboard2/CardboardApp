@@ -1,7 +1,7 @@
 "use client"
 import { SimpleHeader } from "../_components/SimpleHeader";
 import { Transition, Dialog } from "@headlessui/react";
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useState } from "react";
 import { api } from "~/trpc/react";
 
 import { ArrowDownCircleIcon, InformationCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
@@ -58,7 +58,7 @@ export default function SharedFile() {
                         <Dialog.Panel className="relative w-full max-w-6xl transform overflow-hidden rounded-2xl bg-black bg-opacity-20 shadow-xl h-full max-h-[48rem] p-1 flex items-center justify-center ">
                         <div className='absolute right-2 top-2'>
                             
-                            <button onClick={()=>{DownloadFile(ret.data?.downloadUrl ?? "")}} className='h-10 w-10 p-2 ml-2 shadow-xl text-amber-500 hover:text-amber-700 active:opacity-80 duration-200 bg-gray-900 rounded-full'>
+                            <button onClick={()=>{DownloadFile(ret.data?.url ?? "")}} className='h-10 w-10 p-2 ml-2 shadow-xl text-amber-500 hover:text-amber-700 active:opacity-80 duration-200 bg-gray-900 rounded-full'>
                                 <ArrowDownCircleIcon/>
                             </button>
                             <button onClick={()=>{setShowMetadata(!showMetadata)}} className='h-10 w-10 p-2 ml-2 shadow-xl text-amber-500 hover:text-amber-700 active:opacity-80 duration-200 bg-gray-900 rounded-full'>
@@ -73,7 +73,7 @@ export default function SharedFile() {
                             </button>
                         </div>
                         <div className='h-full w-full pt-12 flex items-center justify-center'>
-                            {DisplayContent(ret.data?.file.type ?? "", ret.data?.inlineUrl ?? "")}
+                            {DisplayContent(ret.data?.file.type ?? "", ret.data?.url ?? "")}
                         </div>
                         {DisplayMetadata(showMetadata, ret.data?.file ?? defaultFileDetail)}
                         </Dialog.Panel>

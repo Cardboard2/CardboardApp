@@ -1,5 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react'
-import { Fragment, use, useState } from 'react'
+import { Fragment, RefObject, useRef, useState } from 'react'
 import { DashboardProps } from './DashboardProps'
 import { api } from '~/trpc/react';
 import { ArrowDownCircleIcon, InformationCircleIcon, XCircleIcon, ClipboardDocumentIcon } from '@heroicons/react/24/outline';
@@ -101,8 +101,8 @@ export function DownloadFile(downloadUrl: string) {
 }
 
 
-export function DisplayContent(type: string, url: string) {
-  console.log("Div height: ", parent.innerWidth, "Div width: ", parent.innerHeight)
+export function DisplayContent(container: RefObject<HTMLDivElement>, type: string, url: string) {
+  console.log("Div width: ", container.current?.offsetWidth, "Div height: ", container.current?.offsetHeight)
   if (type == "Unknown")
     return (<p className='text-2xl font-bold text-gray-50'>File does not exist ❌</p>);
 
@@ -113,13 +113,13 @@ export function DisplayContent(type: string, url: string) {
     return (<DocumentIcon className='h-24 w-24 text-slate-200'/>)
 
   else if (type.includes("image"))
-    return (<img src={url} className='object-contain max-w-full max-h-full p-3 pt-10'/>);
+    return (<img src={url} className='object-contain max-w-full max-h-full p-1'/>);
   
   else if (type.includes("mp4"))
-    return (<ReactPlayer url={url} playsinline controls/>)
+    return (<ReactPlayer url={url} playsinline controls width={container.current?.offsetWidth!*11/12} height={container.current?.offsetHeight!*3/4}/>)
     
   else
-    return (<iframe src={url} allowFullScreen={true} className={`h-full w-full p-3 flex items-center justify-center pt-10 ${type.includes("text") ? "bg-slate-100" : ""}`}/>);
+    return (<iframe src={url} allowFullScreen={true} className={`h-full w-full p-1 flex items-center justify-center ${type.includes("text") ? "bg-slate-100" : ""}`}/>);
 }
 
 export function ItemPreview(props: {dashboardProps : DashboardProps}) {
@@ -137,6 +137,8 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
       setShareFileUrl(data ?? "err");
     }
   });
+  
+  const containerRef = useRef<HTMLDivElement>(null);
 
   return (
     <>
@@ -167,7 +169,7 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
               >
                 
                 <Dialog.Panel className="relative w-full max-w-6xl transform overflow-hidden rounded-2xl bg-black bg-opacity-20 shadow-xl h-full max-h-[48rem] p-1 flex items-center justify-center ">
-                  <div className='absolute right-2 top-2'>
+                  <div className='absolute right-2 top-2 inline-block'>
                     <button onClick={()=>{
                                         shareFileUrl == "" ? shareableLink.mutate({id: props.dashboardProps.fileDetail.id}) : "";
                                         setShowMetadata(false);
@@ -198,9 +200,12 @@ export function ItemPreview(props: {dashboardProps : DashboardProps}) {
                       <XCircleIcon/>
                     </button>
                   </div>
-                  {DisplayContent(props.dashboardProps.fileDetail.type ?? "", url ?? "")}
                   {DisplayMetadata(showMetadata, props.dashboardProps.fileDetail)}
                   {ShareFile(shareFile, shareFileUrl)}
+
+                  <div ref={containerRef} className='h-full w-full pt-12 flex items-center justify-center'>
+                    {DisplayContent(containerRef, props.dashboardProps.fileDetail.type ?? "", url ?? "")}
+                  </div>
                 </Dialog.Panel>
               </Transition.Child>
             </div>

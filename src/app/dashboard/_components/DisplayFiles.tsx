@@ -123,8 +123,7 @@ function DisplayFileList(props: { displayProps: DisplayProps }) {
   )
     return (
       <div className="flex h-full w-full items-center justify-center">
-        {" "}
-        <Spinner />{" "}
+        <Spinner />
       </div>
     );
 
@@ -246,10 +245,10 @@ export function DisplayFiles(props: {
 
   return (
     <div className="h-full w-full">
-      <div className="h-[8%] w-full border-b-2 border-amber-800 bg-amber-300 p-5 lg:p-8"></div>
-      <div className={`h-[92%] w-full p-2`}>
+      <div className="h-[8%] w-full border-b-2 border-amber-800 bg-amber-300"></div>
+      <div className={`h-[92%] w-full px-2 py-1`}>
         {displayFiles ? (
-          <div>
+          <div className="h-full w-full overflow-y-auto">
             <DisplayFileList displayProps={displayProps} />
             <button
               type="button"

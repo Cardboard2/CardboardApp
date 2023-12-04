@@ -293,7 +293,7 @@ export function DisplayFiles(props: {
             <button
                 onClick={()=>props.dashboardProps.setCreationOpen(!props.dashboardProps.creationOpen)}
                 type="button"
-                className="fixed bottom-5 left-20 lg:left-96 duration-300 active:opacity-80 rounded-full bg-amber-600 p-2 text-white shadow-xl hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600"
+                className="fixed bottom-20 left-5 lg:left-80 duration-300 active:opacity-80 rounded-full bg-amber-600 p-2 text-white shadow-xl hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600"
               >
               <FolderPlusIcon className="h-10 w-10" aria-hidden="true" />
             </button>

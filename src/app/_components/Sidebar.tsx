@@ -58,7 +58,6 @@ function SidebarComponent(props: {
     console.log("asds");
     console.log(props.usageBarProps);
     if (
-      props.usageBarProps &&
       props.usageBarProps?.usageBarUsage !== undefined &&
       props.usageBarProps?.usageBarTotal !== undefined
     ) {

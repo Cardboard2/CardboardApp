@@ -16,6 +16,7 @@ import {
 import type { Dispatch, SetStateAction } from "react";
 import { UsageBarProps } from "~/app/_components/UsageBarProps";
 import CircularButton from "./CircularButton";
+import Notification from "~/app/_components/Notification";
 
 interface DisplayProps {
   fileDetails: FileDetail[];
@@ -147,6 +148,11 @@ export function DisplayFiles(props: {
   const [currItems, updateItems] = useState<Array<FileDetail>>([]);
   const [displayFiles, setDisplayFiles] = useState(true);
 
+  const [notificationShow, setNotificationVisible] = useState(false);
+  const [notificationTitle, setNotificationTitle] = useState("");
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [notificationSuccess, setNotificationSuccess] = useState(true);
+
   const getFiles = api.aws.getFolderContents.useMutation({
     onSuccess: (data) => {
       if (data) {
@@ -178,6 +184,22 @@ export function DisplayFiles(props: {
         console.log(data.usage);
         props.usageBarProps.setUsageBarUsage(data.usage.userUsage);
         props.usageBarProps.setUsageBarTotal(data.usage.totalStorage);
+
+        setNotificationTitle("File deleted successfully!");
+        setNotificationMessage("File has been deleted");
+        setNotificationSuccess(true);
+        setNotificationVisible(true);
+        setTimeout(function () {
+          setNotificationVisible(false);
+        }, 3000);
+      } else {
+        setNotificationTitle("File deletion failed..");
+        setNotificationMessage("Error detected...");
+        setNotificationSuccess(false);
+        setNotificationVisible(true);
+        setTimeout(function () {
+          setNotificationVisible(false);
+        }, 10000);
       }
     },
   });
@@ -246,6 +268,18 @@ export function DisplayFiles(props: {
 
   return (
     <div className="h-full w-full">
+      {notificationShow ? (
+        <Notification
+          title={notificationTitle}
+          success={notificationSuccess}
+          message={notificationMessage}
+          closeFunction={function () {
+            return setNotificationVisible(false);
+          }}
+        />
+      ) : (
+        <></>
+      )}
       <div className="h-[8%] w-full border-b-2 border-amber-800 bg-amber-300 p-5 lg:p-8"></div>
       <div className={`h-[92%] w-full p-2`}>
         {displayFiles ? (

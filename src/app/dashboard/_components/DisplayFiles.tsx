@@ -4,7 +4,7 @@ import { api } from "~/trpc/react";
 import type { FileDetail } from "./FileDetail";
 import { defaultFileDetail } from "./FileDetail";
 import { Spinner } from "~/app/_components/Spinner";
-import { FolderIcon, PhotoIcon, PlusIcon } from "@heroicons/react/20/solid";
+import { FolderIcon, PhotoIcon } from "@heroicons/react/20/solid";
 import {
   ArrowDownTrayIcon,
   DocumentArrowUpIcon,
@@ -43,6 +43,22 @@ export function DisplayFiles(props: {
   const [notificationTitle, setNotificationTitle] = useState("");
   const [notificationMessage, setNotificationMessage] = useState("");
   const [notificationSuccess, setNotificationSuccess] = useState(true);
+
+  const createFolderAPI = api.aws.createFolder.useMutation({
+    onSuccess: () => {
+      getFiles.mutate({ folderId: currFolderId });
+    },
+  });
+  function createFolder() {
+    const folderName = window.prompt("Enter new folder name");
+    if (folderName && validateName(folderName)) {
+      createFolderAPI.mutate({
+        request: { name: folderName, parentId: currFolderId },
+      });
+    } else {
+      console.log("Error: No folder name or name has special characters");
+    }
+  }
 
   const getFiles = api.aws.getFolderContents.useMutation({
     onSuccess: (data) => {
@@ -291,7 +307,7 @@ export function DisplayFiles(props: {
             </button>
 
             <button
-                onClick={()=>props.dashboardProps.setCreationOpen(!props.dashboardProps.creationOpen)}
+                onClick={()=>{createFolder()}}
                 type="button"
                 className="fixed bottom-20 left-5 lg:left-80 duration-300 active:opacity-80 rounded-full bg-amber-600 p-2 text-white shadow-xl hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600"
               >

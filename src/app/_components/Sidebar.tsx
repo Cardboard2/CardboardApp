@@ -16,7 +16,7 @@ import { UsageBarProps } from "../_components/UsageBarProps";
 import { useEffect } from "react";
 import { api } from "~/trpc/react";
 import UsageBar from "./UsageBar";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: HomeIcon, current: false },
   { name: "Upgrade", href: "/upgrade", icon: CircleStackIcon, current: false },
@@ -38,6 +38,8 @@ function SidebarComponent(props: {
       nav.current = false;
     }
   }
+
+  const router = useRouter();
 
   const [usage, setUsage] = useState(0);
   const [totalSpace, setTotalSpace] = useState(0);
@@ -68,7 +70,7 @@ function SidebarComponent(props: {
   return (
     <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r-2 border-amber-800 bg-amber-400 px-6">
       <div className="flex h-16 shrink-0 items-center">
-        <div className="h-8 w-8 text-amber-950">
+        <div className="h-8 w-8 text-amber-950 cursor-pointer" onClick={()=>router.push("/dashboard")}>
           <CardboardLogo />
         </div>
       </div>
@@ -99,7 +101,7 @@ function SidebarComponent(props: {
           </li>
 
           <li className="-mx-6 mt-auto">
-            <div className="mx-5 mb-5 rounded-md bg-amber-100 px-5 pb-2 pt-3">
+            <div className="mx-5 mb-5 rounded-md bg-amber-200 shadow px-5 pb-2 pt-3">
               <UsageBar usage={usage} totalSpace={totalSpace} />
               <a className="pl-1 text-[12px] font-medium text-black">
                 {usage} MB of {totalSpace} MB used

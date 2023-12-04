@@ -1,32 +1,18 @@
 import { Dialog, Transition } from '@headlessui/react'
-import { Fragment, useState } from 'react'
+import { Fragment } from 'react'
 import { DashboardProps } from './DashboardProps'
+import { useState } from 'react'
+import { Tab } from '@headlessui/react'
 
-export default function CreationForm(props: {dashboardProps: DashboardProps}) {
-  let [isOpen, setIsOpen] = useState(true)
 
-  function closeModal() {
-    setIsOpen(false)
-  }
 
-  function openModal() {
-    setIsOpen(true)
-  }
+
+export function CreationForm(props: {dashboardProps: DashboardProps}) {
 
   return (
     <>
-      <div className="fixed inset-0 flex items-center justify-center">
-        <button
-          type="button"
-          onClick={openModal}
-          className="rounded-md bg-black/20 px-4 py-2 text-sm font-medium text-white hover:bg-black/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75"
-        >
-          Open dialog
-        </button>
-      </div>
-
-      <Transition appear show={isOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={closeModal}>
+      <Transition appear show={props.dashboardProps.creationOpen} as={Fragment}>
+        <Dialog as="div" className="absolute top-0 left-0 z-50 h-screen w-screen" onClose={()=>{props.dashboardProps.setCreationOpen(false)}}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -36,11 +22,11 @@ export default function CreationForm(props: {dashboardProps: DashboardProps}) {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black/25" />
+            <div className="fixed inset-0 bg-gray-900 opacity-80" />
           </Transition.Child>
 
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
+          <div className="fixed h-full w-full inset-0 overflow-y-auto">
+            <div className="flex h-full w-full items-center justify-center p-4 text-center">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -50,29 +36,8 @@ export default function CreationForm(props: {dashboardProps: DashboardProps}) {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  <Dialog.Title
-                    as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
-                  >
-                    Payment successful
-                  </Dialog.Title>
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500">
-                      Your payment has been successfully submitted. We’ve sent
-                      you an email with all of the details of your order.
-                    </p>
-                  </div>
-
-                  <div className="mt-4">
-                    <button
-                      type="button"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                      onClick={closeModal}
-                    >
-                      Got it, thanks!
-                    </button>
-                  </div>
+                
+                <Dialog.Panel className="relative w-11/12 md:w-3/5 transform overflow-hidden rounded-2xl bg-amber-200 shadow-xl h-5/6 lg:3/5 p-1 flex items-center justify-center ">
                 </Dialog.Panel>
               </Transition.Child>
             </div>

@@ -13,6 +13,7 @@ import { ItemPreview } from "./_components/ItemPreview";
 import { UsageBarProps } from "../_components/UsageBarProps";
 import { useEffect } from "react";
 import { FileDetailsSideBar } from "./_components/FileDetailsSideBar";
+import { CreationForm } from "./_components/CreationForm";
 
 function DashboardPage() {
   const router = useRouter();
@@ -73,7 +74,7 @@ function DashboardPage() {
             usageBarProps={usageBarProps}
           />
           {dialogOpen ? <ItemPreview dashboardProps={dashboardProps} /> : ""}
-          {creationOpen ? <ItemPreview dashboardProps={dashboardProps} /> : ""}
+          {creationOpen ? <CreationForm dashboardProps={dashboardProps} /> : ""}
         </div>
         <div className="hidden h-full border-l-2 border-amber-800 bg-amber-200 md:block md:w-5/12">
           <FileDetailsSideBar dashboardProps={dashboardProps} />

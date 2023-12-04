@@ -7,8 +7,10 @@ import { Spinner } from "~/app/_components/Spinner";
 import { FolderIcon, PhotoIcon, PlusIcon } from "@heroicons/react/20/solid";
 import {
   ArrowDownTrayIcon,
+  DocumentArrowUpIcon,
   DocumentIcon,
   FilmIcon,
+  FolderPlusIcon,
   PencilSquareIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
@@ -99,7 +101,7 @@ export function DisplayFiles(props: {
     
     for (let i = 0; i < currItems.length; i++) {
       if (currItems[i]?.id == id) {
-        currItems.splice(i);
+        currItems.splice(i, 1);
         break;
       }
     }
@@ -281,10 +283,19 @@ export function DisplayFiles(props: {
           <div className="relative h-full w-full overflow-y-auto">
             <DisplayFileList displayProps={displayProps} />
             <button
+                onClick={()=>props.dashboardProps.setCreationOpen(!props.dashboardProps.creationOpen)}
                 type="button"
-                className="fixed bottom-5 left-5 lg:left-80 duration-300 active:opacity-80 rounded-full bg-amber-600 p-2 text-white shadow-sm hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600"
+                className="fixed bottom-5 left-5 lg:left-80 duration-300 active:opacity-80 rounded-full bg-amber-600 p-2 text-white shadow-xl hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600"
               >
-              <PlusIcon className="h-10 w-10" aria-hidden="true" />
+              <DocumentArrowUpIcon className="h-10 w-10" aria-hidden="true" />
+            </button>
+
+            <button
+                onClick={()=>props.dashboardProps.setCreationOpen(!props.dashboardProps.creationOpen)}
+                type="button"
+                className="fixed bottom-5 left-20 lg:left-96 duration-300 active:opacity-80 rounded-full bg-amber-600 p-2 text-white shadow-xl hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600"
+              >
+              <FolderPlusIcon className="h-10 w-10" aria-hidden="true" />
             </button>
           </div>
         ) : (

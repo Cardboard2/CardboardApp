@@ -8,134 +8,23 @@ import { FolderIcon, PhotoIcon, PlusIcon } from "@heroicons/react/20/solid";
 import {
   ArrowDownTrayIcon,
   DocumentIcon,
-  EllipsisHorizontalCircleIcon,
   FilmIcon,
   PencilSquareIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import type { Dispatch, SetStateAction } from "react";
 import { UsageBarProps } from "~/app/_components/UsageBarProps";
-import CircularButton from "./CircularButton";
-import Notification from "~/app/_components/Notification";
 
+import Notification from "~/app/_components/Notification";
 interface DisplayProps {
   fileDetails: FileDetail[];
   currFolderId: string;
   updateFolderId: Dispatch<SetStateAction<string>>;
-  updateFolderInfo: Function;
-  downloadFile: Function;
-  deleteFile: Function;
-  renameFile: Function;
   dashboardProps: DashboardProps;
 }
 
 function validateName(name: string) {
   return name.match(/^[^a-zA-Z0-9]+$/) ? false : true;
-}
-
-function DisplayIndividualFile(file: FileDetail, displayProps: DisplayProps) {
-  const itemBaseClassname =
-    "flex items-center mb-2 \
-        justify-between h-14 w-full flex py-2 px-2 border-2 text-amber-700 duration-300\
-        rounded-2xl border-amber-800 shadow-xl hover:border-gray-50 hover:bg-amber-700 hover:text-gray-200";
-
-  if (file.objectType == "Folder")
-    return (
-      <div id={file.name} className={itemBaseClassname}>
-        <div
-          className="h-full w-1/12 cursor-pointer p-1"
-          onClick={() => {
-            displayProps.updateFolderInfo(file.id);
-          }}
-        >
-          <FolderIcon className="h-full w-full" aria-hidden />
-        </div>
-        <div
-          className="h-full w-11/12"
-          onClick={() => {
-            displayProps.updateFolderInfo(file.id);
-            displayProps.dashboardProps.setFileDetail(defaultFileDetail);
-          }}
-        >
-          <p className="h-full w-full cursor-pointer truncate p-2 font-semibold">
-            <span className="text-sm">Folder: </span> <span>{file.name}</span>
-          </p>
-        </div>
-      </div>
-    );
-  else
-    return (
-      <div id={file.name} className={itemBaseClassname}>
-        <div
-          className="h-full w-1/12 cursor-pointer p-1"
-          onDoubleClick={() =>
-            displayProps.dashboardProps.setDialogOpen(
-              !displayProps.dashboardProps.dialogOpen,
-            )
-          }
-          onClick={() => {
-            displayProps.dashboardProps.setFileDetail(file);
-          }}
-        >
-          {file.type?.includes("image") ? (
-            <PhotoIcon className="h-full w-full" aria-hidden />
-          ) : file.type?.includes("video") ? (
-            <FilmIcon className="h-full w-full" aria-hidden />
-          ) : (
-            <DocumentIcon className="h-full w-full" aria-hidden />
-          )}
-        </div>
-        <div
-          className="h-full w-8/12"
-          onDoubleClick={() =>
-            displayProps.dashboardProps.setDialogOpen(
-              !displayProps.dashboardProps.dialogOpen,
-            )
-          }
-          onClick={() => {
-            displayProps.dashboardProps.setFileDetail(file);
-          }}
-        >
-          <p className="h-full w-full cursor-pointer truncate p-2 font-semibold">
-            <span>{file.name}</span>
-          </p>
-        </div>
-        <ArrowDownTrayIcon
-          className="h-full w-1/12 cursor-pointer rounded-2xl py-1"
-          onClick={() => displayProps.downloadFile(file.name)}
-        />
-        <PencilSquareIcon
-          className="h-full w-1/12 cursor-pointer rounded-2xl py-1"
-          onClick={() => displayProps.renameFile(file.name)}
-        />
-        <TrashIcon
-          className="h-full w-1/12 cursor-pointer rounded-2xl py-1"
-          onClick={() => displayProps.deleteFile(file.name)}
-        />
-      </div>
-    );
-}
-
-function DisplayFileList(props: { displayProps: DisplayProps }) {
-  if (
-    !props.displayProps.fileDetails.length &&
-    (props.displayProps.currFolderId == "" ||
-      props.displayProps.currFolderId == undefined)
-  )
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        {" "}
-        <Spinner />{" "}
-      </div>
-    );
-
-  return (
-    <div>
-      {props.displayProps.fileDetails.map((file) => {
-        return DisplayIndividualFile(file, props.displayProps);
-      })}
-    </div>
-  );
 }
 
 export function DisplayFiles(props: {
@@ -252,11 +141,7 @@ export function DisplayFiles(props: {
     fileDetails: currItems,
     currFolderId: currFolderId,
     updateFolderId: updateFolderId,
-    updateFolderInfo: updateFolderInfo,
     dashboardProps: props.dashboardProps,
-    deleteFile: deleteFile,
-    renameFile: renameFile,
-    downloadFile: downloadFile,
   };
 
   useEffect(() => {
@@ -265,6 +150,110 @@ export function DisplayFiles(props: {
       getFiles.mutate({ folderId: currFolderId });
     }
   }, []);
+
+  function DisplayIndividualFile(file: FileDetail, displayProps: DisplayProps) {
+    const itemBaseClassname =
+      "flex items-center mb-2 \
+          justify-between h-14 w-full flex py-2 px-2 border-2 text-amber-700 duration-300\
+          rounded-2xl border-amber-800 shadow-xl hover:border-gray-50 hover:bg-amber-700 hover:text-gray-200";
+
+    if (file.objectType == "Folder")
+      return (
+        <div id={file.name} className={itemBaseClassname}>
+          <div
+            className="h-full w-1/12 cursor-pointer p-1"
+            onClick={() => {
+              updateFolderInfo(file.id);
+            }}
+          >
+            <FolderIcon className="h-full w-full" aria-hidden />
+          </div>
+          <div
+            className="h-full w-11/12"
+            onClick={() => {
+              updateFolderInfo(file.id);
+              displayProps.dashboardProps.setFileDetail(defaultFileDetail);
+            }}
+          >
+            <p className="h-full w-full cursor-pointer truncate p-2 font-semibold">
+              <span className="text-sm">Folder: </span> <span>{file.name}</span>
+            </p>
+          </div>
+        </div>
+      );
+    else
+      return (
+        <div id={file.name} className={itemBaseClassname}>
+          <div
+            className="h-full w-1/12 cursor-pointer p-1"
+            onDoubleClick={() =>
+              displayProps.dashboardProps.setDialogOpen(
+                !displayProps.dashboardProps.dialogOpen,
+              )
+            }
+            onClick={() => {
+              displayProps.dashboardProps.setFileDetail(file);
+            }}
+          >
+            {file.type?.includes("image") ? (
+              <PhotoIcon className="h-full w-full" aria-hidden />
+            ) : file.type?.includes("video") ? (
+              <FilmIcon className="h-full w-full" aria-hidden />
+            ) : (
+              <DocumentIcon className="h-full w-full" aria-hidden />
+            )}
+          </div>
+          <div
+            className="h-full w-8/12"
+            onDoubleClick={() =>
+              displayProps.dashboardProps.setDialogOpen(
+                !displayProps.dashboardProps.dialogOpen,
+              )
+            }
+            onClick={() => {
+              displayProps.dashboardProps.setFileDetail(file);
+            }}
+          >
+            <p className="h-full w-full cursor-pointer truncate p-2 font-semibold">
+              <span>{file.name}</span>
+            </p>
+          </div>
+          <ArrowDownTrayIcon
+            className="h-full w-1/12 cursor-pointer rounded-2xl py-1"
+            onClick={() => downloadFile(file.name)}
+          />
+          <PencilSquareIcon
+            className="h-full w-1/12 cursor-pointer rounded-2xl py-1"
+            onClick={() => renameFile(file.name)}
+          />
+          <TrashIcon
+            className="h-full w-1/12 cursor-pointer rounded-2xl py-1"
+            onClick={() => deleteFile(file.name)}
+          />
+        </div>
+      );
+  }
+
+  function DisplayFileList(props: { displayProps: DisplayProps }) {
+    if (
+      !props.displayProps.fileDetails.length &&
+      (props.displayProps.currFolderId == "" ||
+        props.displayProps.currFolderId == undefined)
+    )
+      return (
+        <div className="flex h-full w-full items-center justify-center">
+          <Spinner />
+        </div>
+      );
+
+    return (
+      <div>
+        {props.displayProps.fileDetails.map((file) => {
+          return DisplayIndividualFile(file, props.displayProps);
+        })}
+      </div>
+    );
+  }
 
   return (
     <div className="h-full w-full">
@@ -283,7 +272,7 @@ export function DisplayFiles(props: {
       <div className="h-[8%] w-full border-b-2 border-amber-800 bg-amber-300 p-5 lg:p-8"></div>
       <div className={`h-[92%] w-full p-2`}>
         {displayFiles ? (
-          <div>
+          <div className="h-full w-full overflow-y-auto">
             <DisplayFileList displayProps={displayProps} />
             <button
               type="button"

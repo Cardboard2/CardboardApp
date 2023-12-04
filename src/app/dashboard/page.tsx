@@ -71,7 +71,7 @@ function DashboardPage() {
           />
           {dialogOpen ? <ItemPreview dashboardProps={dashboardProps} /> : ""}
         </div>
-        <div className="hidden h-full border-l-2 border-amber-800 bg-white md:block md:w-5/12">
+        <div className="hidden h-full border-l-2 border-amber-800 bg-amber-200 md:block md:w-5/12">
           <FileDetailsSideBar dashboardProps={dashboardProps} />
         </div>
       </div>

@@ -6,6 +6,8 @@ export interface DashboardProps {
     session: Session,
     dialogOpen: boolean,
     setDialogOpen: Dispatch<SetStateAction<boolean>>,
+    creationOpen: boolean,
+    setCreationOpen: Dispatch<SetStateAction<boolean>>,
     fileDetail: FileDetail,
     setFileDetail: Dispatch<SetStateAction<FileDetail>>
 };

@@ -92,11 +92,17 @@ export function DisplayFiles(props: {
       }
     },
   });
-  function deleteFile(name: string) {
+  function deleteFile(name: string, id: string) {
     deleteFileAPI.mutate({
       request: { name: name, folderId: currFolderId },
     });
-    document.getElementById(name)?.remove();
+    
+    for (let i = 0; i < currItems.length; i++) {
+      if (currItems[i]?.id == id) {
+        currItems.splice(i);
+        break;
+      }
+    }
   }
 
   const renameFileAPI = api.aws.renameFile.useMutation({
@@ -159,7 +165,7 @@ export function DisplayFiles(props: {
 
     if (file.objectType == "Folder")
       return (
-        <div id={file.name} className={itemBaseClassname}>
+        <div id={file.id} className={itemBaseClassname}>
           <div
             className="h-full w-1/12 cursor-pointer p-1"
             onClick={() => {
@@ -183,7 +189,7 @@ export function DisplayFiles(props: {
       );
     else
       return (
-        <div id={file.name} className={itemBaseClassname}>
+        <div id={file.id} className={itemBaseClassname}>
           <div
             className="h-full w-1/12 cursor-pointer p-1"
             onDoubleClick={() =>
@@ -228,7 +234,7 @@ export function DisplayFiles(props: {
           />
           <TrashIcon
             className="h-full w-1/12 cursor-pointer rounded-2xl py-1"
-            onClick={() => deleteFile(file.name)}
+            onClick={() => deleteFile(file.name, file.id)}
           />
         </div>
       );
@@ -269,15 +275,15 @@ export function DisplayFiles(props: {
       ) : (
         <></>
       )}
-      <div className="h-[8%] w-full border-b-2 border-amber-800 bg-amber-300 p-5 lg:p-8"></div>
+      <div className="hidden lg:block h-[8%] w-full border-b-2 border-amber-800 bg-amber-300 p-5 lg:p-8"></div>
       <div className={`h-[92%] w-full p-2`}>
         {displayFiles ? (
-          <div className="h-full w-full overflow-y-auto">
+          <div className="relative h-full w-full overflow-y-auto">
             <DisplayFileList displayProps={displayProps} />
             <button
-              type="button"
-              className="fixed bottom-0 right-0 rounded-full bg-amber-600 p-2 text-white shadow-sm hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600"
-            >
+                type="button"
+                className="fixed bottom-5 left-5 lg:left-80 duration-300 active:opacity-80 rounded-full bg-amber-600 p-2 text-white shadow-sm hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600"
+              >
               <PlusIcon className="h-10 w-10" aria-hidden="true" />
             </button>
           </div>

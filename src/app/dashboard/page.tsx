@@ -18,6 +18,7 @@ function DashboardPage() {
   const router = useRouter();
   const session = useSession();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [creationOpen, setCreationOpen] = useState(false);
   const [fileDetail, setFileDetail] = useState(defaultFileDetail);
   const [usageBarUsage, setUsageBarUsage] = useState(0);
   const [usageBarTotal, setUsageBarTotal] = useState(0);
@@ -56,6 +57,8 @@ function DashboardPage() {
     fileDetail: fileDetail,
     setDialogOpen: setDialogOpen,
     setFileDetail: setFileDetail,
+    creationOpen: creationOpen,
+    setCreationOpen: setCreationOpen
   };
 
   return (
@@ -70,6 +73,7 @@ function DashboardPage() {
             usageBarProps={usageBarProps}
           />
           {dialogOpen ? <ItemPreview dashboardProps={dashboardProps} /> : ""}
+          {creationOpen ? <ItemPreview dashboardProps={dashboardProps} /> : ""}
         </div>
         <div className="hidden h-full border-l-2 border-amber-800 bg-amber-200 md:block md:w-5/12">
           <FileDetailsSideBar dashboardProps={dashboardProps} />

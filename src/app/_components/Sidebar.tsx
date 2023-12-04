@@ -55,8 +55,6 @@ function SidebarComponent(props: {
   }, []);
 
   useEffect(() => {
-    console.log("asds");
-    console.log(props.usageBarProps);
     if (
       props.usageBarProps?.usageBarUsage !== undefined &&
       props.usageBarProps?.usageBarTotal !== undefined
@@ -100,7 +98,7 @@ function SidebarComponent(props: {
           </li>
 
           <li className="-mx-6 mt-auto">
-            <div className="mx-5 mb-5 rounded-md bg-amber-200 shadow px-5 pb-2 pt-3">
+            <div className="mx-5 mb-5 rounded-md bg-amber-200 border-2 border-amber-800 shadow px-5 pb-2 pt-3">
               <UsageBar usage={usage} totalSpace={totalSpace} />
               <a className="pl-1 text-[12px] font-medium text-black">
                 {usage} MB of {totalSpace} MB used

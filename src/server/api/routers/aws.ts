@@ -14,6 +14,7 @@ import {
   updateUsage,
   makePleb,
   getUserUsageStats,
+  convertToMb,
 } from "./routerHelpers";
 
 // Set your AWS credentials and S3 bucket information
@@ -365,7 +366,10 @@ export const awsRouter = createTRPCRouter({
       const metadata = input.metadata;
       console.log(metadata);
 
-      // console.log(input.file.size);
+      //First override the file size with the real one as user input can be fabricated
+      const data = Buffer.from(input.file, "base64");
+      metadata.size = Buffer.byteLength(data);
+
       let fileChanged = false;
 
       const folder = await ctx.db.folder.findFirst({

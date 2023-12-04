@@ -37,30 +37,30 @@ function convertDateTime(date: Date | undefined) {
 
 export function FileDetailsSideBar(props: { dashboardProps: DashboardProps }) {
   return (
-    <div>
+    <div className="w-full h-full overflow-y-auto">
       {props.dashboardProps.fileDetail == defaultFileDetail ? (
         <></>
       ) : (
-        <ul className="mt-8 space-y-5 px-7 text-lg">
+        <ul className="pt-8 space-y-5 px-7 text-lg w-full h-full">
           <li>
-            <h2>Name</h2>
-            <p>{props.dashboardProps.fileDetail.name}</p>
+            <h2 className="text-sm font-bold text-gray-700 py-2">Name</h2>
+            <textarea className="w-full h-20 py-2 px-5 bg-amber-300 rounded-2xl shadow-sm border-2 border-amber-800 resize-none" disabled value={props.dashboardProps.fileDetail.name}/>
           </li>
           <li>
-            <h2>Type</h2>
-            <p>{props.dashboardProps.fileDetail.type}</p>
+            <h2 className="text-sm font-bold text-gray-700 py-2">Type</h2>
+            <textarea className="w-full h-20 py-2 px-5 bg-amber-300 rounded-2xl shadow-sm border-2 border-amber-800 resize-none" disabled value={props.dashboardProps.fileDetail.type}/>
           </li>
           <li>
-            <h2>Size</h2>
-            <p>{DataSizeConversion(props.dashboardProps.fileDetail.size)}</p>
+            <h2 className="text-sm font-bold text-gray-700 py-2">Size</h2>
+            <textarea className="w-full h-12 py-2 px-5 bg-amber-300 rounded-2xl shadow-sm border-2 border-amber-800 resize-none" disabled value={DataSizeConversion(props.dashboardProps.fileDetail.size)}/>
           </li>
           <li>
-            <h2>Created date</h2>
-            <p>{convertDateTime(props.dashboardProps.fileDetail.createdAt)}</p>
+            <h2 className="text-sm font-bold text-gray-700 py-2">Created date</h2>
+            <textarea className="w-full h-12 py-2 px-5 bg-amber-300 rounded-2xl shadow-sm border-2 border-amber-800 resize-none" disabled value={convertDateTime(props.dashboardProps.fileDetail.createdAt)}/>
           </li>
           <li>
-            <h2>Last modified</h2>
-            <p>{convertDateTime(props.dashboardProps.fileDetail.modifiedAt)}</p>
+            <h2 className="text-sm font-bold text-gray-700 py-2">Last modified</h2>
+            <textarea className="w-full h-12 py-2 px-5 bg-amber-300 rounded-2xl shadow-sm border-2 border-amber-800 resize-none" disabled value={convertDateTime(props.dashboardProps.fileDetail.modifiedAt)}/>
           </li>
         </ul>
       )}

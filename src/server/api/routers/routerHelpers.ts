@@ -10,7 +10,7 @@ interface TierInterface {
 const TierSize: TierInterface = {
   "tier-pleb": 10 * 1048576, // 10 MB
   "tier-normal": 100 * 1048576, // 100 MB
-  "tier-whale": 1000 * 1048576, // 1 GB
+  "tier-whale": 500 * 1048576, // 1 GB
 };
 
 export function getUserUsageStats(

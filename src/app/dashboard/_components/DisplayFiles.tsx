@@ -15,20 +15,8 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import type { Dispatch, SetStateAction } from "react";
+import { NotificationProps } from "~/app/_components/NotificationProps";
 import { UsageBarProps } from "~/app/_components/UsageBarProps";
-import { type SubmitHandler, useForm } from "react-hook-form";
-import { FormInput } from "./FileDetail";
-
-function readFile(file: File) {
-  return new Promise((resolve, reject) => {
-    const fr = new FileReader();
-    fr.onload = () => {
-      resolve(fr.result);
-    };
-    fr.onerror = reject;
-    fr.readAsBinaryString(file);
-  });
-}
 
 import Notification from "~/app/_components/Notification";
 interface DisplayProps {
@@ -45,17 +33,13 @@ function validateName(name: string) {
 export function DisplayFiles(props: {
   dashboardProps: DashboardProps;
   usageBarProps: UsageBarProps;
+  notificationProps: NotificationProps;
 }) {
   const shouldGetFolder = useRef(true);
   const [retry, updateRetry] = useState(0);
   const [currFolderId, updateFolderId] = useState("");
   const [currItems, updateItems] = useState<Array<FileDetail>>([]);
   const [displayFiles, setDisplayFiles] = useState(true);
-
-  const [notificationShow, setNotificationVisible] = useState(false);
-  const [notificationTitle, setNotificationTitle] = useState("");
-  const [notificationMessage, setNotificationMessage] = useState("");
-  const [notificationSuccess, setNotificationSuccess] = useState(true);
 
   const createFolderAPI = api.aws.createFolder.useMutation({
     onSuccess: () => {
@@ -78,6 +62,7 @@ export function DisplayFiles(props: {
       if (data) {
         updateItems(data.childList);
         updateFolderId(data.folderId);
+        props.dashboardProps.setCurrFolderId(data.folderId);
       } else {
         if (retry < 5) {
           updateFolderInfo(currFolderId);
@@ -93,6 +78,7 @@ export function DisplayFiles(props: {
 
   function updateFolderInfo(id: string) {
     updateFolderId(id);
+    props.dashboardProps.setCurrFolderId(id);
     getFiles.mutate({ folderId: id });
   }
 
@@ -105,20 +91,22 @@ export function DisplayFiles(props: {
         props.usageBarProps.setUsageBarUsage(data.usage.userUsage);
         props.usageBarProps.setUsageBarTotal(data.usage.totalStorage);
 
-        setNotificationTitle("File deleted successfully!");
-        setNotificationMessage("File has been deleted");
-        setNotificationSuccess(true);
-        setNotificationVisible(true);
+        props.notificationProps.setNotificationTitle(
+          "File deleted successfully!",
+        );
+        props.notificationProps.setNotificationMessage("File has been deleted");
+        props.notificationProps.setNotificationSuccess(true);
+        props.notificationProps.setNotificationVisible(true);
         setTimeout(function () {
-          setNotificationVisible(false);
+          props.notificationProps.setNotificationVisible(false);
         }, 3000);
       } else {
-        setNotificationTitle("File deletion failed..");
-        setNotificationMessage("Error detected...");
-        setNotificationSuccess(false);
-        setNotificationVisible(true);
+        props.notificationProps.setNotificationTitle("File deletion failed..");
+        props.notificationProps.setNotificationMessage("Error detected...");
+        props.notificationProps.setNotificationSuccess(false);
+        props.notificationProps.setNotificationVisible(true);
         setTimeout(function () {
-          setNotificationVisible(false);
+          props.notificationProps.setNotificationVisible(false);
         }, 10000);
       }
     },
@@ -188,55 +176,21 @@ export function DisplayFiles(props: {
     }
   }, []);
 
-  const { register, handleSubmit } = useForm<FormInput>();
+  useEffect(() => {
+    getFiles.mutate({ folderId: currFolderId });
+  }, [props.dashboardProps.fileListUpdatedCounter]);
 
-  const uploadFile = api.aws.uploadFile.useMutation({
-    onSuccess: (data) => {
-      if (data && data.status == "success") {
-        console.log(data.usage);
-        getFiles.mutate({ folderId: currFolderId });
-        props.usageBarProps.setUsageBarUsage(data.usage.userUsage);
-        props.usageBarProps.setUsageBarTotal(data.usage.totalStorage);
+  // const uploadFile = api.aws.uploadFile.useMutation({
+  //   onSuccess: (data) => {
+  //     if (data && data.status == "success") {
+  //       console.log(data.usage);
+  //       getFiles.mutate({ folderId: currFolderId });
+  //       props.usageBarProps.setUsageBarUsage(data.usage.userUsage);
+  //       props.usageBarProps.setUsageBarTotal(data.usage.totalStorage);
+  //   },
+  // });
 
-        setNotificationTitle("File upload successfully!");
-        setNotificationMessage("File has been uploaded");
-        setNotificationSuccess(true);
-        setNotificationVisible(true);
-        setTimeout(function () {
-          setNotificationVisible(false);
-        }, 3000);
-      } else {
-        setNotificationTitle("File upload failed..");
-        setNotificationMessage("Error detected...");
-        setNotificationSuccess(false);
-        setNotificationVisible(true);
-        setTimeout(function () {
-          setNotificationVisible(false);
-        }, 10000);
-      }
-    },
-  });
-
-  const onSubmit: SubmitHandler<FormInput> = async (data) => {
-    for (const currFile of data.files) {
-      if (!currFile.name || !currFile.size || !currFile.type) return;
-
-      await new Promise((r) => setTimeout(r, 1000));
-      await readFile(currFile).then((file) => {
-        const fileData = {
-          name: currFile.name,
-          size: currFile.size,
-          type: currFile.type,
-          folderId: currFolderId,
-        };
-        const rawData = file as Blob;
-        const encryptedData = btoa(String(rawData));
-        uploadFile.mutate({ file: encryptedData, metadata: fileData });
-      });
-    }
-
-    // create an api that sends the file to the aws upload feature
-  };
+  // create an api that sends the file to the aws upload feature
 
   function DisplayIndividualFile(file: FileDetail, displayProps: DisplayProps) {
     const itemBaseClassname =
@@ -344,18 +298,6 @@ export function DisplayFiles(props: {
 
   return (
     <div className="h-full w-full">
-      {notificationShow ? (
-        <Notification
-          title={notificationTitle}
-          success={notificationSuccess}
-          message={notificationMessage}
-          closeFunction={function () {
-            return setNotificationVisible(false);
-          }}
-        />
-      ) : (
-        <></>
-      )}
       <div className="hidden h-[8%] w-full border-b-2 border-amber-800 bg-amber-300 p-5 lg:block lg:p-8"></div>
       <div className={`h-[92%] w-full p-2`}>
         {displayFiles ? (
@@ -382,12 +324,6 @@ export function DisplayFiles(props: {
             >
               <FolderPlusIcon className="h-10 w-10" aria-hidden="true" />
             </button>
-            <form onSubmit={handleSubmit(onSubmit)} className="w-full">
-              <input {...register("files")} type="file" id="upload" multiple />
-              <button className=" float-right inline-flex rounded-md bg-amber-400 px-3 py-2 text-sm font-semibold  text-gray-900  shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
-                Upload File
-              </button>
-            </form>
           </div>
         ) : (
           <div className="flex h-full w-full items-center justify-center">

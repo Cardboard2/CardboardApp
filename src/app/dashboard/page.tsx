@@ -15,12 +15,36 @@ import { useEffect } from "react";
 import { FileDetailsSideBar } from "./_components/FileDetailsSideBar";
 import { CreationForm } from "./_components/CreationForm";
 
+import Notification from "~/app/_components/Notification";
+
+import { NotificationProps } from "../_components/NotificationProps";
+
 function DashboardPage() {
   const router = useRouter();
   const session = useSession();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [creationOpen, setCreationOpen] = useState(false);
   const [fileDetail, setFileDetail] = useState(defaultFileDetail);
+  const [fileListUpdatedCounter, updateFileListCounter] = useState(0);
+
+  const [currFolderId, setCurrFolderId] = useState("");
+
+  const [notificationShow, setNotificationVisible] = useState(false);
+  const [notificationTitle, setNotificationTitle] = useState("");
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [notificationSuccess, setNotificationSuccess] = useState(true);
+
+  const notificationProps: NotificationProps = {
+    notificationSuccess: notificationSuccess,
+    notificationTitle: notificationTitle,
+    notificationMessage: notificationMessage,
+    notificationShow: notificationShow,
+    setNotificationTitle: setNotificationTitle,
+    setNotificationMessage: setNotificationMessage,
+    setNotificationSuccess: setNotificationSuccess,
+    setNotificationVisible: setNotificationVisible,
+  };
+
   const [usageBarUsage, setUsageBarUsage] = useState(0);
   const [usageBarTotal, setUsageBarTotal] = useState(0);
 
@@ -54,12 +78,16 @@ function DashboardPage() {
 
   const dashboardProps: DashboardProps = {
     session: session.data,
+    currFolderId: currFolderId,
+    setCurrFolderId: setCurrFolderId,
     dialogOpen: dialogOpen,
     fileDetail: fileDetail,
     setDialogOpen: setDialogOpen,
     setFileDetail: setFileDetail,
     creationOpen: creationOpen,
-    setCreationOpen: setCreationOpen
+    setCreationOpen: setCreationOpen,
+    fileListUpdatedCounter: fileListUpdatedCounter,
+    updateFileListCounter: updateFileListCounter,
   };
 
   return (
@@ -68,13 +96,34 @@ function DashboardPage() {
         <Sidebar session={session.data} usageBarProps={usageBarProps} />
       </div>
       <div className="z-0 flex h-full w-full bg-amber-200 pt-14 lg:pl-72 lg:pt-0">
+        {notificationShow ? (
+          <Notification
+            title={notificationTitle}
+            success={notificationSuccess}
+            message={notificationMessage}
+            closeFunction={function () {
+              return setNotificationVisible(false);
+            }}
+          />
+        ) : (
+          <></>
+        )}
         <div className="h-full w-full md:w-7/12 ">
           <DisplayFiles
             dashboardProps={dashboardProps}
             usageBarProps={usageBarProps}
+            notificationProps={notificationProps}
           />
           {dialogOpen ? <ItemPreview dashboardProps={dashboardProps} /> : ""}
-          {creationOpen ? <CreationForm dashboardProps={dashboardProps} /> : ""}
+          {creationOpen ? (
+            <CreationForm
+              dashboardProps={dashboardProps}
+              usageBarProps={usageBarProps}
+              notificationProps={notificationProps}
+            />
+          ) : (
+            ""
+          )}
         </div>
         <div className="hidden h-full border-l-2 border-amber-800 bg-amber-200 md:block md:w-5/12">
           <FileDetailsSideBar dashboardProps={dashboardProps} />

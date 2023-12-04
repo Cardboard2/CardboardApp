@@ -39,7 +39,7 @@ const UsageBar = ({ usage, totalSpace }: UsageBarInterface) => {
   return (
     <div className=" w-full rounded-lg bg-neutral-200 dark:bg-neutral-600 dark:text-gray-200 p-1">
       <div
-        className="bg-primary text-primary-100 rounded-lg bg-amber-200 dark:bg-amber-800 p-0.5 py-1.5 text-center text-sm font-medium leading-none"
+        className="bg-primary text-primary-100 rounded-lg bg-amber-400 dark:bg-amber-800 p-0.5 py-1.5 text-center text-sm font-medium leading-none"
         style={{ width: Math.round(percent) + "%" }}
       >
         {percent}%

@@ -1,89 +1,158 @@
-import { Fragment, useState } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
+import { Fragment, useState } from "react";
+import { Dialog, Transition } from "@headlessui/react";
 import {
-    ArrowLeftOnRectangleIcon,
-    Bars3Icon,
-    HomeIcon,
-    CircleStackIcon,
-    XMarkIcon,
-} from '@heroicons/react/24/outline'
-import { signOut } from 'next-auth/react'
-import CardboardLogo from './CardboardLogo'
-import { UserData } from '~/server/api/routers/user'
-import type { Session } from 'next-auth'
-import Image from 'next/image'
-
+  ArrowLeftOnRectangleIcon,
+  Bars3Icon,
+  HomeIcon,
+  CircleStackIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+import { signOut } from "next-auth/react";
+import CardboardLogo from "./CardboardLogo";
+import { UserData } from "~/server/api/routers/user";
+import type { Session } from "next-auth";
+import Image from "next/image";
+import { UsageBarProps } from "../_components/UsageBarProps";
+import { useEffect } from "react";
+import { api } from "~/trpc/react";
+import UsageBar from "./UsageBar";
+import { usePathname } from "next/navigation";
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: true },
-  { name: 'Upgrade', href: '/upgrade', icon: CircleStackIcon, current: false },
-]
+  { name: "Dashboard", href: "/dashboard", icon: HomeIcon, current: false },
+  { name: "Upgrade", href: "/upgrade", icon: CircleStackIcon, current: false },
+];
 
 function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
 
-function SidebarComponent(props: {session: Session}) {
-    return (
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-amber-400 border-r-2 border-amber-800 px-6">
-            <div className="flex h-16 shrink-0 items-center">
-                <div className="w-8 h-8 text-amber-950"><CardboardLogo/></div>
-            </div>
-            <nav className="flex flex-1 flex-col">
-                <ul role="list" className="flex flex-1 flex-col gap-y-7">
-                    <li>
-                        <ul role="list" className="-mx-2 space-y-1">
-                            {navigation.map((item) => (
-                                <li key={item.name}>
-                                    <a
-                                        href={item.href}
-                                        className={classNames(
-                                            item.current
-                                            ? 'bg-amber-800 text-white'
-                                            : 'text-gray-800 hover:text-white hover:bg-amber-800 duration-300',
-                                            'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
-                                        )}
-                                    >
-                                    <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
-                                    {item.name}
-                                    </a>
-                                </li>
-                            ))}
-                        </ul>
-                    </li>
-                    <li className="-mx-6 mt-auto">
-                        <a href="/profile" className="flex items-center truncate w-full gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-800 hover:text-white hover:bg-amber-800 duration-300">
-                            <Image
-                                className="h-8 w-8 rounded-full bg-gray-800 ring-2 ring-amber-700"
-                                src={ props.session.user.image ?? "/Cardboard_Normal.png"}
-                                alt=""
-                                height={32}
-                                width={32}
-                            />
-                            <span className="sr-only">Your profile</span>
-                            <span aria-hidden="true" className="max-w-full truncate">{props.session.user.name}</span>
-                        </a>
-                        <button
-                            onClick={()=>signOut()}
-                            className="flex w-full items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-800 hover:text-white hover:bg-amber-800 duration-300"
-                        >
-                            <ArrowLeftOnRectangleIcon className="h-6 w-6 shrink-0 "/>
-                            <span aria-hidden="true">Log out</span>
-                        </button>
-                    </li>
-                </ul>
-            </nav>
+function SidebarComponent(props: {
+  session: Session;
+  usageBarProps?: UsageBarProps;
+}) {
+  const path: string = usePathname();
+  for (const nav of navigation) {
+    if (nav.href == path) {
+      nav.current = true;
+    } else {
+      nav.current = false;
+    }
+  }
+
+  const [usage, setUsage] = useState(0);
+  const [totalSpace, setTotalSpace] = useState(0);
+
+  const getUsage = api.aws.getUsage.useMutation({
+    onSuccess: (data) => {
+      setUsage(data.userUsage);
+      setTotalSpace(data.totalStorage);
+    },
+  });
+  useEffect(() => {
+    getUsage.mutate();
+  }, []);
+
+  useEffect(() => {
+    console.log("asds");
+    console.log(props.usageBarProps);
+    if (
+      props.usageBarProps &&
+      props.usageBarProps?.usageBarUsage !== undefined &&
+      props.usageBarProps?.usageBarTotal !== undefined
+    ) {
+      setUsage(props.usageBarProps?.usageBarUsage);
+      setTotalSpace(props.usageBarProps?.usageBarTotal);
+    }
+  }, [props.usageBarProps?.usageBarUsage]);
+
+  return (
+    <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r-2 border-amber-800 bg-amber-400 px-6">
+      <div className="flex h-16 shrink-0 items-center">
+        <div className="h-8 w-8 text-amber-950">
+          <CardboardLogo />
         </div>
-    );
+      </div>
+      <nav className="flex flex-1 flex-col">
+        <ul role="list" className="flex flex-1 flex-col gap-y-7">
+          <li>
+            <ul role="list" className="-mx-2 space-y-1">
+              {navigation.map((item) => (
+                <li key={item.name}>
+                  <a
+                    href={item.href}
+                    className={classNames(
+                      item.current
+                        ? "bg-amber-800 text-white"
+                        : "text-gray-800 duration-300 hover:bg-amber-800 hover:text-white",
+                      "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6",
+                    )}
+                  >
+                    <item.icon
+                      className="h-6 w-6 shrink-0"
+                      aria-hidden="true"
+                    />
+                    {item.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </li>
+
+          <li className="-mx-6 mt-auto">
+            <div className="mx-5 mb-5 rounded-md bg-amber-100 px-5 pb-2 pt-3">
+              <UsageBar usage={usage} totalSpace={totalSpace} />
+              <a className="pl-1 text-[12px] font-medium text-black">
+                {usage} MB of {totalSpace} MB used
+              </a>
+            </div>
+            <a
+              href="/profile"
+              className={classNames(
+                "duration-30 flex w-full items-center gap-x-4 truncate px-6 py-3 text-sm font-semibold leading-6 text-gray-800 hover:text-white",
+                path == "/profile" ? "bg-amber-800" : "hover:bg-amber-800",
+              )}
+            >
+              <Image
+                className="h-8 w-8 rounded-full bg-gray-800 ring-2 ring-amber-700"
+                src={props.session.user.image ?? "/Cardboard_Normal.png"}
+                alt=""
+                height={32}
+                width={32}
+              />
+              <span className="sr-only">Your profile</span>
+              <span aria-hidden="true" className="max-w-full truncate">
+                {props.session.user.name}
+              </span>
+            </a>
+            <button
+              onClick={() => signOut()}
+              className="flex w-full items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-800 duration-300 hover:bg-amber-800 hover:text-white"
+            >
+              <ArrowLeftOnRectangleIcon className="h-6 w-6 shrink-0 " />
+              <span aria-hidden="true">Log out</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  );
 }
 
-export default function Sidebar(props: {session: Session}) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+export default function Sidebar(props: {
+  session: Session;
+  usageBarProps?: UsageBarProps;
+}) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <>
-      <div className='w-full'>
+      <div className="w-full">
         <Transition.Root show={sidebarOpen} as={Fragment}>
-          <Dialog as="div" className="relative z-50 lg:hidden" onClose={setSidebarOpen}>
+          <Dialog
+            as="div"
+            className="relative z-50 lg:hidden"
+            onClose={setSidebarOpen}
+          >
             <Transition.Child
               as={Fragment}
               enter="transition-opacity ease-linear duration-300"
@@ -117,13 +186,23 @@ export default function Sidebar(props: {session: Session}) {
                     leaveTo="opacity-0"
                   >
                     <div className="absolute left-full top-0 flex w-16 justify-center pt-5">
-                      <button type="button" className="-m-2.5 p-2.5" onClick={() => setSidebarOpen(false)}>
+                      <button
+                        type="button"
+                        className="-m-2.5 p-2.5"
+                        onClick={() => setSidebarOpen(false)}
+                      >
                         <span className="sr-only">Close sidebar</span>
-                        <XMarkIcon className="h-6 w-6 text-white" aria-hidden="true" />
+                        <XMarkIcon
+                          className="h-6 w-6 text-white"
+                          aria-hidden="true"
+                        />
                       </button>
                     </div>
                   </Transition.Child>
-                  <SidebarComponent session={props.session}/>
+                  <SidebarComponent
+                    session={props.session}
+                    usageBarProps={props.usageBarProps}
+                  />
                 </Dialog.Panel>
               </Transition.Child>
             </div>
@@ -131,16 +210,23 @@ export default function Sidebar(props: {session: Session}) {
         </Transition.Root>
 
         <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-          <SidebarComponent session={props.session}/>
+          <SidebarComponent
+            session={props.session}
+            usageBarProps={props.usageBarProps}
+          />
         </div>
 
-        <div className="fixed w-full top-0 z-40 flex items-center gap-x-6 bg-amber-400 px-4 py-4 shadow-sm sm:px-6 lg:hidden">
-          <button type="button" className="-m-2.5 p-2.5 text-gray-800 lg:hidden" onClick={() => setSidebarOpen(true)}>
+        <div className="fixed top-0 z-40 flex w-full items-center gap-x-6 bg-amber-400 px-4 py-4 shadow-sm sm:px-6 lg:hidden">
+          <button
+            type="button"
+            className="-m-2.5 p-2.5 text-gray-800 lg:hidden"
+            onClick={() => setSidebarOpen(true)}
+          >
             <span className="sr-only">Open sidebar</span>
             <Bars3Icon className="h-6 w-6" aria-hidden="true" />
           </button>
         </div>
       </div>
     </>
-  )
+  );
 }

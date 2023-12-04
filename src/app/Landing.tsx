@@ -1,8 +1,11 @@
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 export default function Landing() {
   const router = useRouter();
+  const session = useSession();
+
   return (
     // <div className="grid w-full grid-cols-5 bg-amber-500">
     //   <div className="w-full px-20 py-20"></div>
@@ -18,8 +21,8 @@ export default function Landing() {
           </h1>
           <h2 className="text-xl">
             Pack and store your digital world effortlessly. View, share and
-            manage your files, just like neatly packed boxes but on the cloud
-            :).
+            manage your files, just like a neatly packed cardboard box but on
+            the cloud.
           </h2>
           <div className="mx-auto flex gap-3">
             <button
@@ -28,19 +31,34 @@ export default function Landing() {
             >
               See Pricings
             </button>
-            <button
-              onClick={() => router.push("/login")}
-              className="rounded-lg border-[1px] border-black/10 px-3 py-2 text-xl font-medium  hover:bg-amber-200"
-            >
-              Sign in
-            </button>
+
+            {session.status == "authenticated" ? (
+              <button
+                onClick={() => router.push("/dashboard")}
+                className="rounded-lg border-[1px] border-black/10 px-3 py-2 text-xl font-medium  hover:bg-amber-200"
+              >
+                Go to Dashboard
+              </button>
+            ) : (
+              <button
+                onClick={() => router.push("/login")}
+                className="rounded-lg border-[1px] border-black/10 px-3 py-2 text-xl font-medium  hover:bg-amber-200"
+              >
+                Sign in
+              </button>
+            )}
           </div>
-          <p className="mt-5">
-            New user to Cardbox?{" "}
-            <a href="/login" className="pl-4 text-amber-600">
-              Get started here
-            </a>
-          </p>
+
+          {session.status == "authenticated" ? (
+            <></>
+          ) : (
+            <p className="mt-5">
+              New user to Cardbox?{" "}
+              <a href="/login" className="pl-4 text-amber-600">
+                Sign up here
+              </a>
+            </p>
+          )}
         </div>
         <div className="block lg:col-span-3">
           <Image

@@ -24,12 +24,14 @@ const SignUpForm = () => {
         >
           Email address
         </label>
-        <div className="mt-2 ring-2 ring-inset ring-amber-700 rounded-md">
+        <div className="mt-2 rounded-md ring-2 ring-inset ring-amber-700">
           <input
             {...signup("email")}
             type="input"
+            disabled
+            value="OUT OF ORDER"
             required
-            className="block w-full border-0 p-2 text-gray-900 shadow-sm bg-transparent focus:outline-none duration-300 text-sm leading-6"
+            className="block w-full border-0 bg-transparent p-2 text-sm leading-6 text-gray-900 shadow-sm duration-300 focus:outline-none"
           />
         </div>
       </div>
@@ -41,7 +43,7 @@ const SignUpForm = () => {
         >
           Password
         </label>
-        <div className="mt-2 ring-2 ring-inset ring-amber-700 rounded-md">
+        <div className="mt-2 rounded-md ring-2 ring-inset ring-amber-700">
           <input
             {...signup("password", {
               required: "You must specify a password",
@@ -55,7 +57,9 @@ const SignUpForm = () => {
             type="password"
             autoComplete="current-password"
             required
-            className="block w-full border-0 p-2 text-gray-900 shadow-sm bg-transparent focus:outline-none duration-300 text-sm leading-6"
+            disabled
+            value="OUT OF ORDER"
+            className="block w-full border-0 bg-transparent p-2 text-sm leading-6 text-gray-900 shadow-sm duration-300 focus:outline-none"
           />
         </div>
       </div>
@@ -63,7 +67,7 @@ const SignUpForm = () => {
       <div>
         <button
           type="submit"
-          className="flex w-full justify-center rounded-md bg-amber-400 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-amber-500 active:opacity-80 duration-300"
+          className="flex w-full justify-center rounded-md bg-amber-400 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm duration-300 hover:bg-amber-500 active:opacity-80"
         >
           Sign up
         </button>

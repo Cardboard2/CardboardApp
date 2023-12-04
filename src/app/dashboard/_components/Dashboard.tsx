@@ -90,8 +90,8 @@ export function Dashboard(props: {
 
       if (data && data.status == "success") {
         console.log(data.usage);
-        props.usageBarProps.setUsage(data.usage.userUsage);
-        props.usageBarProps.setTotalSpace(data.usage.totalStorage);
+        props.usageBarProps.setUsageBarUsage(data.usage.userUsage);
+        props.usageBarProps.setUsageBarTotal(data.usage.totalStorage);
       }
     },
   });
@@ -149,8 +149,8 @@ export function Dashboard(props: {
 
       if (data && data.status == "success" && data.usage) {
         console.log(data.usage);
-        props.usageBarProps.setUsage(data.usage.userUsage);
-        props.usageBarProps.setTotalSpace(data.usage.totalStorage);
+        props.usageBarProps.setUsageBarUsage(data.usage.userUsage);
+        props.usageBarProps.setUsageBarTotal(data.usage.totalStorage);
       }
     },
   });
@@ -231,7 +231,7 @@ export function Dashboard(props: {
                       key={item.name}
                     >
                       {String(item.type).includes("image") ? (
-                        <PhotoIcon className="float-left h-6 w-6 "></PhotoIcon>
+                        <PhotoIcon className="float-left h-6 w-6"></PhotoIcon>
                       ) : (
                         <DocumentIcon className="float-left h-6 w-6 "></DocumentIcon>
                       )}

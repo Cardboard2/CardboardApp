@@ -8,9 +8,9 @@ interface TierInterface {
 }
 
 const TierSize: TierInterface = {
-  "tier-pleb": 10000000, // 10 MB
-  "tier-normal": 1e8, // 100 MB
-  "tier-whale": 1e9, // 1 GB
+  "tier-pleb": 10 * 1048576, // 10 MB
+  "tier-normal": 100 * 1048576, // 100 MB
+  "tier-whale": 1000 * 1048576, // 1 GB
 };
 
 export function getUserUsageStats(
@@ -37,7 +37,7 @@ export function getUserUsageStats(
 
 export function convertToMb(bytes: number | undefined | null) {
   if (bytes && bytes !== null) {
-    const sumMB = bytes / (1000 * 1000);
+    const sumMB = bytes / (1024 * 1024);
     return Math.round(sumMB * 100) / 100;
   } else {
     return 0;

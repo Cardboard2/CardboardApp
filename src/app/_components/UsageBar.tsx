@@ -18,7 +18,7 @@ const UsageBar = ({ usage, totalSpace }: UsageBarInterface) => {
   }, [usage, totalSpace]);
 
   function incrementBar(newPercent: number) {
-    for (let i = percent; i <= newPercent; i++) {
+    for (let i = percent; i <= newPercent && i <= 100; i++) {
       setTimeout(function () {
         updatePercent(Math.floor(i));
       }, i * 7);
@@ -26,9 +26,7 @@ const UsageBar = ({ usage, totalSpace }: UsageBarInterface) => {
   }
 
   function decrementBar(newPercent: number) {
-    console.log("new %: " + newPercent);
-    console.log("og %: " + percent);
-    for (let i = percent; i >= newPercent; i--) {
+    for (let i = percent; i >= newPercent && i >= 0; i--) {
       setTimeout(
         function () {
           updatePercent(Math.floor(i));
@@ -39,9 +37,9 @@ const UsageBar = ({ usage, totalSpace }: UsageBarInterface) => {
   }
 
   return (
-    <div className=" w-full rounded-md bg-neutral-200 dark:bg-neutral-600">
+    <div className=" w-full rounded-lg bg-neutral-200 dark:bg-neutral-600">
       <div
-        className="bg-primary text-primary-100 rounded-md bg-amber-400 p-0.5 text-center text-xs font-medium leading-none"
+        className="bg-primary text-primary-100 rounded-lg bg-amber-400 p-0.5 py-1.5 text-center text-sm font-medium leading-none"
         style={{ width: Math.round(percent) + "%" }}
       >
         {percent}%

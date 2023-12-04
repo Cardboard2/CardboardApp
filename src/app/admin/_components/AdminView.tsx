@@ -5,6 +5,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { api } from "~/trpc/react";
 import StatisticBox from "./StatisticBox";
 import UsageBar from "../../_components/UsageBar";
+import Sidebar from "~/app/_components/Sidebar";
 
 import type { FileListInterface } from "~/app/admin/_components/FileList";
 import type { UserListInterface } from "~/app/admin/_components/UserList";
@@ -12,7 +13,7 @@ import type { PaymentListInterface } from "~/app/admin/_components/PaymentList";
 
 export interface AdminStatsInterface {
   "Total users": number;
-  "Total usage (Mb)": number;
+  "Total usage (MB)": number;
   "Total tier-pleb": number;
   "Total tier-normal": number;
   "Total tier-whale": number;
@@ -21,7 +22,7 @@ export interface AdminStatsInterface {
 function AdminStatsList(props: { AdminListProps: UserListInterface[] }) {
   const [adminStats, updateAdminStats] = useState<AdminStatsInterface>({
     "Total users": 0,
-    "Total usage (Mb)": 0,
+    "Total usage (MB)": 0,
     "Total tier-pleb": 0,
     "Total tier-normal": 0,
     "Total tier-whale": 0,
@@ -56,7 +57,7 @@ function AdminStatsList(props: { AdminListProps: UserListInterface[] }) {
 
     updateAdminStats({
       "Total users": props.AdminListProps.length,
-      "Total usage (Mb)": usage,
+      "Total usage (MB)": usage,
       "Total tier-pleb": tiers["tier-pleb"],
       "Total tier-normal": tiers["tier-normal"],
       "Total tier-whale": tiers["tier-whale"],
@@ -89,7 +90,7 @@ function FileList(props: {
     <div>
       <div>
         <div className="px-4 sm:px-6 lg:px-8 ">
-          <div className="md: flex flex-col justify-between bg-amber-200 md:flex-row">
+          <div className="flex-col justify-between bg-amber-200 md:flex md:flex-row">
             <div className="flex-col">
               <div className="sm:flex sm:items-center">
                 <div className="sm:flex-auto">
@@ -144,7 +145,7 @@ function FileList(props: {
           <div className="mt-5 flow-root">
             <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
               <div className="inline-block min-w-full overflow-hidden overflow-y-scroll py-2 align-middle sm:px-6 lg:px-8">
-                <h1>File List</h1>
+                <h1 className="font-medium underline">File List</h1>
                 <table className="min-w-full divide-y divide-gray-300">
                   <thead>
                     <tr>
@@ -201,10 +202,10 @@ function FileList(props: {
           </div>
 
           <div></div>
-          <div className="mt-5 flow-root">
+          <div className="mt-10 flow-root w-full">
             <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-              <div className="inline-block min-w-full overflow-hidden overflow-y-scroll py-2 align-middle sm:px-6 lg:px-8">
-                <h1>Payments List</h1>
+              <div className=" inline-block min-w-full overflow-hidden overflow-y-scroll py-2 align-middle sm:px-6 lg:px-8">
+                <h1 className="font-medium underline">Payments List</h1>
                 <table className="min-w-full divide-y divide-gray-300">
                   <thead>
                     <tr>
@@ -266,6 +267,9 @@ export default function AdminView() {
   const [paymentList, updatePaymentList] = useState<
     Array<PaymentListInterface>
   >([]);
+
+  const { data: session } = useSession();
+
   const [selectedUser, updateSelectedUser] = useState<UserListInterface>({
     name: "",
     id: "",
@@ -350,11 +354,12 @@ export default function AdminView() {
     makeUserAPI.mutate();
   }
 
-  if (isAdmin == true) {
+  if (isAdmin == true && session) {
     if (userInfoView == false) {
       return (
         <div>
-          <div className="flex flex-col gap-10 px-4 sm:px-6 lg:px-8">
+          <Sidebar session={session} />
+          <div className="mt-20 flex flex-col gap-10 px-4 sm:px-6 lg:px-8 lg:pl-80">
             <div className="sm:flex sm:items-center">
               <div className="sm:flex-auto">
                 <h1 className="mt-5 text-xl font-semibold leading-6 text-gray-900">
@@ -454,7 +459,7 @@ export default function AdminView() {
                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                               <a
                                 onClick={() => getUserDetails(user.id, user)}
-                                className="cursor-pointer text-indigo-600 hover:text-indigo-900"
+                                className="cursor-pointer text-amber-600 hover:text-amber-900"
                               >
                                 View
                                 <span className="sr-only">, {user.name}</span>
@@ -474,9 +479,10 @@ export default function AdminView() {
     } else {
       return (
         <div>
-          <div className="flex flex-col gap-5 px-4 sm:px-6 lg:px-8">
+          <Sidebar session={session} />
+          <div className="flex flex-col gap-5 px-4 sm:px-6 lg:px-8 lg:pl-80">
             <button
-              className=" width: auto mt-3 rounded-md bg-amber-300 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 "
+              className=" width: auto mt-3 rounded-md bg-amber-500 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 "
               onClick={() => setUserInfoView(false)}
             >
               Return to Users Page

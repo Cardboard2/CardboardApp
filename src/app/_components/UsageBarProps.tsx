@@ -1,6 +1,8 @@
 import { Dispatch, SetStateAction } from "react";
 
 export interface UsageBarProps {
-  setUsage: Dispatch<SetStateAction<number>>;
-  setTotalSpace: Dispatch<SetStateAction<number>>;
+  usageBarUsage: number;
+  usageBarTotal: number;
+  setUsageBarUsage: Dispatch<SetStateAction<number>>;
+  setUsageBarTotal: Dispatch<SetStateAction<number>>;
 }

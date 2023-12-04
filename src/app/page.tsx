@@ -2,7 +2,6 @@
 import { Header } from "./_components/Header.tsx";
 import { SessionProvider } from "next-auth/react";
 import Landing from "./Landing.tsx";
-
 export default function Home() {
   return (
     <SessionProvider>

@@ -120,7 +120,7 @@ export function UploadForm(props: {
                     disabled={uploadFile.isLoading}
                     customUpload
                     uploadHandler={(event)=>{
-                      event.files.forEach(async (file) => {
+                      event.files.forEach((file) => { (async ()=>{ 
                         console.log("File: ", file)
                         const fileData = {
                           name: file.name,
@@ -129,11 +129,10 @@ export function UploadForm(props: {
                           folderId: props.dashboardProps.currFolderId,
                         };
                         
-
                         const blob = await readFile(file) as Blob;
                         const base64data = btoa(String(blob));
                         uploadFile.mutate({ file: base64data, metadata: fileData });
-                      })
+                      })()})
                     }}
                     previewWidth={0}/>
                     

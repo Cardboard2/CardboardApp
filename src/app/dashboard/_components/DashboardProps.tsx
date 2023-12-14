@@ -1,11 +1,17 @@
-import { Dispatch, SetStateAction } from "react";
-import { FileDetail } from "./FileDetail";
+import type { Dispatch, SetStateAction } from "react";
+import type { FileDetail } from "./FileDetail";
+import type { Session } from "next-auth";
 
 export interface DashboardProps {
-    dialogOpen: boolean,
-    setDialogOpen: Dispatch<SetStateAction<boolean>>,
-    folderId: string,
-    setFolderId: Dispatch<SetStateAction<string>>,
-    fileDetail: FileDetail,
-    setFileDetail: Dispatch<SetStateAction<FileDetail>>
-};
+  session: Session;
+  dialogOpen: boolean;
+  setDialogOpen: Dispatch<SetStateAction<boolean>>;
+  uploadFormOpen: boolean;
+  setUploadFormOpen: Dispatch<SetStateAction<boolean>>;
+  fileDetail: FileDetail;
+  setFileDetail: Dispatch<SetStateAction<FileDetail>>;
+  currFolderId: string;
+  setCurrFolderId: Dispatch<SetStateAction<string>>;
+  fileListUpdatedCounter: number;
+  updateFileListCounter: Dispatch<SetStateAction<number>>;
+}

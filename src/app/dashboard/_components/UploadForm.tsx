@@ -21,7 +21,7 @@ function readFile(file: File) {
   });
 }
 
-export function CreationForm(props: {
+export function UploadForm(props: {
   dashboardProps: DashboardProps;
   usageBarProps: UsageBarProps;
   notificationProps: NotificationProps;
@@ -86,7 +86,7 @@ export function CreationForm(props: {
       <Transition appear show={props.dashboardProps.creationOpen} as={Fragment}>
         <Dialog
           as="div"
-          className="absolute left-0 top-0 z-50 h-screen w-screen"
+          className="absolute left-0 top-0 z-40 h-screen w-screen"
           onClose={() => {
             props.dashboardProps.setCreationOpen(false);
           }}

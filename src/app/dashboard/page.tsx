@@ -4,7 +4,6 @@ import { SessionProvider, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Spinner } from "../_components/Spinner";
 import Sidebar from "../_components/Sidebar";
-import { api } from "~/trpc/react";
 import { DisplayFiles } from "./_components/DisplayFiles";
 import { useState } from "react";
 import { defaultFileDetail } from "./_components/FileDetail";
@@ -13,7 +12,7 @@ import { ItemPreview } from "./_components/ItemPreview";
 import { UsageBarProps } from "../_components/UsageBarProps";
 import { useEffect } from "react";
 import { FileDetailsSideBar } from "./_components/FileDetailsSideBar";
-import { CreationForm } from "./_components/CreationForm";
+import { UploadForm } from "./_components/UploadForm";
 
 import Notification from "~/app/_components/Notification";
 
@@ -96,18 +95,6 @@ function DashboardPage() {
         <Sidebar session={session.data} usageBarProps={usageBarProps} />
       </div>
       <div className="z-0 flex h-full w-full bg-amber-200 pt-14 lg:pl-72 lg:pt-0">
-        {notificationShow ? (
-          <Notification
-            title={notificationTitle}
-            success={notificationSuccess}
-            message={notificationMessage}
-            closeFunction={function () {
-              return setNotificationVisible(false);
-            }}
-          />
-        ) : (
-          <></>
-        )}
         <div className="h-full w-full md:w-7/12 ">
           <DisplayFiles
             dashboardProps={dashboardProps}
@@ -116,7 +103,7 @@ function DashboardPage() {
           />
           {dialogOpen ? <ItemPreview dashboardProps={dashboardProps} /> : ""}
           {creationOpen ? (
-            <CreationForm
+            <UploadForm
               dashboardProps={dashboardProps}
               usageBarProps={usageBarProps}
               notificationProps={notificationProps}
@@ -129,7 +116,21 @@ function DashboardPage() {
           <FileDetailsSideBar dashboardProps={dashboardProps} />
         </div>
       </div>
+      
+      {notificationShow ? (
+          <Notification
+            title={notificationTitle}
+            success={notificationSuccess}
+            message={notificationMessage}
+            closeFunction={function () {
+              return setNotificationVisible(false);
+            }}
+          />
+        ) : (
+          <></>
+        )}
     </div>
+    
   );
 }
 

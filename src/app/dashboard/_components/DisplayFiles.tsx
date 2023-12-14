@@ -297,9 +297,8 @@ export function DisplayFiles(props: {
   }
 
   return (
-    <div className="h-full w-full">
-      <div className="hidden h-[8%] w-full border-b-2 border-amber-800 bg-amber-300 p-5 lg:block lg:p-8"></div>
-      <div className={`h-[92%] w-full p-2`}>
+    <div className="h-full w-full bg-amber-400 lg:flex lg:items-end">
+      <div className={`h-full lg:h-[95%] w-full p-2 bg-amber-200 lg:border-t-2 lg:border-amber-800 `}>
         {displayFiles ? (
           <div className="relative h-full w-full overflow-y-auto">
             <DisplayFileList displayProps={displayProps} />

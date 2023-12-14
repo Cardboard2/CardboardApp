@@ -180,15 +180,6 @@ export function DisplayFiles(props: {
     getFiles.mutate({ folderId: currFolderId });
   }, [props.dashboardProps.fileListUpdatedCounter]);
 
-  // const uploadFile = api.aws.uploadFile.useMutation({
-  //   onSuccess: (data) => {
-  //     if (data && data.status == "success") {
-  //       console.log(data.usage);
-  //       getFiles.mutate({ folderId: currFolderId });
-  //       props.usageBarProps.setUsageBarUsage(data.usage.userUsage);
-  //       props.usageBarProps.setUsageBarTotal(data.usage.totalStorage);
-  //   },
-  // });
 
   // create an api that sends the file to the aws upload feature
 

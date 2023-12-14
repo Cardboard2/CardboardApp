@@ -170,16 +170,12 @@ export function DisplayFiles(props: {
   };
 
   useEffect(() => {
+    console.log("Triggering!");
     if (shouldGetFolder.current) {
       shouldGetFolder.current = false;
       getFiles.mutate({ folderId: currFolderId });
     }
-  }, []);
-
-  useEffect(() => {
-    getFiles.mutate({ folderId: currFolderId });
   }, [props.dashboardProps.fileListUpdatedCounter]);
-
 
   // create an api that sends the file to the aws upload feature
 
@@ -294,10 +290,12 @@ export function DisplayFiles(props: {
           <div className="relative h-full w-full overflow-y-auto">
             <DisplayFileList displayProps={displayProps} />
             <button
-              onClick={() =>
+              onClick={() => {
+                shouldGetFolder.current = true;
                 props.dashboardProps.setUploadFormOpen(
                   !props.dashboardProps.uploadFormOpen,
                 )
+              }
               }
               type="button"
               className="fixed bottom-5 left-5 rounded-full bg-amber-600 p-2 text-white shadow-xl duration-300 hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600 active:opacity-80 lg:left-80"
@@ -307,6 +305,7 @@ export function DisplayFiles(props: {
 
             <button
               onClick={() => {
+                shouldGetFolder.current = true;
                 createFolder();
               }}
               type="button"

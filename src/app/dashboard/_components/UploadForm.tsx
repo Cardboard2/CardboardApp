@@ -132,7 +132,7 @@ export function UploadForm(props: {
                         const blob = await readFile(file) as Blob;
                         const base64data = btoa(String(blob));
                         uploadFile.mutate({ file: base64data, metadata: fileData });
-                      })().then(() => {})})
+                      })().then(() => {}, () => {},)})
                     }}
                     previewWidth={0}/>
                     

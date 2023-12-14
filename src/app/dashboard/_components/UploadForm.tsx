@@ -112,7 +112,7 @@ export function UploadForm(props: {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="lg:3/5 relative flex h-1/2 w-11/12 transform items-center justify-center overflow-hidden rounded-2xl bg-amber-200 p-8 shadow-xl md:w-3/5">
+                <Dialog.Panel className={`lg:3/5 relative flex h-1/2 w-11/12 transform items-center justify-center overflow-hidden rounded-2xl bg-amber-200 p-8 shadow-xl md:w-3/5 ${uploadFile.isLoading ? "cursor-wait" : ""}`}>
                   <FileUpload name="upload" chooseOptions={chooseOpt} uploadOptions={uploadOpt} cancelOptions={cancelOpt} mode="advanced"
                     emptyTemplate={<p className="break-words hidden h-80 md:flex md:items-center md:m-auto text-xl lg:text-2xl border-4 border-amber-700 p-3 font-bold m-2 rounded-2xl text-gray-600">Drag file here or use the select button</p>}
                     contentClassName=" m-2 p-2 truncate text-sm md:text-md font-semibold "

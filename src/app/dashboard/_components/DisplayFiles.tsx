@@ -304,8 +304,8 @@ export function DisplayFiles(props: {
             <DisplayFileList displayProps={displayProps} />
             <button
               onClick={() =>
-                props.dashboardProps.setCreationOpen(
-                  !props.dashboardProps.creationOpen,
+                props.dashboardProps.setUploadFormOpen(
+                  !props.dashboardProps.uploadFormOpen,
                 )
               }
               type="button"

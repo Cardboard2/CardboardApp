@@ -1,24 +1,30 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { DashboardProps } from "./DashboardProps";
-import { useState } from "react";
-import { Tab } from "@headlessui/react";
 import { api } from "~/trpc/react";
+import { FileUpload, FileUploadOptions } from 'primereact/fileupload';
 
-import { type SubmitHandler, useForm } from "react-hook-form";
-import { FormInput } from "./FileDetail";
 import { NotificationProps } from "~/app/_components/NotificationProps";
 import { UsageBarProps } from "~/app/_components/UsageBarProps";
+import { XCircleIcon } from "@heroicons/react/24/outline";
 
-function readFile(file: File) {
-  return new Promise((resolve, reject) => {
-    const fr = new FileReader();
-    fr.onload = () => {
-      resolve(fr.result);
-    };
-    fr.onerror = reject;
-    fr.readAsBinaryString(file);
-  });
+
+const chooseOpt : FileUploadOptions = {
+  label: "Select File",
+  className: "p-2 w-20 md:w-24 font-bold text-2xl duration-300 active:opacity-80 text-sm text-blue-500 shadow-xl rounded-full mr-2 border-4 border-blue-400 hover:border-blue-600",
+  iconOnly: true
+}
+
+const uploadOpt : FileUploadOptions = {
+  label: "Upload File",
+  className: "p-2 w-20 md:w-24 font-bold duration-300 active:opacity-80 text-sm text-green-700 shadow-xl rounded-full border-4 border-green-400 hover:border-green-600",
+  iconOnly: true
+}
+
+const cancelOpt : FileUploadOptions = {
+  label: "Clear Upload",
+  className: "hidden",
+  iconOnly: true
 }
 
 export function UploadForm(props: {
@@ -26,9 +32,22 @@ export function UploadForm(props: {
   usageBarProps: UsageBarProps;
   notificationProps: NotificationProps;
 }) {
+
+  function readFile(file: File) {
+    return new Promise((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onload = () => {
+        resolve(fr.result);
+      };
+      fr.onerror = reject;
+      fr.readAsBinaryString(file);
+    });}
+  
+
   const uploadFile = api.aws.uploadFile.useMutation({
     onSuccess: (data) => {
       if (data && data.status == "success") {
+        props.dashboardProps.setUploadFormOpen(false);
         console.log(data.usage);
         props.usageBarProps.setUsageBarUsage(data.usage.userUsage);
         props.usageBarProps.setUsageBarTotal(data.usage.totalStorage);
@@ -60,35 +79,14 @@ export function UploadForm(props: {
     },
   });
 
-  const { register, handleSubmit } = useForm<FormInput>();
-
-  const onSubmit: SubmitHandler<FormInput> = async (data) => {
-    for (const currFile of data.files) {
-      if (!currFile.name || !currFile.size || !currFile.type) return;
-
-      await new Promise((r) => setTimeout(r, 1000));
-      await readFile(currFile).then((file) => {
-        const fileData = {
-          name: currFile.name,
-          size: currFile.size,
-          type: currFile.type,
-          folderId: props.dashboardProps.currFolderId,
-        };
-        const rawData = file as Blob;
-        const encryptedData = btoa(String(rawData));
-        uploadFile.mutate({ file: encryptedData, metadata: fileData });
-      });
-    }
-  };
-
   return (
     <>
-      <Transition appear show={props.dashboardProps.creationOpen} as={Fragment}>
+      <Transition appear show={props.dashboardProps.uploadFormOpen} as={Fragment}>
         <Dialog
           as="div"
           className="absolute left-0 top-0 z-40 h-screen w-screen"
           onClose={() => {
-            props.dashboardProps.setCreationOpen(false);
+            props.dashboardProps.setUploadFormOpen(false);
           }}
         >
           <Transition.Child
@@ -114,19 +112,32 @@ export function UploadForm(props: {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="lg:3/5 relative flex h-5/6 w-11/12 transform items-center justify-center overflow-hidden rounded-2xl bg-amber-200 p-1 shadow-xl md:w-3/5 ">
-                  {" "}
-                  <form onSubmit={handleSubmit(onSubmit)} className="w-full">
-                    <input
-                      {...register("files")}
-                      type="file"
-                      id="upload"
-                      multiple
-                    />
-                    <button className=" float-right inline-flex rounded-md bg-amber-400 px-3 py-2 text-sm font-semibold  text-gray-900  shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
-                      Upload File
-                    </button>
-                  </form>
+                <Dialog.Panel className="lg:3/5 relative flex h-1/2 w-11/12 transform items-center justify-center overflow-hidden rounded-2xl bg-amber-200 p-8 shadow-xl md:w-3/5">
+                  <FileUpload name="upload" chooseOptions={chooseOpt} uploadOptions={uploadOpt} cancelOptions={cancelOpt} mode="advanced"
+                    emptyTemplate={<p className="break-words hidden h-80 md:flex md:items-center md:m-auto text-xl lg:text-2xl border-4 border-amber-700 p-3 font-bold m-2 rounded-2xl text-gray-600">Drag file here or use the select button</p>}
+                    contentClassName=" m-2 p-2 truncate text-sm md:text-md font-semibold "
+                    headerClassName="fixed bottom-4 left-4 md:bottom-10 left-10"
+                    disabled={uploadFile.isLoading}
+                    customUpload
+                    uploadHandler={(event)=>{
+                      event.files.forEach(async (file) => {
+                        console.log("File: ", file)
+                        const fileData = {
+                          name: file.name,
+                          size: file.size,
+                          type: file.type,
+                          folderId: props.dashboardProps.currFolderId,
+                        };
+                        
+
+                        const blob = await readFile(file) as Blob;
+                        const base64data = btoa(String(blob));
+                        uploadFile.mutate({ file: base64data, metadata: fileData });
+                      })
+                    }}
+                    previewWidth={0}/>
+                    
+                  <XCircleIcon className="fixed top-4 right-4 w-10 h-10 text-red-500 hover:text-red-600 active:opacity-80 cursor-pointer font-bold" onClick={()=>{props.dashboardProps.setUploadFormOpen(false)}}/>
                 </Dialog.Panel>
               </Transition.Child>
             </div>
@@ -136,30 +147,3 @@ export function UploadForm(props: {
     </>
   );
 }
-
-// const uploadFile = api.aws.uploadFile.useMutation({
-//   onSuccess: (data) => {
-//     if (data && data.status == "success") {
-//       console.log(data.usage);
-//       getFiles.mutate({ folderId: currFolderId });
-//       props.usageBarProps.setUsageBarUsage(data.usage.userUsage);
-//       props.usageBarProps.setUsageBarTotal(data.usage.totalStorage);
-
-//     //   setNotificationTitle("File upload successfully!");
-//     //   setNotificationMessage("File has been uploaded");
-//     //   setNotificationSuccess(true);
-//     //   setNotificationVisible(true);
-//     //   setTimeout(function () {
-//     //     setNotificationVisible(false);
-//     //   }, 3000);
-//     // } else {
-//     //   setNotificationTitle("File upload failed..");
-//     //   setNotificationMessage("Error detected...");
-//     //   setNotificationSuccess(false);
-//     //   setNotificationVisible(true);
-//     //   setTimeout(function () {
-//     //     setNotificationVisible(false);
-//     //   }, 10000);
-//     // }
-//   },
-// });

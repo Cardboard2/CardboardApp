@@ -13,6 +13,7 @@ import { UsageBarProps } from "../_components/UsageBarProps";
 import { useEffect } from "react";
 import { FileDetailsSideBar } from "./_components/FileDetailsSideBar";
 import { UploadForm } from "./_components/UploadForm";
+import { PrimeReactProvider } from 'primereact/api';
 
 import Notification from "~/app/_components/Notification";
 
@@ -22,7 +23,7 @@ function DashboardPage() {
   const router = useRouter();
   const session = useSession();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [creationOpen, setCreationOpen] = useState(false);
+  const [uploadFormOpen, setUploadFormOpen] = useState(false);
   const [fileDetail, setFileDetail] = useState(defaultFileDetail);
   const [fileListUpdatedCounter, updateFileListCounter] = useState(0);
 
@@ -83,8 +84,8 @@ function DashboardPage() {
     fileDetail: fileDetail,
     setDialogOpen: setDialogOpen,
     setFileDetail: setFileDetail,
-    creationOpen: creationOpen,
-    setCreationOpen: setCreationOpen,
+    uploadFormOpen: uploadFormOpen,
+    setUploadFormOpen: setUploadFormOpen,
     fileListUpdatedCounter: fileListUpdatedCounter,
     updateFileListCounter: updateFileListCounter,
   };
@@ -102,7 +103,7 @@ function DashboardPage() {
             notificationProps={notificationProps}
           />
           {dialogOpen ? <ItemPreview dashboardProps={dashboardProps} /> : ""}
-          {creationOpen ? (
+          {uploadFormOpen ? (
             <UploadForm
               dashboardProps={dashboardProps}
               usageBarProps={usageBarProps}
@@ -116,7 +117,7 @@ function DashboardPage() {
           <FileDetailsSideBar dashboardProps={dashboardProps} />
         </div>
       </div>
-      
+
       {notificationShow ? (
           <Notification
             title={notificationTitle}
@@ -136,8 +137,10 @@ function DashboardPage() {
 
 export default function DashboardPageWrapper() {
   return (
-    <SessionProvider>
-      <DashboardPage />
-    </SessionProvider>
+    <PrimeReactProvider>
+      <SessionProvider>
+        <DashboardPage />
+      </SessionProvider>
+    </PrimeReactProvider>
   );
 }

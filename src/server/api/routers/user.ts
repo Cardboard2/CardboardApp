@@ -1,4 +1,5 @@
 import { protectedProcedure, createTRPCRouter } from "~/server/api/trpc";
+import { api } from "~/trpc/server";
 
 export interface UserData {
     name: string
@@ -11,21 +12,29 @@ export interface UserData {
 
 export const userRouter = createTRPCRouter({
   getUser: protectedProcedure.query(async ({ ctx }) => {
-    const user = await ctx.db.user.findUnique({
+    let user = await ctx.db.user.findUnique({
       where: { id: ctx.session.user.id },
     });
+
     if (!user)
         return null;
     else {
-        const userData : UserData = {
-            name: user.name ?? "",
-            email: user.email ?? "",
-            image: user.image ?? "",
-            usage: user.usage ?? 0,
-            tierId: user.tierId ?? "",
-            tierExpiry: user.tierExpiry
-        }
-        return userData;
+      if (!user.tierId) {
+        user = await ctx.db.user.update({
+          where: { id: user.id },
+          data: { tierId: "tier-pleb" },
+        });
+      }
+
+      const userData : UserData = {
+          name: user.name ?? "",
+          email: user.email ?? "",
+          image: user.image ?? "",
+          usage: user.usage ?? 0,
+          tierId: user.tierId ?? "tier-pleb",
+          tierExpiry: user.tierExpiry
+      }
+      return userData;
     };
   }),
   setUserFreeTier: protectedProcedure.mutation(async ({ ctx }) => {

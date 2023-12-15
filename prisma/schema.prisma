@@ -66,7 +66,7 @@ model User {
   authorisedFolder Folder[]  @relation("authorisedRelation")
   files            File[]    @relation("ownRelation")
   authorisedFiles  File[]    @relation("authorisedRelation")
-  tierId           String?
+  tierId           String    @default("tier-pleb")
   tierExpiry       DateTime?
   payments         Payment[]
 }

@@ -26,36 +26,16 @@ interface DisplayProps {
   dashboardProps: DashboardProps;
 }
 
-function validateName(name: string) {
-  return name.match(/^[^a-zA-Z0-9]+$/) ? false : true;
-}
-
 export function DisplayFiles(props: {
   dashboardProps: DashboardProps;
   usageBarProps: UsageBarProps;
   notificationProps: NotificationProps;
 }) {
-  const shouldGetFolder = useRef(true);
+  
   const [retry, updateRetry] = useState(0);
   const [currFolderId, updateFolderId] = useState("");
   const [currItems, updateItems] = useState<Array<FileDetail>>([]);
   const [displayFiles, setDisplayFiles] = useState(true);
-
-  const createFolderAPI = api.aws.createFolder.useMutation({
-    onSuccess: () => {
-      getFiles.mutate({ folderId: currFolderId });
-    },
-  });
-  function createFolder() {
-    const folderName = window.prompt("Enter new folder name");
-    if (folderName && validateName(folderName)) {
-      createFolderAPI.mutate({
-        request: { name: folderName, parentId: currFolderId },
-      });
-    } else {
-      console.log("Error: No folder name or name has special characters");
-    }
-  }
 
   const getFiles = api.aws.getFolderContents.useMutation({
     onSuccess: (data) => {
@@ -124,24 +104,7 @@ export function DisplayFiles(props: {
     }
   }
 
-  const renameFileAPI = api.aws.renameFile.useMutation({
-    onSuccess: (data) => {
-      console.log(data);
-      getFiles.mutate({ folderId: currFolderId });
-    },
-  });
-  function renameFile(name: string) {
-    const rename = window.prompt("Enter new file name");
-    if (rename && validateName(rename)) {
-      renameFileAPI.mutate({
-        request: { oldName: name, newName: rename, folderId: currFolderId },
-      });
-    } else {
-      console.log(
-        "Error: No new file name or new file name has special characters",
-      );
-    }
-  }
+  
 
   const downloadFileAPI = api.aws.getDownloadLink.useMutation({
     onSuccess: (data) => {
@@ -171,8 +134,8 @@ export function DisplayFiles(props: {
 
   useEffect(() => {
     console.log("Triggering!");
-    if (shouldGetFolder.current) {
-      shouldGetFolder.current = false;
+    if (props.dashboardProps.shouldGetFolder.current) {
+      props.dashboardProps.shouldGetFolder.current = false;
       getFiles.mutate({ folderId: currFolderId });
     }
   }, [props.dashboardProps.fileListUpdatedCounter]);
@@ -184,6 +147,11 @@ export function DisplayFiles(props: {
       "flex items-center mb-2 \
           justify-between h-14 w-full flex py-2 px-2 border-2 text-amber-700 duration-300\
           rounded-2xl border-amber-800 shadow-xl hover:border-gray-50 hover:bg-amber-700 hover:text-gray-200";
+
+    const itemActiveClassname =
+      "flex items-center mb-2 \
+          justify-between h-14 w-full flex py-2 px-2 border-2 text-amber-700 duration-300\
+          rounded-2xl border-amber-800 shadow-xl border-gray-50 bg-amber-700 text-gray-200";
 
     if (file.objectType == "Folder")
       return (
@@ -211,16 +179,24 @@ export function DisplayFiles(props: {
       );
     else
       return (
-        <div id={file.id} className={itemBaseClassname} key={file.id}>
+        <div id={file.id} className={file.id == props.dashboardProps.fileDetail.id ? itemActiveClassname : itemBaseClassname} key={file.id}>
           <div
             className="h-full w-1/12 cursor-pointer p-1"
-            onDoubleClick={() =>
-              displayProps.dashboardProps.setDialogOpen(
-                !displayProps.dashboardProps.dialogOpen,
-              )
-            }
             onClick={() => {
-              displayProps.dashboardProps.setFileDetail(file);
+              if (file.objectType != "Folder") {
+                if (displayProps.dashboardProps.fileDetail.id != file.id)
+                {
+                  displayProps.dashboardProps.setFileDetail(file);
+                  console.log(document.body.clientWidth)
+                    displayProps.dashboardProps.setDialogOpen(
+                      !displayProps.dashboardProps.dialogOpen,
+                    )
+                }
+                else
+                  displayProps.dashboardProps.setDialogOpen(
+                    !displayProps.dashboardProps.dialogOpen,
+                  )
+              }
             }}
           >
             {file.type?.includes("image") ? (
@@ -233,13 +209,20 @@ export function DisplayFiles(props: {
           </div>
           <div
             className="h-full w-8/12"
-            onDoubleClick={() =>
-              displayProps.dashboardProps.setDialogOpen(
-                !displayProps.dashboardProps.dialogOpen,
-              )
-            }
             onClick={() => {
-              displayProps.dashboardProps.setFileDetail(file);
+              if (file.objectType != "Folder") {
+                if (displayProps.dashboardProps.fileDetail.id != file.id) {
+                  displayProps.dashboardProps.setFileDetail(file);
+                  if (document.body.clientWidth < 768)
+                    displayProps.dashboardProps.setDialogOpen(
+                      !displayProps.dashboardProps.dialogOpen,
+                    )
+                }
+                else
+                  displayProps.dashboardProps.setDialogOpen(
+                    !displayProps.dashboardProps.dialogOpen,
+                  )
+              }
             }}
           >
             <p className="h-full w-full cursor-pointer truncate p-2 font-semibold">
@@ -252,7 +235,11 @@ export function DisplayFiles(props: {
           />
           <PencilSquareIcon
             className="h-full w-1/12 cursor-pointer rounded-2xl py-1"
-            onClick={() => renameFile(file.name)}
+            onClick={() => {
+              props.dashboardProps.setNameChangeFormHeader("Rename " + file.name);
+              props.dashboardProps.setNameChangeFormTarget(file.name);
+              props.dashboardProps.setNameChangeFormOpen(true);
+            }}
           />
           <TrashIcon
             className="h-full w-1/12 cursor-pointer rounded-2xl py-1"
@@ -291,7 +278,7 @@ export function DisplayFiles(props: {
             <DisplayFileList displayProps={displayProps} />
             <button
               onClick={() => {
-                shouldGetFolder.current = true;
+                props.dashboardProps.shouldGetFolder.current = true;
                 props.dashboardProps.setUploadFormOpen(
                   !props.dashboardProps.uploadFormOpen,
                 )
@@ -305,8 +292,10 @@ export function DisplayFiles(props: {
 
             <button
               onClick={() => {
-                shouldGetFolder.current = true;
-                createFolder();
+                props.dashboardProps.shouldGetFolder.current = true;
+                props.dashboardProps.setNameChangeFormHeader("Create a new folder");
+                props.dashboardProps.setNameChangeFormTarget("");
+                props.dashboardProps.setNameChangeFormOpen(true);
               }}
               type="button"
               className="fixed bottom-20 left-5 rounded-full bg-amber-600 p-2 text-white shadow-xl duration-300 hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600 active:opacity-80 lg:left-80"

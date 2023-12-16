@@ -35,7 +35,7 @@ export function DisplayFiles(props: {
   usageBarProps: UsageBarProps;
   notificationProps: NotificationProps;
 }) {
-  const shouldGetFolder = useRef(true);
+  
   const [retry, updateRetry] = useState(0);
   const [currFolderId, updateFolderId] = useState("");
   const [currItems, updateItems] = useState<Array<FileDetail>>([]);
@@ -171,8 +171,8 @@ export function DisplayFiles(props: {
 
   useEffect(() => {
     console.log("Triggering!");
-    if (shouldGetFolder.current) {
-      shouldGetFolder.current = false;
+    if (props.dashboardProps.shouldGetFolder.current) {
+      props.dashboardProps.shouldGetFolder.current = false;
       getFiles.mutate({ folderId: currFolderId });
     }
   }, [props.dashboardProps.fileListUpdatedCounter]);
@@ -291,7 +291,7 @@ export function DisplayFiles(props: {
             <DisplayFileList displayProps={displayProps} />
             <button
               onClick={() => {
-                shouldGetFolder.current = true;
+                props.dashboardProps.shouldGetFolder.current = true;
                 props.dashboardProps.setUploadFormOpen(
                   !props.dashboardProps.uploadFormOpen,
                 )
@@ -305,8 +305,10 @@ export function DisplayFiles(props: {
 
             <button
               onClick={() => {
-                shouldGetFolder.current = true;
-                createFolder();
+                props.dashboardProps.shouldGetFolder.current = true;
+                props.dashboardProps.setNameChangeFormHeader("Create a new folder");
+                props.dashboardProps.setNameChangeFormTarget("");
+                props.dashboardProps.setNameChangeFormOpen(true);
               }}
               type="button"
               className="fixed bottom-20 left-5 rounded-full bg-amber-600 p-2 text-white shadow-xl duration-300 hover:bg-amber-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600 active:opacity-80 lg:left-80"

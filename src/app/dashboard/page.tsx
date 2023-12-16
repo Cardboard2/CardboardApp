@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Spinner } from "../_components/Spinner";
 import Sidebar from "../_components/Sidebar";
 import { DisplayFiles } from "./_components/DisplayFiles";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { defaultFileDetail } from "./_components/FileDetail";
 import { DashboardProps } from "./_components/DashboardProps";
 import { ItemPreview } from "./_components/ItemPreview";
@@ -18,12 +18,18 @@ import { PrimeReactProvider } from 'primereact/api';
 import Notification from "~/app/_components/Notification";
 
 import { NotificationProps } from "../_components/NotificationProps";
+import { NameChangeForm } from "./_components/NameChangeForm";
 
 function DashboardPage() {
   const router = useRouter();
   const session = useSession();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [uploadFormOpen, setUploadFormOpen] = useState(false);
+  const [nameChangeFormOpen, setNameChangeFormOpen] = useState(false);
+  const [nameChangeFormHeader, setNameChangeFormHeader] = useState("");
+  const [nameChangeFormTarget, setNameChangeFormTarget] = useState("");
+  const shouldGetFolder = useRef(true);
+  
   const [fileDetail, setFileDetail] = useState(defaultFileDetail);
   const [fileListUpdatedCounter, updateFileListCounter] = useState(0);
 
@@ -88,6 +94,13 @@ function DashboardPage() {
     setUploadFormOpen: setUploadFormOpen,
     fileListUpdatedCounter: fileListUpdatedCounter,
     updateFileListCounter: updateFileListCounter,
+    nameChangeFormOpen: nameChangeFormOpen,
+    setNameChangeFormOpen: setNameChangeFormOpen,
+    nameChangeFormHeader: nameChangeFormHeader,
+    setNameChangeFormHeader: setNameChangeFormHeader,
+    nameChangeFormTarget: nameChangeFormTarget,
+    setNameChangeFormTarget: setNameChangeFormTarget,
+    shouldGetFolder: shouldGetFolder,
   };
 
   return (
@@ -117,7 +130,7 @@ function DashboardPage() {
           <FileDetailsSideBar dashboardProps={dashboardProps} />
         </div>
       </div>
-
+      <NameChangeForm dashboardProps={dashboardProps}/>
       {notificationShow ? (
           <Notification
             title={notificationTitle}

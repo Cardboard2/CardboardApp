@@ -148,6 +148,11 @@ export function DisplayFiles(props: {
           justify-between h-14 w-full flex py-2 px-2 border-2 text-amber-700 duration-300\
           rounded-2xl border-amber-800 shadow-xl hover:border-gray-50 hover:bg-amber-700 hover:text-gray-200";
 
+    const itemActiveClassname =
+      "flex items-center mb-2 \
+          justify-between h-14 w-full flex py-2 px-2 border-2 text-amber-700 duration-300\
+          rounded-2xl border-amber-800 shadow-xl border-gray-50 bg-amber-700 text-gray-200";
+
     if (file.objectType == "Folder")
       return (
         <div id={file.id} className={itemBaseClassname} key={file.id}>
@@ -174,16 +179,24 @@ export function DisplayFiles(props: {
       );
     else
       return (
-        <div id={file.id} className={itemBaseClassname} key={file.id}>
+        <div id={file.id} className={file.id == props.dashboardProps.fileDetail.id ? itemActiveClassname : itemBaseClassname} key={file.id}>
           <div
             className="h-full w-1/12 cursor-pointer p-1"
-            onDoubleClick={() =>
-              displayProps.dashboardProps.setDialogOpen(
-                !displayProps.dashboardProps.dialogOpen,
-              )
-            }
             onClick={() => {
-              displayProps.dashboardProps.setFileDetail(file);
+              if (file.objectType != "Folder") {
+                if (displayProps.dashboardProps.fileDetail.id != file.id)
+                {
+                  displayProps.dashboardProps.setFileDetail(file);
+                  console.log(document.body.clientWidth)
+                    displayProps.dashboardProps.setDialogOpen(
+                      !displayProps.dashboardProps.dialogOpen,
+                    )
+                }
+                else
+                  displayProps.dashboardProps.setDialogOpen(
+                    !displayProps.dashboardProps.dialogOpen,
+                  )
+              }
             }}
           >
             {file.type?.includes("image") ? (
@@ -196,13 +209,20 @@ export function DisplayFiles(props: {
           </div>
           <div
             className="h-full w-8/12"
-            onDoubleClick={() =>
-              displayProps.dashboardProps.setDialogOpen(
-                !displayProps.dashboardProps.dialogOpen,
-              )
-            }
             onClick={() => {
-              displayProps.dashboardProps.setFileDetail(file);
+              if (file.objectType != "Folder") {
+                if (displayProps.dashboardProps.fileDetail.id != file.id) {
+                  displayProps.dashboardProps.setFileDetail(file);
+                  if (document.body.clientWidth < 768)
+                    displayProps.dashboardProps.setDialogOpen(
+                      !displayProps.dashboardProps.dialogOpen,
+                    )
+                }
+                else
+                  displayProps.dashboardProps.setDialogOpen(
+                    !displayProps.dashboardProps.dialogOpen,
+                  )
+              }
             }}
           >
             <p className="h-full w-full cursor-pointer truncate p-2 font-semibold">

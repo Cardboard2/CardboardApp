@@ -26,10 +26,6 @@ interface DisplayProps {
   dashboardProps: DashboardProps;
 }
 
-function validateName(name: string) {
-  return name.match(/^[^a-zA-Z0-9]+$/) ? false : true;
-}
-
 export function DisplayFiles(props: {
   dashboardProps: DashboardProps;
   usageBarProps: UsageBarProps;
@@ -40,22 +36,6 @@ export function DisplayFiles(props: {
   const [currFolderId, updateFolderId] = useState("");
   const [currItems, updateItems] = useState<Array<FileDetail>>([]);
   const [displayFiles, setDisplayFiles] = useState(true);
-
-  const createFolderAPI = api.aws.createFolder.useMutation({
-    onSuccess: () => {
-      getFiles.mutate({ folderId: currFolderId });
-    },
-  });
-  function createFolder() {
-    const folderName = window.prompt("Enter new folder name");
-    if (folderName && validateName(folderName)) {
-      createFolderAPI.mutate({
-        request: { name: folderName, parentId: currFolderId },
-      });
-    } else {
-      console.log("Error: No folder name or name has special characters");
-    }
-  }
 
   const getFiles = api.aws.getFolderContents.useMutation({
     onSuccess: (data) => {
@@ -124,24 +104,7 @@ export function DisplayFiles(props: {
     }
   }
 
-  const renameFileAPI = api.aws.renameFile.useMutation({
-    onSuccess: (data) => {
-      console.log(data);
-      getFiles.mutate({ folderId: currFolderId });
-    },
-  });
-  function renameFile(name: string) {
-    const rename = window.prompt("Enter new file name");
-    if (rename && validateName(rename)) {
-      renameFileAPI.mutate({
-        request: { oldName: name, newName: rename, folderId: currFolderId },
-      });
-    } else {
-      console.log(
-        "Error: No new file name or new file name has special characters",
-      );
-    }
-  }
+  
 
   const downloadFileAPI = api.aws.getDownloadLink.useMutation({
     onSuccess: (data) => {
@@ -252,7 +215,11 @@ export function DisplayFiles(props: {
           />
           <PencilSquareIcon
             className="h-full w-1/12 cursor-pointer rounded-2xl py-1"
-            onClick={() => renameFile(file.name)}
+            onClick={() => {
+              props.dashboardProps.setNameChangeFormHeader("Rename " + file.name);
+              props.dashboardProps.setNameChangeFormTarget(file.name);
+              props.dashboardProps.setNameChangeFormOpen(true);
+            }}
           />
           <TrashIcon
             className="h-full w-1/12 cursor-pointer rounded-2xl py-1"
